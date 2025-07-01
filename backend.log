@@ -1,0 +1,1497 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] -----------------------< com.desafios:RobotCode >-----------------------
+[INFO] Building RobotCode 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] >>> spring-boot:3.5.0:run (default-cli) > test-compile @ RobotCode >>>
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ RobotCode ---
+[INFO] Copying 1 resource from src/main/resources to target/classes
+[INFO] Copying 0 resource from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.14.0:compile (default-compile) @ RobotCode ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 47 source files with javac [debug parameters release 17] to target/classes
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ RobotCode ---
+[INFO] skip non existing resourceDirectory /Users/jorgegangale/Library/Mobile Documents/com~apple~CloudDocs/Proyectos/robotcode/RobotCode backend/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.14.0:testCompile (default-testCompile) @ RobotCode ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] <<< spring-boot:3.5.0:run (default-cli) < test-compile @ RobotCode <<<
+[INFO] 
+[INFO] 
+[INFO] --- spring-boot:3.5.0:run (default-cli) @ RobotCode ---
+[INFO] Attaching agents: []
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.5.0)
+
+2025-07-01T13:25:48.892-04:00  INFO 8257 --- [RobotCode] [  restartedMain] c.d.robotcode.RobotCodeApplication       : Starting RobotCodeApplication using Java 17.0.15 with PID 8257 (/Users/jorgegangale/Library/Mobile Documents/com~apple~CloudDocs/Proyectos/robotcode/RobotCode backend/target/classes started by jorgegangale in /Users/jorgegangale/Library/Mobile Documents/com~apple~CloudDocs/Proyectos/robotcode/RobotCode backend)
+2025-07-01T13:25:48.893-04:00  INFO 8257 --- [RobotCode] [  restartedMain] c.d.robotcode.RobotCodeApplication       : No active profile set, falling back to 1 default profile: "default"
+2025-07-01T13:25:48.906-04:00  INFO 8257 --- [RobotCode] [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2025-07-01T13:25:48.906-04:00  INFO 8257 --- [RobotCode] [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2025-07-01T13:25:49.117-04:00  INFO 8257 --- [RobotCode] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-07-01T13:25:49.137-04:00  INFO 8257 --- [RobotCode] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 17 ms. Found 6 JPA repository interfaces.
+2025-07-01T13:25:49.313-04:00  INFO 8257 --- [RobotCode] [  restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-07-01T13:25:49.319-04:00  INFO 8257 --- [RobotCode] [  restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-07-01T13:25:49.319-04:00  INFO 8257 --- [RobotCode] [  restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.41]
+2025-07-01T13:25:49.330-04:00  INFO 8257 --- [RobotCode] [  restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-07-01T13:25:49.330-04:00  INFO 8257 --- [RobotCode] [  restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 424 ms
+2025-07-01T13:25:49.379-04:00  INFO 8257 --- [RobotCode] [  restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-07-01T13:25:49.395-04:00  INFO 8257 --- [RobotCode] [  restartedMain] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.15.Final
+2025-07-01T13:25:49.404-04:00  INFO 8257 --- [RobotCode] [  restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-07-01T13:25:49.482-04:00  INFO 8257 --- [RobotCode] [  restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-07-01T13:25:49.489-04:00  INFO 8257 --- [RobotCode] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-07-01T13:25:49.555-04:00  INFO 8257 --- [RobotCode] [  restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@3496b71a
+2025-07-01T13:25:49.556-04:00  INFO 8257 --- [RobotCode] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-07-01T13:25:49.569-04:00  WARN 8257 --- [RobotCode] [  restartedMain] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-07-01T13:25:49.576-04:00  INFO 8257 --- [RobotCode] [  restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 15.13
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-07-01T13:25:49.841-04:00  INFO 8257 --- [RobotCode] [  restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-07-01T13:25:49.844-04:00 DEBUG 8257 --- [RobotCode] [  restartedMain] org.hibernate.SQL                        : 
+    set client_min_messages = WARNING
+Hibernate: 
+    set client_min_messages = WARNING
+2025-07-01T13:25:49.846-04:00 DEBUG 8257 --- [RobotCode] [  restartedMain] org.hibernate.SQL                        : 
+    alter table if exists problemas 
+       drop constraint if exists FK734g8qk965lgfaawmemsx7quq
+Hibernate: 
+    alter table if exists problemas 
+       drop constraint if exists FK734g8qk965lgfaawmemsx7quq
+2025-07-01T13:25:49.847-04:00 DEBUG 8257 --- [RobotCode] [  restartedMain] org.hibernate.SQL                        : 
+    alter table if exists progreso_usuario 
+       drop constraint if exists FKk8nu4vuk3au5efqu76gtapa2j
+Hibernate: 
+    alter table if exists progreso_usuario 
+       drop constraint if exists FKk8nu4vuk3au5efqu76gtapa2j
+2025-07-01T13:25:49.848-04:00 DEBUG 8257 --- [RobotCode] [  restartedMain] org.hibernate.SQL                        : 
+    alter table if exists progreso_usuario 
+       drop constraint if exists FK31f8nnpf2w40at3hwrljvcurw
+Hibernate: 
+    alter table if exists progreso_usuario 
+       drop constraint if exists FK31f8nnpf2w40at3hwrljvcurw
+2025-07-01T13:25:49.848-04:00 DEBUG 8257 --- [RobotCode] [  restartedMain] org.hibernate.SQL                        : 
+    alter table if exists ranking 
+       drop constraint if exists FKdk59vfgtvw0qr12a4y9fh5xwn
+Hibernate: 
+    alter table if exists ranking 
+       drop constraint if exists FKdk59vfgtvw0qr12a4y9fh5xwn
+2025-07-01T13:25:49.849-04:00 DEBUG 8257 --- [RobotCode] [  restartedMain] org.hibernate.SQL                        : 
+    drop table if exists email_verification_tokens cascade
+Hibernate: 
+    drop table if exists email_verification_tokens cascade
+2025-07-01T13:25:49.850-04:00 DEBUG 8257 --- [RobotCode] [  restartedMain] org.hibernate.SQL                        : 
+    drop table if exists problemas cascade
+Hibernate: 
+    drop table if exists problemas cascade
+2025-07-01T13:25:49.850-04:00 DEBUG 8257 --- [RobotCode] [  restartedMain] org.hibernate.SQL                        : 
+    drop table if exists progreso_usuario cascade
+Hibernate: 
+    drop table if exists progreso_usuario cascade
+2025-07-01T13:25:49.850-04:00 DEBUG 8257 --- [RobotCode] [  restartedMain] org.hibernate.SQL                        : 
+    drop table if exists ranking cascade
+Hibernate: 
+    drop table if exists ranking cascade
+2025-07-01T13:25:49.851-04:00 DEBUG 8257 --- [RobotCode] [  restartedMain] org.hibernate.SQL                        : 
+    drop table if exists temas cascade
+Hibernate: 
+    drop table if exists temas cascade
+2025-07-01T13:25:49.851-04:00 DEBUG 8257 --- [RobotCode] [  restartedMain] org.hibernate.SQL                        : 
+    drop table if exists usuarios cascade
+Hibernate: 
+    drop table if exists usuarios cascade
+2025-07-01T13:25:49.853-04:00 DEBUG 8257 --- [RobotCode] [  restartedMain] org.hibernate.SQL                        : 
+    create table email_verification_tokens (
+        is_expired boolean not null,
+        is_used boolean not null,
+        created_at timestamp(6) not null,
+        expires_at timestamp(6) not null,
+        id bigint generated by default as identity,
+        email varchar(255) not null,
+        password_hash varchar(255) not null,
+        token varchar(255) not null unique,
+        username varchar(255) not null,
+        primary key (id)
+    )
+Hibernate: 
+    create table email_verification_tokens (
+        is_expired boolean not null,
+        is_used boolean not null,
+        created_at timestamp(6) not null,
+        expires_at timestamp(6) not null,
+        id bigint generated by default as identity,
+        email varchar(255) not null,
+        password_hash varchar(255) not null,
+        token varchar(255) not null unique,
+        username varchar(255) not null,
+        primary key (id)
+    )
+2025-07-01T13:25:49.869-04:00 DEBUG 8257 --- [RobotCode] [  restartedMain] org.hibernate.SQL                        : 
+    create table problemas (
+        id bigint not null,
+        tema_id bigint,
+        codigo_inicial TEXT,
+        descripcion TEXT,
+        dificultad varchar(255) not null check (dificultad in ('EASY','INTERMEDIATE','HARD')),
+        solucion_correcta TEXT,
+        test_cases_json TEXT,
+        titulo varchar(255) not null,
+        primary key (id)
+    )
+Hibernate: 
+    create table problemas (
+        id bigint not null,
+        tema_id bigint,
+        codigo_inicial TEXT,
+        descripcion TEXT,
+        dificultad varchar(255) not null check (dificultad in ('EASY','INTERMEDIATE','HARD')),
+        solucion_correcta TEXT,
+        test_cases_json TEXT,
+        titulo varchar(255) not null,
+        primary key (id)
+    )
+2025-07-01T13:25:49.879-04:00 DEBUG 8257 --- [RobotCode] [  restartedMain] org.hibernate.SQL                        : 
+    create table progreso_usuario (
+        intentos integer not null,
+        id bigint generated by default as identity,
+        problema_id bigint,
+        ultima_modificacion timestamp(6),
+        usuario_id bigint,
+        estado varchar(255) check (estado in ('NOT_STARTED','IN_PROGRESS','SOLVED')),
+        primary key (id)
+    )
+Hibernate: 
+    create table progreso_usuario (
+        intentos integer not null,
+        id bigint generated by default as identity,
+        problema_id bigint,
+        ultima_modificacion timestamp(6),
+        usuario_id bigint,
+        estado varchar(255) check (estado in ('NOT_STARTED','IN_PROGRESS','SOLVED')),
+        primary key (id)
+    )
+2025-07-01T13:25:49.882-04:00 DEBUG 8257 --- [RobotCode] [  restartedMain] org.hibernate.SQL                        : 
+    create table ranking (
+        puntaje integer not null,
+        fecha_actualizacion timestamp(6),
+        id bigint generated by default as identity,
+        usuario_id bigint unique,
+        primary key (id)
+    )
+Hibernate: 
+    create table ranking (
+        puntaje integer not null,
+        fecha_actualizacion timestamp(6),
+        id bigint generated by default as identity,
+        usuario_id bigint unique,
+        primary key (id)
+    )
+2025-07-01T13:25:49.886-04:00 DEBUG 8257 --- [RobotCode] [  restartedMain] org.hibernate.SQL                        : 
+    create table temas (
+        id bigint generated by default as identity,
+        descripcion varchar(255),
+        dificultad varchar(255) check (dificultad in ('EASY','INTERMEDIATE','HARD')),
+        nombre varchar(255) not null,
+        primary key (id)
+    )
+Hibernate: 
+    create table temas (
+        id bigint generated by default as identity,
+        descripcion varchar(255),
+        dificultad varchar(255) check (dificultad in ('EASY','INTERMEDIATE','HARD')),
+        nombre varchar(255) not null,
+        primary key (id)
+    )
+2025-07-01T13:25:49.889-04:00 DEBUG 8257 --- [RobotCode] [  restartedMain] org.hibernate.SQL                        : 
+    create table usuarios (
+        email_verified boolean not null,
+        puntaje integer not null,
+        fecha_registro timestamp(6),
+        id bigint generated by default as identity,
+        password varchar(60) not null,
+        email varchar(255) not null unique,
+        rol varchar(255) check (rol in ('USER','ADMIN')),
+        username varchar(255) not null unique,
+        primary key (id)
+    )
+Hibernate: 
+    create table usuarios (
+        email_verified boolean not null,
+        puntaje integer not null,
+        fecha_registro timestamp(6),
+        id bigint generated by default as identity,
+        password varchar(60) not null,
+        email varchar(255) not null unique,
+        rol varchar(255) check (rol in ('USER','ADMIN')),
+        username varchar(255) not null unique,
+        primary key (id)
+    )
+2025-07-01T13:25:49.897-04:00 DEBUG 8257 --- [RobotCode] [  restartedMain] org.hibernate.SQL                        : 
+    alter table if exists problemas 
+       add constraint FK734g8qk965lgfaawmemsx7quq 
+       foreign key (tema_id) 
+       references temas
+Hibernate: 
+    alter table if exists problemas 
+       add constraint FK734g8qk965lgfaawmemsx7quq 
+       foreign key (tema_id) 
+       references temas
+2025-07-01T13:25:49.899-04:00 DEBUG 8257 --- [RobotCode] [  restartedMain] org.hibernate.SQL                        : 
+    alter table if exists progreso_usuario 
+       add constraint FKk8nu4vuk3au5efqu76gtapa2j 
+       foreign key (problema_id) 
+       references problemas
+Hibernate: 
+    alter table if exists progreso_usuario 
+       add constraint FKk8nu4vuk3au5efqu76gtapa2j 
+       foreign key (problema_id) 
+       references problemas
+2025-07-01T13:25:49.899-04:00 DEBUG 8257 --- [RobotCode] [  restartedMain] org.hibernate.SQL                        : 
+    alter table if exists progreso_usuario 
+       add constraint FK31f8nnpf2w40at3hwrljvcurw 
+       foreign key (usuario_id) 
+       references usuarios
+Hibernate: 
+    alter table if exists progreso_usuario 
+       add constraint FK31f8nnpf2w40at3hwrljvcurw 
+       foreign key (usuario_id) 
+       references usuarios
+2025-07-01T13:25:49.900-04:00 DEBUG 8257 --- [RobotCode] [  restartedMain] org.hibernate.SQL                        : 
+    alter table if exists ranking 
+       add constraint FKdk59vfgtvw0qr12a4y9fh5xwn 
+       foreign key (usuario_id) 
+       references usuarios
+Hibernate: 
+    alter table if exists ranking 
+       add constraint FKdk59vfgtvw0qr12a4y9fh5xwn 
+       foreign key (usuario_id) 
+       references usuarios
+2025-07-01T13:25:49.902-04:00  INFO 8257 --- [RobotCode] [  restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-07-01T13:25:49.996-04:00  INFO 8257 --- [RobotCode] [  restartedMain] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-07-01T13:25:50.177-04:00  WARN 8257 --- [RobotCode] [  restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-07-01T13:25:50.187-04:00  WARN 8257 --- [RobotCode] [  restartedMain] .s.s.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: f30b2c51-3713-4b62-b6f3-f17f840b0593
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2025-07-01T13:25:50.189-04:00  INFO 8257 --- [RobotCode] [  restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2025-07-01T13:25:50.328-04:00  INFO 8257 --- [RobotCode] [  restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2025-07-01T13:25:50.337-04:00  INFO 8257 --- [RobotCode] [  restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2025-07-01T13:25:50.341-04:00  INFO 8257 --- [RobotCode] [  restartedMain] c.d.robotcode.RobotCodeApplication       : Started RobotCodeApplication in 1.571 seconds (process running for 1.698)
+2025-07-01T13:25:50.356-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+Hibernate: 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+2025-07-01T13:25:50.364-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    delete 
+    from
+        email_verification_tokens evt1_0 
+    where
+        evt1_0.is_used=true 
+        or evt1_0.is_expired=true 
+        or evt1_0.expires_at<?
+Hibernate: 
+    delete 
+    from
+        email_verification_tokens evt1_0 
+    where
+        evt1_0.is_used=true 
+        or evt1_0.is_expired=true 
+        or evt1_0.expires_at<?
+2025-07-01T13:26:34.319-04:00  INFO 8257 --- [RobotCode] [nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-07-01T13:26:34.320-04:00  INFO 8257 --- [RobotCode] [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2025-07-01T13:26:34.325-04:00  INFO 8257 --- [RobotCode] [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 5 ms
+2025-07-01T13:26:34.409-04:00 DEBUG 8257 --- [RobotCode] [nio-8080-exec-1] org.hibernate.SQL                        : 
+    select
+        u1_0.id,
+        u1_0.email,
+        u1_0.email_verified,
+        u1_0.fecha_registro,
+        u1_0.password,
+        u1_0.puntaje,
+        u1_0.rol,
+        u1_0.username 
+    from
+        usuarios u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.email,
+        u1_0.email_verified,
+        u1_0.fecha_registro,
+        u1_0.password,
+        u1_0.puntaje,
+        u1_0.rol,
+        u1_0.username 
+    from
+        usuarios u1_0 
+    where
+        u1_0.email=?
+2025-07-01T13:26:34.421-04:00 DEBUG 8257 --- [RobotCode] [nio-8080-exec-1] org.hibernate.SQL                        : 
+    select
+        u1_0.id,
+        u1_0.email,
+        u1_0.email_verified,
+        u1_0.fecha_registro,
+        u1_0.password,
+        u1_0.puntaje,
+        u1_0.rol,
+        u1_0.username 
+    from
+        usuarios u1_0 
+    where
+        u1_0.username=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.email,
+        u1_0.email_verified,
+        u1_0.fecha_registro,
+        u1_0.password,
+        u1_0.puntaje,
+        u1_0.rol,
+        u1_0.username 
+    from
+        usuarios u1_0 
+    where
+        u1_0.username=?
+2025-07-01T13:26:34.423-04:00 DEBUG 8257 --- [RobotCode] [nio-8080-exec-1] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.email=? 
+        and evt1_0.is_used=false
+Hibernate: 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.email=? 
+        and evt1_0.is_used=false
+2025-07-01T13:26:34.496-04:00 DEBUG 8257 --- [RobotCode] [nio-8080-exec-1] org.hibernate.SQL                        : 
+    insert 
+    into
+        email_verification_tokens
+        (created_at, email, expires_at, is_expired, is_used, password_hash, token, username) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        email_verification_tokens
+        (created_at, email, expires_at, is_expired, is_used, password_hash, token, username) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-01T13:26:34.507-04:00  INFO 8257 --- [RobotCode] [nio-8080-exec-1] c.d.robotcode.service.EmailService       : === EMAIL DE VERIFICACIÓN ===
+2025-07-01T13:26:34.507-04:00  INFO 8257 --- [RobotCode] [nio-8080-exec-1] c.d.robotcode.service.EmailService       : Para: jorge.gangale@mtn.cl
+2025-07-01T13:26:34.507-04:00  INFO 8257 --- [RobotCode] [nio-8080-exec-1] c.d.robotcode.service.EmailService       : Usuario: UsuarioTest
+2025-07-01T13:26:34.508-04:00  INFO 8257 --- [RobotCode] [nio-8080-exec-1] c.d.robotcode.service.EmailService       : CÓDIGO DE VERIFICACIÓN: 790014
+2025-07-01T13:26:34.508-04:00  INFO 8257 --- [RobotCode] [nio-8080-exec-1] c.d.robotcode.service.EmailService       : ============================
+2025-07-01T13:26:37.175-04:00  INFO 8257 --- [RobotCode] [nio-8080-exec-1] c.d.robotcode.service.EmailService       : Verification email sent successfully to: jorge.gangale@mtn.cl
+2025-07-01T13:26:37.175-04:00  INFO 8257 --- [RobotCode] [nio-8080-exec-1] c.d.r.service.EmailVerificationService   : Verification email sent for user: UsuarioTest with email: jorge.gangale@mtn.cl
+2025-07-01T13:26:37.185-04:00  INFO 8257 --- [RobotCode] [nio-8080-exec-1] c.d.robotcode.controller.AuthController  : Registration initiated for user: UsuarioTest with email: jorge.gangale@mtn.cl
+2025-07-01T13:27:00.649-04:00 DEBUG 8257 --- [RobotCode] [nio-8080-exec-2] org.hibernate.SQL                        : 
+    select
+        evt1_0.id,
+        evt1_0.created_at,
+        evt1_0.email,
+        evt1_0.expires_at,
+        evt1_0.is_expired,
+        evt1_0.is_used,
+        evt1_0.password_hash,
+        evt1_0.token,
+        evt1_0.username 
+    from
+        email_verification_tokens evt1_0 
+    where
+        evt1_0.email=? 
+        and evt1_0.token=?
+Hibernate: 
+    select
+        evt1_0.id,
+        evt1_0.created_at,
+        evt1_0.email,
+        evt1_0.expires_at,
+        evt1_0.is_expired,
+        evt1_0.is_used,
+        evt1_0.password_hash,
+        evt1_0.token,
+        evt1_0.username 
+    from
+        email_verification_tokens evt1_0 
+    where
+        evt1_0.email=? 
+        and evt1_0.token=?
+2025-07-01T13:27:00.655-04:00 DEBUG 8257 --- [RobotCode] [nio-8080-exec-2] org.hibernate.SQL                        : 
+    select
+        u1_0.id,
+        u1_0.email,
+        u1_0.email_verified,
+        u1_0.fecha_registro,
+        u1_0.password,
+        u1_0.puntaje,
+        u1_0.rol,
+        u1_0.username 
+    from
+        usuarios u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.email,
+        u1_0.email_verified,
+        u1_0.fecha_registro,
+        u1_0.password,
+        u1_0.puntaje,
+        u1_0.rol,
+        u1_0.username 
+    from
+        usuarios u1_0 
+    where
+        u1_0.email=?
+2025-07-01T13:27:00.656-04:00 DEBUG 8257 --- [RobotCode] [nio-8080-exec-2] org.hibernate.SQL                        : 
+    select
+        u1_0.id,
+        u1_0.email,
+        u1_0.email_verified,
+        u1_0.fecha_registro,
+        u1_0.password,
+        u1_0.puntaje,
+        u1_0.rol,
+        u1_0.username 
+    from
+        usuarios u1_0 
+    where
+        u1_0.username=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.email,
+        u1_0.email_verified,
+        u1_0.fecha_registro,
+        u1_0.password,
+        u1_0.puntaje,
+        u1_0.rol,
+        u1_0.username 
+    from
+        usuarios u1_0 
+    where
+        u1_0.username=?
+PrePersist - Usuario: UsuarioTest, Puntaje: 0
+2025-07-01T13:27:00.657-04:00 DEBUG 8257 --- [RobotCode] [nio-8080-exec-2] org.hibernate.SQL                        : 
+    insert 
+    into
+        usuarios
+        (email, email_verified, fecha_registro, password, puntaje, rol, username) 
+    values
+        (?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        usuarios
+        (email, email_verified, fecha_registro, password, puntaje, rol, username) 
+    values
+        (?, ?, ?, ?, ?, ?, ?)
+2025-07-01T13:27:00.663-04:00  INFO 8257 --- [RobotCode] [nio-8080-exec-2] c.d.robotcode.service.EmailService       : === EMAIL DE BIENVENIDA ===
+2025-07-01T13:27:00.663-04:00  INFO 8257 --- [RobotCode] [nio-8080-exec-2] c.d.robotcode.service.EmailService       : Para: jorge.gangale@mtn.cl
+2025-07-01T13:27:00.663-04:00  INFO 8257 --- [RobotCode] [nio-8080-exec-2] c.d.robotcode.service.EmailService       : Usuario: UsuarioTest
+2025-07-01T13:27:00.663-04:00  INFO 8257 --- [RobotCode] [nio-8080-exec-2] c.d.robotcode.service.EmailService       : Cuenta verificada exitosamente!
+2025-07-01T13:27:00.663-04:00  INFO 8257 --- [RobotCode] [nio-8080-exec-2] c.d.robotcode.service.EmailService       : ==========================
+2025-07-01T13:27:03.369-04:00  INFO 8257 --- [RobotCode] [nio-8080-exec-2] c.d.robotcode.service.EmailService       : Welcome email sent successfully to: jorge.gangale@mtn.cl
+2025-07-01T13:27:03.369-04:00  INFO 8257 --- [RobotCode] [nio-8080-exec-2] c.d.r.service.EmailVerificationService   : User registration completed successfully for: UsuarioTest with email: jorge.gangale@mtn.cl
+2025-07-01T13:27:03.377-04:00 DEBUG 8257 --- [RobotCode] [nio-8080-exec-2] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens 
+    set
+        created_at=?,
+        email=?,
+        expires_at=?,
+        is_expired=?,
+        is_used=?,
+        password_hash=?,
+        token=?,
+        username=? 
+    where
+        id=?
+Hibernate: 
+    update
+        email_verification_tokens 
+    set
+        created_at=?,
+        email=?,
+        expires_at=?,
+        is_expired=?,
+        is_used=?,
+        password_hash=?,
+        token=?,
+        username=? 
+    where
+        id=?
+2025-07-01T13:27:03.382-04:00  INFO 8257 --- [RobotCode] [nio-8080-exec-2] c.d.robotcode.controller.AuthController  : Email verification successful for user: UsuarioTest with email: jorge.gangale@mtn.cl
+2025-07-01T13:28:03.421-04:00 DEBUG 8257 --- [RobotCode] [nio-8080-exec-4] org.hibernate.SQL                        : 
+    select
+        u1_0.id,
+        u1_0.email,
+        u1_0.email_verified,
+        u1_0.fecha_registro,
+        u1_0.password,
+        u1_0.puntaje,
+        u1_0.rol,
+        u1_0.username 
+    from
+        usuarios u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.email,
+        u1_0.email_verified,
+        u1_0.fecha_registro,
+        u1_0.password,
+        u1_0.puntaje,
+        u1_0.rol,
+        u1_0.username 
+    from
+        usuarios u1_0 
+    where
+        u1_0.email=?
+2025-07-01T13:28:03.433-04:00  WARN 8257 --- [RobotCode] [nio-8080-exec-4] c.d.robotcode.controller.AuthController  : Registration failed for email jorge.gangale@mtn.cl: Ya existe una cuenta con este correo electrónico
+2025-07-01T13:28:17.763-04:00 DEBUG 8257 --- [RobotCode] [nio-8080-exec-6] org.hibernate.SQL                        : 
+    select
+        u1_0.id,
+        u1_0.email,
+        u1_0.email_verified,
+        u1_0.fecha_registro,
+        u1_0.password,
+        u1_0.puntaje,
+        u1_0.rol,
+        u1_0.username 
+    from
+        usuarios u1_0 
+    where
+        u1_0.username=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.email,
+        u1_0.email_verified,
+        u1_0.fecha_registro,
+        u1_0.password,
+        u1_0.puntaje,
+        u1_0.rol,
+        u1_0.username 
+    from
+        usuarios u1_0 
+    where
+        u1_0.username=?
+2025-07-01T13:28:32.219-04:00 DEBUG 8257 --- [RobotCode] [nio-8080-exec-7] org.hibernate.SQL                        : 
+    select
+        u1_0.id,
+        u1_0.email,
+        u1_0.email_verified,
+        u1_0.fecha_registro,
+        u1_0.password,
+        u1_0.puntaje,
+        u1_0.rol,
+        u1_0.username 
+    from
+        usuarios u1_0 
+    where
+        u1_0.username=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.email,
+        u1_0.email_verified,
+        u1_0.fecha_registro,
+        u1_0.password,
+        u1_0.puntaje,
+        u1_0.rol,
+        u1_0.username 
+    from
+        usuarios u1_0 
+    where
+        u1_0.username=?
+2025-07-01T13:28:33.798-04:00 DEBUG 8257 --- [RobotCode] [nio-8080-exec-8] org.hibernate.SQL                        : 
+    select
+        u1_0.id,
+        u1_0.email,
+        u1_0.email_verified,
+        u1_0.fecha_registro,
+        u1_0.password,
+        u1_0.puntaje,
+        u1_0.rol,
+        u1_0.username 
+    from
+        usuarios u1_0 
+    where
+        u1_0.username=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.email,
+        u1_0.email_verified,
+        u1_0.fecha_registro,
+        u1_0.password,
+        u1_0.puntaje,
+        u1_0.rol,
+        u1_0.username 
+    from
+        usuarios u1_0 
+    where
+        u1_0.username=?
+2025-07-01T13:28:57.244-04:00 DEBUG 8257 --- [RobotCode] [nio-8080-exec-9] org.hibernate.SQL                        : 
+    select
+        u1_0.id,
+        u1_0.email,
+        u1_0.email_verified,
+        u1_0.fecha_registro,
+        u1_0.password,
+        u1_0.puntaje,
+        u1_0.rol,
+        u1_0.username 
+    from
+        usuarios u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.email,
+        u1_0.email_verified,
+        u1_0.fecha_registro,
+        u1_0.password,
+        u1_0.puntaje,
+        u1_0.rol,
+        u1_0.username 
+    from
+        usuarios u1_0 
+    where
+        u1_0.email=?
+2025-07-01T13:28:57.248-04:00  WARN 8257 --- [RobotCode] [nio-8080-exec-9] c.d.robotcode.controller.AuthController  : Registration failed for email jorge.gangale@mtn.cl: Ya existe una cuenta con este correo electrónico
+2025-07-01T13:29:16.054-04:00 DEBUG 8257 --- [RobotCode] [io-8080-exec-10] org.hibernate.SQL                        : 
+    select
+        u1_0.id,
+        u1_0.email,
+        u1_0.email_verified,
+        u1_0.fecha_registro,
+        u1_0.password,
+        u1_0.puntaje,
+        u1_0.rol,
+        u1_0.username 
+    from
+        usuarios u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.email,
+        u1_0.email_verified,
+        u1_0.fecha_registro,
+        u1_0.password,
+        u1_0.puntaje,
+        u1_0.rol,
+        u1_0.username 
+    from
+        usuarios u1_0 
+    where
+        u1_0.email=?
+2025-07-01T13:29:16.057-04:00 DEBUG 8257 --- [RobotCode] [io-8080-exec-10] org.hibernate.SQL                        : 
+    select
+        u1_0.id,
+        u1_0.email,
+        u1_0.email_verified,
+        u1_0.fecha_registro,
+        u1_0.password,
+        u1_0.puntaje,
+        u1_0.rol,
+        u1_0.username 
+    from
+        usuarios u1_0 
+    where
+        u1_0.username=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.email,
+        u1_0.email_verified,
+        u1_0.fecha_registro,
+        u1_0.password,
+        u1_0.puntaje,
+        u1_0.rol,
+        u1_0.username 
+    from
+        usuarios u1_0 
+    where
+        u1_0.username=?
+2025-07-01T13:29:16.064-04:00 DEBUG 8257 --- [RobotCode] [io-8080-exec-10] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.email=? 
+        and evt1_0.is_used=false
+Hibernate: 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.email=? 
+        and evt1_0.is_used=false
+2025-07-01T13:29:16.161-04:00 DEBUG 8257 --- [RobotCode] [io-8080-exec-10] org.hibernate.SQL                        : 
+    insert 
+    into
+        email_verification_tokens
+        (created_at, email, expires_at, is_expired, is_used, password_hash, token, username) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        email_verification_tokens
+        (created_at, email, expires_at, is_expired, is_used, password_hash, token, username) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-01T13:29:16.165-04:00  INFO 8257 --- [RobotCode] [io-8080-exec-10] c.d.robotcode.service.EmailService       : === EMAIL DE VERIFICACIÓN ===
+2025-07-01T13:29:16.165-04:00  INFO 8257 --- [RobotCode] [io-8080-exec-10] c.d.robotcode.service.EmailService       : Para: alejandra.flores@mtn.cl
+2025-07-01T13:29:16.165-04:00  INFO 8257 --- [RobotCode] [io-8080-exec-10] c.d.robotcode.service.EmailService       : Usuario: jorge
+2025-07-01T13:29:16.165-04:00  INFO 8257 --- [RobotCode] [io-8080-exec-10] c.d.robotcode.service.EmailService       : CÓDIGO DE VERIFICACIÓN: 318597
+2025-07-01T13:29:16.165-04:00  INFO 8257 --- [RobotCode] [io-8080-exec-10] c.d.robotcode.service.EmailService       : ============================
+2025-07-01T13:29:19.780-04:00  INFO 8257 --- [RobotCode] [io-8080-exec-10] c.d.robotcode.service.EmailService       : Verification email sent successfully to: alejandra.flores@mtn.cl
+2025-07-01T13:29:19.780-04:00  INFO 8257 --- [RobotCode] [io-8080-exec-10] c.d.r.service.EmailVerificationService   : Verification email sent for user: jorge with email: alejandra.flores@mtn.cl
+2025-07-01T13:29:19.787-04:00  INFO 8257 --- [RobotCode] [io-8080-exec-10] c.d.robotcode.controller.AuthController  : Registration initiated for user: jorge with email: alejandra.flores@mtn.cl
+2025-07-01T13:29:44.354-04:00 DEBUG 8257 --- [RobotCode] [nio-8080-exec-1] org.hibernate.SQL                        : 
+    select
+        evt1_0.id,
+        evt1_0.created_at,
+        evt1_0.email,
+        evt1_0.expires_at,
+        evt1_0.is_expired,
+        evt1_0.is_used,
+        evt1_0.password_hash,
+        evt1_0.token,
+        evt1_0.username 
+    from
+        email_verification_tokens evt1_0 
+    where
+        evt1_0.email=? 
+        and evt1_0.token=?
+Hibernate: 
+    select
+        evt1_0.id,
+        evt1_0.created_at,
+        evt1_0.email,
+        evt1_0.expires_at,
+        evt1_0.is_expired,
+        evt1_0.is_used,
+        evt1_0.password_hash,
+        evt1_0.token,
+        evt1_0.username 
+    from
+        email_verification_tokens evt1_0 
+    where
+        evt1_0.email=? 
+        and evt1_0.token=?
+2025-07-01T13:29:44.359-04:00 DEBUG 8257 --- [RobotCode] [nio-8080-exec-1] org.hibernate.SQL                        : 
+    select
+        u1_0.id,
+        u1_0.email,
+        u1_0.email_verified,
+        u1_0.fecha_registro,
+        u1_0.password,
+        u1_0.puntaje,
+        u1_0.rol,
+        u1_0.username 
+    from
+        usuarios u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.email,
+        u1_0.email_verified,
+        u1_0.fecha_registro,
+        u1_0.password,
+        u1_0.puntaje,
+        u1_0.rol,
+        u1_0.username 
+    from
+        usuarios u1_0 
+    where
+        u1_0.email=?
+2025-07-01T13:29:44.363-04:00 DEBUG 8257 --- [RobotCode] [nio-8080-exec-1] org.hibernate.SQL                        : 
+    select
+        u1_0.id,
+        u1_0.email,
+        u1_0.email_verified,
+        u1_0.fecha_registro,
+        u1_0.password,
+        u1_0.puntaje,
+        u1_0.rol,
+        u1_0.username 
+    from
+        usuarios u1_0 
+    where
+        u1_0.username=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.email,
+        u1_0.email_verified,
+        u1_0.fecha_registro,
+        u1_0.password,
+        u1_0.puntaje,
+        u1_0.rol,
+        u1_0.username 
+    from
+        usuarios u1_0 
+    where
+        u1_0.username=?
+PrePersist - Usuario: jorge, Puntaje: 0
+2025-07-01T13:29:44.366-04:00 DEBUG 8257 --- [RobotCode] [nio-8080-exec-1] org.hibernate.SQL                        : 
+    insert 
+    into
+        usuarios
+        (email, email_verified, fecha_registro, password, puntaje, rol, username) 
+    values
+        (?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        usuarios
+        (email, email_verified, fecha_registro, password, puntaje, rol, username) 
+    values
+        (?, ?, ?, ?, ?, ?, ?)
+2025-07-01T13:29:44.369-04:00  INFO 8257 --- [RobotCode] [nio-8080-exec-1] c.d.robotcode.service.EmailService       : === EMAIL DE BIENVENIDA ===
+2025-07-01T13:29:44.369-04:00  INFO 8257 --- [RobotCode] [nio-8080-exec-1] c.d.robotcode.service.EmailService       : Para: alejandra.flores@mtn.cl
+2025-07-01T13:29:44.369-04:00  INFO 8257 --- [RobotCode] [nio-8080-exec-1] c.d.robotcode.service.EmailService       : Usuario: jorge
+2025-07-01T13:29:44.369-04:00  INFO 8257 --- [RobotCode] [nio-8080-exec-1] c.d.robotcode.service.EmailService       : Cuenta verificada exitosamente!
+2025-07-01T13:29:44.369-04:00  INFO 8257 --- [RobotCode] [nio-8080-exec-1] c.d.robotcode.service.EmailService       : ==========================
+2025-07-01T13:29:47.035-04:00  INFO 8257 --- [RobotCode] [nio-8080-exec-1] c.d.robotcode.service.EmailService       : Welcome email sent successfully to: alejandra.flores@mtn.cl
+2025-07-01T13:29:47.036-04:00  INFO 8257 --- [RobotCode] [nio-8080-exec-1] c.d.r.service.EmailVerificationService   : User registration completed successfully for: jorge with email: alejandra.flores@mtn.cl
+2025-07-01T13:29:47.038-04:00 DEBUG 8257 --- [RobotCode] [nio-8080-exec-1] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens 
+    set
+        created_at=?,
+        email=?,
+        expires_at=?,
+        is_expired=?,
+        is_used=?,
+        password_hash=?,
+        token=?,
+        username=? 
+    where
+        id=?
+Hibernate: 
+    update
+        email_verification_tokens 
+    set
+        created_at=?,
+        email=?,
+        expires_at=?,
+        is_expired=?,
+        is_used=?,
+        password_hash=?,
+        token=?,
+        username=? 
+    where
+        id=?
+2025-07-01T13:29:47.043-04:00  INFO 8257 --- [RobotCode] [nio-8080-exec-1] c.d.robotcode.controller.AuthController  : Email verification successful for user: jorge with email: alejandra.flores@mtn.cl
+2025-07-01T13:30:01.842-04:00 DEBUG 8257 --- [RobotCode] [nio-8080-exec-2] org.hibernate.SQL                        : 
+    select
+        u1_0.id,
+        u1_0.email,
+        u1_0.email_verified,
+        u1_0.fecha_registro,
+        u1_0.password,
+        u1_0.puntaje,
+        u1_0.rol,
+        u1_0.username 
+    from
+        usuarios u1_0 
+    where
+        u1_0.username=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.email,
+        u1_0.email_verified,
+        u1_0.fecha_registro,
+        u1_0.password,
+        u1_0.puntaje,
+        u1_0.rol,
+        u1_0.username 
+    from
+        usuarios u1_0 
+    where
+        u1_0.username=?
+=== CALCULANDO ESTADÍSTICAS PARA USUARIO 2 ===
+=== CALCULANDO ESTADÍSTICAS PARA USUARIO 2 ===
+2025-07-01T13:30:02.008-04:00 DEBUG 8257 --- [RobotCode] [nio-8080-exec-4] org.hibernate.SQL                        : 
+    select
+        u1_0.id,
+        u1_0.email,
+        u1_0.email_verified,
+        u1_0.fecha_registro,
+        u1_0.password,
+        u1_0.puntaje,
+        u1_0.rol,
+        u1_0.username 
+    from
+        usuarios u1_0 
+    where
+        u1_0.id=?
+2025-07-01T13:30:02.008-04:00 DEBUG 8257 --- [RobotCode] [nio-8080-exec-7] org.hibernate.SQL                        : 
+    select
+        u1_0.id,
+        u1_0.email,
+        u1_0.email_verified,
+        u1_0.fecha_registro,
+        u1_0.password,
+        u1_0.puntaje,
+        u1_0.rol,
+        u1_0.username 
+    from
+        usuarios u1_0 
+    where
+        u1_0.id=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.email,
+        u1_0.email_verified,
+        u1_0.fecha_registro,
+        u1_0.password,
+        u1_0.puntaje,
+        u1_0.rol,
+        u1_0.username 
+    from
+        usuarios u1_0 
+    where
+        u1_0.id=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.email,
+        u1_0.email_verified,
+        u1_0.fecha_registro,
+        u1_0.password,
+        u1_0.puntaje,
+        u1_0.rol,
+        u1_0.username 
+    from
+        usuarios u1_0 
+    where
+        u1_0.id=?
+2025-07-01T13:30:02.008-04:00 DEBUG 8257 --- [RobotCode] [nio-8080-exec-6] org.hibernate.SQL                        : 
+    select
+        u1_0.id,
+        u1_0.email,
+        u1_0.email_verified,
+        u1_0.fecha_registro,
+        u1_0.password,
+        u1_0.puntaje,
+        u1_0.rol,
+        u1_0.username 
+    from
+        usuarios u1_0 
+    where
+        u1_0.id=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.email,
+        u1_0.email_verified,
+        u1_0.fecha_registro,
+        u1_0.password,
+        u1_0.puntaje,
+        u1_0.rol,
+        u1_0.username 
+    from
+        usuarios u1_0 
+    where
+        u1_0.id=?
+2025-07-01T13:30:02.008-04:00 DEBUG 8257 --- [RobotCode] [nio-8080-exec-8] org.hibernate.SQL                        : 
+    select
+        u1_0.id,
+        u1_0.email,
+        u1_0.email_verified,
+        u1_0.fecha_registro,
+        u1_0.password,
+        u1_0.puntaje,
+        u1_0.rol,
+        u1_0.username 
+    from
+        usuarios u1_0 
+    where
+        u1_0.id=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.email,
+        u1_0.email_verified,
+        u1_0.fecha_registro,
+        u1_0.password,
+        u1_0.puntaje,
+        u1_0.rol,
+        u1_0.username 
+    from
+        usuarios u1_0 
+    where
+        u1_0.id=?
+2025-07-01T13:30:02.008-04:00 DEBUG 8257 --- [RobotCode] [nio-8080-exec-3] org.hibernate.SQL                        : 
+    select
+        u1_0.id,
+        u1_0.email,
+        u1_0.email_verified,
+        u1_0.fecha_registro,
+        u1_0.password,
+        u1_0.puntaje,
+        u1_0.rol,
+        u1_0.username 
+    from
+        usuarios u1_0 
+    where
+        u1_0.id=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.email,
+        u1_0.email_verified,
+        u1_0.fecha_registro,
+        u1_0.password,
+        u1_0.puntaje,
+        u1_0.rol,
+        u1_0.username 
+    from
+        usuarios u1_0 
+    where
+        u1_0.id=?
+2025-07-01T13:30:02.008-04:00 DEBUG 8257 --- [RobotCode] [nio-8080-exec-5] org.hibernate.SQL                        : 
+    select
+        u1_0.id,
+        u1_0.email,
+        u1_0.email_verified,
+        u1_0.fecha_registro,
+        u1_0.password,
+        u1_0.puntaje,
+        u1_0.rol,
+        u1_0.username 
+    from
+        usuarios u1_0 
+    where
+        u1_0.id=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.email,
+        u1_0.email_verified,
+        u1_0.fecha_registro,
+        u1_0.password,
+        u1_0.puntaje,
+        u1_0.rol,
+        u1_0.username 
+    from
+        usuarios u1_0 
+    where
+        u1_0.id=?
+2025-07-01T13:30:02.013-04:00 DEBUG 8257 --- [RobotCode] [nio-8080-exec-4] org.hibernate.SQL                        : 
+    select
+        pu1_0.id,
+        pu1_0.estado,
+        pu1_0.intentos,
+        pu1_0.problema_id,
+        pu1_0.ultima_modificacion,
+        pu1_0.usuario_id 
+    from
+        progreso_usuario pu1_0 
+    where
+        pu1_0.usuario_id=?
+Hibernate: 
+    select
+        pu1_0.id,
+        pu1_0.estado,
+        pu1_0.intentos,
+        pu1_0.problema_id,
+        pu1_0.ultima_modificacion,
+        pu1_0.usuario_id 
+    from
+        progreso_usuario pu1_0 
+    where
+        pu1_0.usuario_id=?
+Debug - Usuario encontrado: jorge, Puntaje: 0
+Debug - Usuario encontrado: jorge, Puntaje: 0
+Debug - DTO creado, Puntaje en DTO: 0
+Debug - DTO creado, Puntaje en DTO: 0
+2025-07-01T13:30:02.014-04:00 DEBUG 8257 --- [RobotCode] [nio-8080-exec-8] org.hibernate.SQL                        : 
+    select
+        pu1_0.id,
+        pu1_0.estado,
+        pu1_0.intentos,
+        pu1_0.problema_id,
+        pu1_0.ultima_modificacion,
+        pu1_0.usuario_id 
+    from
+        progreso_usuario pu1_0 
+    where
+        pu1_0.usuario_id=?
+Hibernate: 
+    select
+        pu1_0.id,
+        pu1_0.estado,
+        pu1_0.intentos,
+        pu1_0.problema_id,
+        pu1_0.ultima_modificacion,
+        pu1_0.usuario_id 
+    from
+        progreso_usuario pu1_0 
+    where
+        pu1_0.usuario_id=?
+2025-07-01T13:30:02.014-04:00 DEBUG 8257 --- [RobotCode] [nio-8080-exec-5] org.hibernate.SQL                        : 
+    select
+        pu1_0.id,
+        pu1_0.estado,
+        pu1_0.intentos,
+        pu1_0.problema_id,
+        pu1_0.ultima_modificacion,
+        pu1_0.usuario_id 
+    from
+        progreso_usuario pu1_0 
+    where
+        pu1_0.usuario_id=?
+Hibernate: 
+    select
+        pu1_0.id,
+        pu1_0.estado,
+        pu1_0.intentos,
+        pu1_0.problema_id,
+        pu1_0.ultima_modificacion,
+        pu1_0.usuario_id 
+    from
+        progreso_usuario pu1_0 
+    where
+        pu1_0.usuario_id=?
+2025-07-01T13:30:02.014-04:00 DEBUG 8257 --- [RobotCode] [nio-8080-exec-7] org.hibernate.SQL                        : 
+    select
+        pu1_0.id,
+        pu1_0.estado,
+        pu1_0.intentos,
+        pu1_0.problema_id,
+        pu1_0.ultima_modificacion,
+        pu1_0.usuario_id 
+    from
+        progreso_usuario pu1_0 
+    where
+        pu1_0.usuario_id=?
+Hibernate: 
+    select
+        pu1_0.id,
+        pu1_0.estado,
+        pu1_0.intentos,
+        pu1_0.problema_id,
+        pu1_0.ultima_modificacion,
+        pu1_0.usuario_id 
+    from
+        progreso_usuario pu1_0 
+    where
+        pu1_0.usuario_id=?
+Total registros de progreso encontrados: 0
+Total registros de progreso encontrados: 0
+Estadísticas calculadas:
+  - Total problemas: 0
+Estadísticas calculadas:
+  - Total problemas: 0
+  - Problemas resueltos: 0
+  - Problemas resueltos: 0
+  - Problemas en progreso: 0
+  - Problemas en progreso: 0
+  - Puntaje usuario: 0
+  - Puntaje usuario: 0
+==============================
+==============================
+2025-07-01T13:32:49.908-04:00 DEBUG 8257 --- [RobotCode] [nio-8080-exec-7] org.hibernate.SQL                        : 
+    select
+        u1_0.id,
+        u1_0.email,
+        u1_0.email_verified,
+        u1_0.fecha_registro,
+        u1_0.password,
+        u1_0.puntaje,
+        u1_0.rol,
+        u1_0.username 
+    from
+        usuarios u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.email,
+        u1_0.email_verified,
+        u1_0.fecha_registro,
+        u1_0.password,
+        u1_0.puntaje,
+        u1_0.rol,
+        u1_0.username 
+    from
+        usuarios u1_0 
+    where
+        u1_0.email=?
+2025-07-01T13:32:49.916-04:00 DEBUG 8257 --- [RobotCode] [nio-8080-exec-7] org.hibernate.SQL                        : 
+    select
+        u1_0.id,
+        u1_0.email,
+        u1_0.email_verified,
+        u1_0.fecha_registro,
+        u1_0.password,
+        u1_0.puntaje,
+        u1_0.rol,
+        u1_0.username 
+    from
+        usuarios u1_0 
+    where
+        u1_0.username=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.email,
+        u1_0.email_verified,
+        u1_0.fecha_registro,
+        u1_0.password,
+        u1_0.puntaje,
+        u1_0.rol,
+        u1_0.username 
+    from
+        usuarios u1_0 
+    where
+        u1_0.username=?
+2025-07-01T13:32:49.919-04:00 DEBUG 8257 --- [RobotCode] [nio-8080-exec-7] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.email=? 
+        and evt1_0.is_used=false
+Hibernate: 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.email=? 
+        and evt1_0.is_used=false
+2025-07-01T13:32:49.999-04:00 DEBUG 8257 --- [RobotCode] [nio-8080-exec-7] org.hibernate.SQL                        : 
+    insert 
+    into
+        email_verification_tokens
+        (created_at, email, expires_at, is_expired, is_used, password_hash, token, username) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        email_verification_tokens
+        (created_at, email, expires_at, is_expired, is_used, password_hash, token, username) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?)
+2025-07-01T13:32:50.004-04:00  INFO 8257 --- [RobotCode] [nio-8080-exec-7] c.d.robotcode.service.EmailService       : === EMAIL DE VERIFICACIÓN ===
+2025-07-01T13:32:50.005-04:00  INFO 8257 --- [RobotCode] [nio-8080-exec-7] c.d.robotcode.service.EmailService       : Para: jorge.gangale@mtn.cl
+2025-07-01T13:32:50.005-04:00  INFO 8257 --- [RobotCode] [nio-8080-exec-7] c.d.robotcode.service.EmailService       : Usuario: Darkmork
+2025-07-01T13:32:50.005-04:00  INFO 8257 --- [RobotCode] [nio-8080-exec-7] c.d.robotcode.service.EmailService       : CÓDIGO DE VERIFICACIÓN: 900724
+2025-07-01T13:32:50.005-04:00  INFO 8257 --- [RobotCode] [nio-8080-exec-7] c.d.robotcode.service.EmailService       : ============================
+2025-07-01T13:32:53.296-04:00  INFO 8257 --- [RobotCode] [nio-8080-exec-7] c.d.robotcode.service.EmailService       : Verification email sent successfully to: jorge.gangale@mtn.cl
+2025-07-01T13:32:53.296-04:00  INFO 8257 --- [RobotCode] [nio-8080-exec-7] c.d.r.service.EmailVerificationService   : Verification email sent for user: Darkmork with email: jorge.gangale@mtn.cl
+2025-07-01T13:32:53.300-04:00  INFO 8257 --- [RobotCode] [nio-8080-exec-7] c.d.robotcode.controller.AuthController  : Registration initiated for user: Darkmork with email: jorge.gangale@mtn.cl
+2025-07-01T13:33:15.129-04:00 DEBUG 8257 --- [RobotCode] [nio-8080-exec-8] org.hibernate.SQL                        : 
+    select
+        evt1_0.id,
+        evt1_0.created_at,
+        evt1_0.email,
+        evt1_0.expires_at,
+        evt1_0.is_expired,
+        evt1_0.is_used,
+        evt1_0.password_hash,
+        evt1_0.token,
+        evt1_0.username 
+    from
+        email_verification_tokens evt1_0 
+    where
+        evt1_0.email=? 
+        and evt1_0.token=?
+Hibernate: 
+    select
+        evt1_0.id,
+        evt1_0.created_at,
+        evt1_0.email,
+        evt1_0.expires_at,
+        evt1_0.is_expired,
+        evt1_0.is_used,
+        evt1_0.password_hash,
+        evt1_0.token,
+        evt1_0.username 
+    from
+        email_verification_tokens evt1_0 
+    where
+        evt1_0.email=? 
+        and evt1_0.token=?
+2025-07-01T13:33:15.139-04:00 DEBUG 8257 --- [RobotCode] [nio-8080-exec-8] org.hibernate.SQL                        : 
+    select
+        u1_0.id,
+        u1_0.email,
+        u1_0.email_verified,
+        u1_0.fecha_registro,
+        u1_0.password,
+        u1_0.puntaje,
+        u1_0.rol,
+        u1_0.username 
+    from
+        usuarios u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.email,
+        u1_0.email_verified,
+        u1_0.fecha_registro,
+        u1_0.password,
+        u1_0.puntaje,
+        u1_0.rol,
+        u1_0.username 
+    from
+        usuarios u1_0 
+    where
+        u1_0.email=?
+2025-07-01T13:33:15.143-04:00 DEBUG 8257 --- [RobotCode] [nio-8080-exec-8] org.hibernate.SQL                        : 
+    select
+        u1_0.id,
+        u1_0.email,
+        u1_0.email_verified,
+        u1_0.fecha_registro,
+        u1_0.password,
+        u1_0.puntaje,
+        u1_0.rol,
+        u1_0.username 
+    from
+        usuarios u1_0 
+    where
+        u1_0.username=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.email,
+        u1_0.email_verified,
+        u1_0.fecha_registro,
+        u1_0.password,
+        u1_0.puntaje,
+        u1_0.rol,
+        u1_0.username 
+    from
+        usuarios u1_0 
+    where
+        u1_0.username=?
+PrePersist - Usuario: Darkmork, Puntaje: 0
+2025-07-01T13:33:15.146-04:00 DEBUG 8257 --- [RobotCode] [nio-8080-exec-8] org.hibernate.SQL                        : 
+    insert 
+    into
+        usuarios
+        (email, email_verified, fecha_registro, password, puntaje, rol, username) 
+    values
+        (?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        usuarios
+        (email, email_verified, fecha_registro, password, puntaje, rol, username) 
+    values
+        (?, ?, ?, ?, ?, ?, ?)
+2025-07-01T13:33:15.150-04:00  INFO 8257 --- [RobotCode] [nio-8080-exec-8] c.d.robotcode.service.EmailService       : === EMAIL DE BIENVENIDA ===
+2025-07-01T13:33:15.150-04:00  INFO 8257 --- [RobotCode] [nio-8080-exec-8] c.d.robotcode.service.EmailService       : Para: jorge.gangale@mtn.cl
+2025-07-01T13:33:15.150-04:00  INFO 8257 --- [RobotCode] [nio-8080-exec-8] c.d.robotcode.service.EmailService       : Usuario: Darkmork
+2025-07-01T13:33:15.150-04:00  INFO 8257 --- [RobotCode] [nio-8080-exec-8] c.d.robotcode.service.EmailService       : Cuenta verificada exitosamente!
+2025-07-01T13:33:15.150-04:00  INFO 8257 --- [RobotCode] [nio-8080-exec-8] c.d.robotcode.service.EmailService       : ==========================
+2025-07-01T13:33:17.776-04:00  INFO 8257 --- [RobotCode] [nio-8080-exec-8] c.d.robotcode.service.EmailService       : Welcome email sent successfully to: jorge.gangale@mtn.cl
+2025-07-01T13:33:17.776-04:00  INFO 8257 --- [RobotCode] [nio-8080-exec-8] c.d.r.service.EmailVerificationService   : User registration completed successfully for: Darkmork with email: jorge.gangale@mtn.cl
+2025-07-01T13:33:17.777-04:00 DEBUG 8257 --- [RobotCode] [nio-8080-exec-8] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens 
+    set
+        created_at=?,
+        email=?,
+        expires_at=?,
+        is_expired=?,
+        is_used=?,
+        password_hash=?,
+        token=?,
+        username=? 
+    where
+        id=?
+Hibernate: 
+    update
+        email_verification_tokens 
+    set
+        created_at=?,
+        email=?,
+        expires_at=?,
+        is_expired=?,
+        is_used=?,
+        password_hash=?,
+        token=?,
+        username=? 
+    where
+        id=?
+2025-07-01T13:33:17.784-04:00  INFO 8257 --- [RobotCode] [nio-8080-exec-8] c.d.robotcode.controller.AuthController  : Email verification successful for user: Darkmork with email: jorge.gangale@mtn.cl
+2025-07-01T13:35:50.381-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+Hibernate: 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
