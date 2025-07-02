@@ -1495,3 +1495,855 @@ Hibernate:
         is_expired=true 
     where
         evt1_0.expires_at<?
+2025-07-01T13:45:50.387-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+Hibernate: 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+2025-07-01T13:55:50.384-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+Hibernate: 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+2025-07-01T14:05:50.637-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+Hibernate: 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+2025-07-01T14:15:51.275-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+Hibernate: 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+2025-07-01T14:25:51.423-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+Hibernate: 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+2025-07-01T14:25:51.441-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    delete 
+    from
+        email_verification_tokens evt1_0 
+    where
+        evt1_0.is_used=true 
+        or evt1_0.is_expired=true 
+        or evt1_0.expires_at<?
+Hibernate: 
+    delete 
+    from
+        email_verification_tokens evt1_0 
+    where
+        evt1_0.is_used=true 
+        or evt1_0.is_expired=true 
+        or evt1_0.expires_at<?
+2025-07-01T14:25:51.443-04:00  INFO 8257 --- [RobotCode] [   scheduling-1] c.d.r.service.EmailVerificationService   : Cleaned up 3 expired verification tokens
+2025-07-01T14:35:51.425-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+Hibernate: 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+2025-07-01T14:48:52.385-04:00  WARN 8257 --- [RobotCode] [l-1:housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=5m30s764ms).
+2025-07-01T14:54:25.735-04:00  WARN 8257 --- [RobotCode] [l-1:housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=5m33s355ms).
+2025-07-01T15:00:26.733-04:00  WARN 8257 --- [RobotCode] [l-1:housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=5m30s994ms).
+2025-07-01T15:00:56.518-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+Hibernate: 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+2025-07-01T15:10:56.527-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+Hibernate: 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+2025-07-01T15:20:56.536-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+Hibernate: 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+2025-07-01T15:30:56.554-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+Hibernate: 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+2025-07-01T15:40:56.565-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+Hibernate: 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+2025-07-01T15:40:56.582-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    delete 
+    from
+        email_verification_tokens evt1_0 
+    where
+        evt1_0.is_used=true 
+        or evt1_0.is_expired=true 
+        or evt1_0.expires_at<?
+Hibernate: 
+    delete 
+    from
+        email_verification_tokens evt1_0 
+    where
+        evt1_0.is_used=true 
+        or evt1_0.is_expired=true 
+        or evt1_0.expires_at<?
+2025-07-01T15:50:56.591-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+Hibernate: 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+2025-07-01T16:05:55.830-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+Hibernate: 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+2025-07-01T16:05:56.835-04:00  WARN 8257 --- [RobotCode] [l-1:housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=5m29s235ms).
+2025-07-01T16:15:55.830-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+Hibernate: 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+2025-07-01T16:25:55.838-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+Hibernate: 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+2025-07-01T16:35:55.743-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+Hibernate: 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+2025-07-01T16:45:55.743-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+Hibernate: 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+2025-07-01T16:45:55.758-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    delete 
+    from
+        email_verification_tokens evt1_0 
+    where
+        evt1_0.is_used=true 
+        or evt1_0.is_expired=true 
+        or evt1_0.expires_at<?
+Hibernate: 
+    delete 
+    from
+        email_verification_tokens evt1_0 
+    where
+        evt1_0.is_used=true 
+        or evt1_0.is_expired=true 
+        or evt1_0.expires_at<?
+2025-07-01T16:55:55.797-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+Hibernate: 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+2025-07-01T17:10:54.608-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+Hibernate: 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+2025-07-01T17:10:56.454-04:00  WARN 8257 --- [RobotCode] [l-1:housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=5m28s828ms).
+2025-07-01T17:20:54.627-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+Hibernate: 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+2025-07-01T17:30:54.631-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+Hibernate: 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+2025-07-01T17:40:54.634-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+Hibernate: 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+2025-07-01T17:50:54.668-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+Hibernate: 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+2025-07-01T17:50:54.682-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    delete 
+    from
+        email_verification_tokens evt1_0 
+    where
+        evt1_0.is_used=true 
+        or evt1_0.is_expired=true 
+        or evt1_0.expires_at<?
+Hibernate: 
+    delete 
+    from
+        email_verification_tokens evt1_0 
+    where
+        evt1_0.is_used=true 
+        or evt1_0.is_expired=true 
+        or evt1_0.expires_at<?
+2025-07-01T18:00:54.671-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+Hibernate: 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+2025-07-01T18:10:54.660-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+Hibernate: 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+2025-07-01T18:16:27.831-04:00  WARN 8257 --- [RobotCode] [l-1:housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=5m30s583ms).
+2025-07-01T18:25:55.257-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+Hibernate: 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+2025-07-01T18:35:55.226-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+Hibernate: 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+2025-07-01T18:45:55.235-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+Hibernate: 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+2025-07-01T18:55:55.220-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+Hibernate: 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+2025-07-01T18:55:55.238-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    delete 
+    from
+        email_verification_tokens evt1_0 
+    where
+        evt1_0.is_used=true 
+        or evt1_0.is_expired=true 
+        or evt1_0.expires_at<?
+Hibernate: 
+    delete 
+    from
+        email_verification_tokens evt1_0 
+    where
+        evt1_0.is_used=true 
+        or evt1_0.is_expired=true 
+        or evt1_0.expires_at<?
+2025-07-01T19:05:55.218-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+Hibernate: 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+2025-07-01T19:15:55.214-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+Hibernate: 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+2025-07-01T19:22:29.012-04:00  WARN 8257 --- [RobotCode] [l-1:housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=5m30s396ms).
+2025-07-01T19:30:55.546-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+Hibernate: 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+2025-07-01T19:40:55.538-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+Hibernate: 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+2025-07-01T19:50:55.519-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+Hibernate: 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+2025-07-01T20:00:55.545-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+Hibernate: 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+2025-07-01T20:00:55.555-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    delete 
+    from
+        email_verification_tokens evt1_0 
+    where
+        evt1_0.is_used=true 
+        or evt1_0.is_expired=true 
+        or evt1_0.expires_at<?
+Hibernate: 
+    delete 
+    from
+        email_verification_tokens evt1_0 
+    where
+        evt1_0.is_used=true 
+        or evt1_0.is_expired=true 
+        or evt1_0.expires_at<?
+2025-07-01T20:10:55.552-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+Hibernate: 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+2025-07-01T20:20:55.563-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+Hibernate: 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+2025-07-01T20:28:31.171-04:00  WARN 8257 --- [RobotCode] [l-1:housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=5m31s441ms).
+2025-07-01T20:35:57.018-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+Hibernate: 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+2025-07-01T20:45:57.017-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+Hibernate: 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+2025-07-01T20:55:57.028-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+Hibernate: 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+2025-07-01T21:05:57.021-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+Hibernate: 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+2025-07-01T21:05:57.040-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    delete 
+    from
+        email_verification_tokens evt1_0 
+    where
+        evt1_0.is_used=true 
+        or evt1_0.is_expired=true 
+        or evt1_0.expires_at<?
+Hibernate: 
+    delete 
+    from
+        email_verification_tokens evt1_0 
+    where
+        evt1_0.is_used=true 
+        or evt1_0.is_expired=true 
+        or evt1_0.expires_at<?
+2025-07-01T21:15:57.009-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+Hibernate: 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+2025-07-01T21:25:56.946-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+Hibernate: 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+2025-07-01T21:33:31.321-04:00  WARN 8257 --- [RobotCode] [l-1:housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=5m29s399ms).
+2025-07-01T21:40:59.392-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+Hibernate: 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+2025-07-01T21:50:59.388-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+Hibernate: 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+2025-07-01T22:00:59.381-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+Hibernate: 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+2025-07-01T22:10:59.383-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+Hibernate: 
+    update
+        email_verification_tokens evt1_0 
+    set
+        is_expired=true 
+    where
+        evt1_0.expires_at<?
+2025-07-01T22:10:59.393-04:00 DEBUG 8257 --- [RobotCode] [   scheduling-1] org.hibernate.SQL                        : 
+    delete 
+    from
+        email_verification_tokens evt1_0 
+    where
+        evt1_0.is_used=true 
+        or evt1_0.is_expired=true 
+        or evt1_0.expires_at<?
+Hibernate: 
+    delete 
+    from
+        email_verification_tokens evt1_0 
+    where
+        evt1_0.is_used=true 
+        or evt1_0.is_expired=true 
+        or evt1_0.expires_at<?
+2025-07-01T22:12:29.961-04:00  WARN 8257 --- [RobotCode] [nio-8080-exec-3] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.web.method.annotation.MethodArgumentTypeMismatchException: Method parameter 'id': Failed to convert value of type 'java.lang.String' to required type 'java.lang.Long'; For input string: "status"]
+2025-07-01T22:12:29.962-04:00  WARN 8257 --- [RobotCode] [nio-8080-exec-2] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.web.method.annotation.MethodArgumentTypeMismatchException: Method parameter 'id': Failed to convert value of type 'java.lang.String' to required type 'java.lang.Long'; For input string: "status"]
+2025-07-01T22:12:55.955-04:00 DEBUG 8257 --- [RobotCode] [nio-8080-exec-7] org.hibernate.SQL                        : 
+    select
+        u1_0.id,
+        u1_0.email,
+        u1_0.email_verified,
+        u1_0.fecha_registro,
+        u1_0.password,
+        u1_0.puntaje,
+        u1_0.rol,
+        u1_0.username 
+    from
+        usuarios u1_0
+2025-07-01T22:12:55.955-04:00 DEBUG 8257 --- [RobotCode] [nio-8080-exec-5] org.hibernate.SQL                        : 
+    select
+        u1_0.id,
+        u1_0.email,
+        u1_0.email_verified,
+        u1_0.fecha_registro,
+        u1_0.password,
+        u1_0.puntaje,
+        u1_0.rol,
+        u1_0.username 
+    from
+        usuarios u1_0
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.email,
+        u1_0.email_verified,
+        u1_0.fecha_registro,
+        u1_0.password,
+        u1_0.puntaje,
+        u1_0.rol,
+        u1_0.username 
+    from
+        usuarios u1_0
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.email,
+        u1_0.email_verified,
+        u1_0.fecha_registro,
+        u1_0.password,
+        u1_0.puntaje,
+        u1_0.rol,
+        u1_0.username 
+    from
+        usuarios u1_0
+2025-07-01T22:13:35.218-04:00  WARN 8257 --- [RobotCode] [nio-8080-exec-6] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.web.method.annotation.MethodArgumentTypeMismatchException: Method parameter 'id': Failed to convert value of type 'java.lang.String' to required type 'java.lang.Long'; For input string: "status"]
+2025-07-01T22:13:35.218-04:00  WARN 8257 --- [RobotCode] [nio-8080-exec-1] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.web.method.annotation.MethodArgumentTypeMismatchException: Method parameter 'id': Failed to convert value of type 'java.lang.String' to required type 'java.lang.Long'; For input string: "status"]
+2025-07-01T22:14:06.519-04:00  WARN 8257 --- [RobotCode] [nio-8080-exec-2] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.web.method.annotation.MethodArgumentTypeMismatchException: Method parameter 'id': Failed to convert value of type 'java.lang.String' to required type 'java.lang.Long'; For input string: "status"]
+2025-07-01T22:14:06.519-04:00  WARN 8257 --- [RobotCode] [nio-8080-exec-3] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.web.method.annotation.MethodArgumentTypeMismatchException: Method parameter 'id': Failed to convert value of type 'java.lang.String' to required type 'java.lang.Long'; For input string: "status"]
+2025-07-01T22:14:07.824-04:00  WARN 8257 --- [RobotCode] [nio-8080-exec-5] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.web.method.annotation.MethodArgumentTypeMismatchException: Method parameter 'temaId': Failed to convert value of type 'java.lang.String' to required type 'java.lang.Long'; For input string: "conditionals"]
+2025-07-01T22:14:07.824-04:00  WARN 8257 --- [RobotCode] [nio-8080-exec-7] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.web.method.annotation.MethodArgumentTypeMismatchException: Method parameter 'temaId': Failed to convert value of type 'java.lang.String' to required type 'java.lang.Long'; For input string: "conditionals"]
