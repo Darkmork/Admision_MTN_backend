@@ -120,4 +120,65 @@ public class EmailService {
             appName
         );
     }
+    
+    public void sendContactEmail(String senderName, String senderEmail, String subject, String messageContent) {
+        try {
+            logger.info("=== EMAIL DE CONTACTO ===");
+            logger.info("De: {} <{}>", senderName, senderEmail);
+            logger.info("Asunto: {}", subject);
+            logger.info("Mensaje: {}", messageContent);
+            logger.info("========================");
+            
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom(fromEmail);
+            message.setTo("jorge.gangale@mtn.cl"); // Test temporal - cambiar después
+            message.setReplyTo(senderEmail); // Para que pueda responder directamente
+            message.setSubject("[RobotCode Arena] " + subject);
+            
+            String emailBody = buildContactEmailBody(senderName, senderEmail, subject, messageContent);
+            message.setText(emailBody);
+            
+            try {
+                logger.info("Intentando enviar email...");
+                logger.info("From: {}", fromEmail);
+                logger.info("To: contacto@jgangale.cl");
+                logger.info("Subject: [RobotCode Arena] {}", subject);
+                
+                mailSender.send(message);
+                logger.info("Contact email sent successfully from: {} <{}>", senderName, senderEmail);
+            } catch (Exception mailException) {
+                logger.error("Contact email sending failed: {}", mailException.getMessage());
+                logger.error("Exception type: {}", mailException.getClass().getSimpleName());
+                if (mailException.getCause() != null) {
+                    logger.error("Root cause: {}", mailException.getCause().getMessage());
+                }
+                throw new RuntimeException("No se pudo enviar el mensaje de contacto: " + mailException.getMessage());
+            }
+            
+        } catch (Exception e) {
+            logger.error("Failed to process contact email from: {} <{}>", senderName, senderEmail, e);
+            throw new RuntimeException("Error procesando el mensaje de contacto: " + e.getMessage());
+        }
+    }
+    
+    private String buildContactEmailBody(String senderName, String senderEmail, String subject, String messageContent) {
+        return String.format(
+            "=== NUEVO MENSAJE DE CONTACTO ===\n\n" +
+            "Has recibido un nuevo mensaje desde RobotCode Arena:\n\n" +
+            "👤 Nombre: %s\n" +
+            "📧 Email: %s\n" +
+            "📝 Asunto: %s\n\n" +
+            "💬 Mensaje:\n" +
+            "%s\n\n" +
+            "---\n" +
+            "Este mensaje fue enviado desde el formulario de contacto de RobotCode Arena.\n" +
+            "Para responder, simplemente responde a este email.\n" +
+            "Fecha: %s",
+            senderName,
+            senderEmail,
+            subject,
+            messageContent,
+            java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"))
+        );
+    }
 }
