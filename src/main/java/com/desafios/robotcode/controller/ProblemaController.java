@@ -2,6 +2,7 @@ package com.desafios.robotcode.controller;
 
 import com.desafios.robotcode.dto.ProblemaDto;
 import com.desafios.robotcode.dto.FrontendProblemaDto;
+import com.desafios.robotcode.dto.EjemploDto;
 import com.desafios.robotcode.model.Problema;
 import com.desafios.robotcode.model.Tema;
 import com.desafios.robotcode.model.Dificultad;
@@ -16,6 +17,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ArrayList;
+import com.fasterxml.jackson.core.type.TypeReference;
 
 @RestController
 @RequestMapping("/api/problemas")
@@ -41,6 +44,33 @@ public class ProblemaController {
         Optional<Problema> problemaOpt = problemaService.findById(id);
         return problemaOpt.map(problema -> ResponseEntity.ok(toDto(problema)))
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/condicionales")
+    public ResponseEntity<List<ProblemaDto>> getProblemasCondicionales() {
+        try {
+            // Buscar el tema de condicionales por nombre
+            Optional<Tema> temaCondicionales = temaService.findAll().stream()
+                .filter(t -> "Condicionales".equals(t.getNombre()))
+                .findFirst();
+            
+            if (temaCondicionales.isEmpty()) {
+                // Si no existe el tema, crear uno
+                Tema nuevoTema = new Tema();
+                nuevoTema.setNombre("Condicionales");
+                nuevoTema.setDescripcion("Problemas de condicionales en Python");
+                nuevoTema.setDificultad(Dificultad.EASY);
+                temaCondicionales = Optional.of(temaService.save(nuevoTema));
+            }
+            
+            List<ProblemaDto> problemas = problemaService.findByTema(temaCondicionales.get()).stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+            
+            return ResponseEntity.ok(problemas);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(List.of());
+        }
     }
 
     @GetMapping("/tema/{temaId}")
@@ -138,7 +168,6 @@ public class ProblemaController {
             System.out.println("Total problemas recibidos: " + problemasDelFrontend.size());
             
             int problemasCreados = 0;
-            int problemasActualizados = 0;
             
             for (FrontendProblemaDto frontendProblema : problemasDelFrontend) {
                 try {
@@ -147,27 +176,13 @@ public class ProblemaController {
                     
                     System.out.println("Procesando: " + frontendProblema.getId() + " -> ID Backend: " + backendId);
                     
-                    // Buscar si ya existe un problema con el mismo título (como identificador único)
-                    Optional<Problema> existing = problemaService.findAll().stream()
-                        .filter(p -> p.getTitulo() != null && p.getTitulo().equals(frontendProblema.getTitle()))
-                        .findFirst();
-                    
-                    // Siempre usar el ID calculado para consistencia
+                    // Siempre crear un nuevo problema (no actualizar existentes)
                     Long calculatedId = convertirFrontendIdABackendId(frontendProblema.getId());
                     
-                    Problema problema;
-                    if (existing.isPresent()) {
-                        problema = existing.get();
-                        // Actualizar el ID del problema existente al ID correcto
-                        problema.setId(calculatedId);
-                        problemasActualizados++;
-                        System.out.println("  - Actualizando problema existente con ID correcto: " + calculatedId);
-                    } else {
-                        problema = new Problema();
-                        problema.setId(calculatedId);
-                        problemasCreados++;
-                        System.out.println("  - Creando nuevo problema con ID calculado: " + calculatedId);
-                    }
+                    Problema problema = new Problema();
+                    problema.setId(calculatedId);
+                    problemasCreados++;
+                    System.out.println("  - Creando nuevo problema con ID calculado: " + calculatedId);
                     
                     // Mapear datos del frontend al modelo del backend
                     problema.setTitulo(frontendProblema.getTitle());
@@ -229,8 +244,8 @@ public class ProblemaController {
                 }
             }
             
-            String resultado = String.format("Migración completada: %d problemas creados, %d actualizados", 
-                problemasCreados, problemasActualizados);
+            String resultado = String.format("Migración completada: %d problemas creados", 
+                problemasCreados);
             System.out.println(resultado);
             System.out.println("===========================");
             
@@ -393,6 +408,98 @@ public class ProblemaController {
         if (problema.getTema() != null) {
             dto.setTemaId(problema.getTema().getId());
         }
+        if (problema.getDificultad() != null) {
+            dto.setDificultad(problema.getDificultad().name());
+        }
+        // Mapear tema a topic para el frontend
+        if (problema.getTema() != null) {
+            dto.setTopic(mapearTemaATopic(problema.getTema().getNombre()));
+        }
+        
+        // Generar ejemplos basados en los casos de prueba
+        dto.setEjemplos(generarEjemplosDesdeTestCases(problema));
+        
         return dto;
+    }
+    
+    private String mapearTemaATopic(String nombreTema) {
+        switch (nombreTema) {
+            case "Condicionales": return "conditionals";
+            case "Bucles": return "loops";
+            case "Funciones": return "functions";
+            case "Listas y Arrays": return "lists";
+            case "Diccionarios": return "dictionaries";
+            case "Algoritmos": return "algorithms";
+            case "Clases en Python": return "pythonClasses";
+            case "Ciencia de Datos": return "dataScience";
+            case "Machine Learning": return "machineLearning";
+            default: return "general";
+        }
+    }
+    
+    private List<EjemploDto> generarEjemplosDesdeTestCases(Problema problema) {
+        List<EjemploDto> ejemplos = new ArrayList<>();
+        
+        try {
+            if (problema.getTestCasesJson() != null && !problema.getTestCasesJson().isEmpty()) {
+                ObjectMapper mapper = new ObjectMapper();
+                List<Map<String, Object>> testCases = mapper.readValue(
+                    problema.getTestCasesJson(), 
+                    new TypeReference<List<Map<String, Object>>>() {}
+                );
+                
+                // Tomar los primeros 3 casos de prueba como ejemplos
+                int maxEjemplos = Math.min(3, testCases.size());
+                for (int i = 0; i < maxEjemplos; i++) {
+                    Map<String, Object> testCase = testCases.get(i);
+                    
+                    EjemploDto ejemplo = new EjemploDto();
+                    ejemplo.setEntrada(testCase.get("input").toString());
+                    ejemplo.setSalida(testCase.get("expectedOutput").toString());
+                    ejemplo.setDescripcion("Ejemplo " + (i + 1));
+                    
+                    ejemplos.add(ejemplo);
+                }
+            }
+        } catch (Exception e) {
+            // Si hay error al parsear, crear ejemplos genéricos basados en el problema
+            System.err.println("Error generando ejemplos para problema " + problema.getId() + ": " + e.getMessage());
+            ejemplos = generarEjemplosGenericos(problema);
+        }
+        
+        return ejemplos;
+    }
+    
+    private List<EjemploDto> generarEjemplosGenericos(Problema problema) {
+        List<EjemploDto> ejemplos = new ArrayList<>();
+        
+        // Generar ejemplos básicos basados en el título del problema
+        String titulo = problema.getTitulo().toLowerCase();
+        
+        if (titulo.contains("edad") || titulo.contains("mayor")) {
+            ejemplos.add(crearEjemplo("18", "Mayor de edad", "Edad de mayoría"));
+            ejemplos.add(crearEjemplo("16", "Menor de edad", "Edad menor"));
+        } else if (titulo.contains("par") || titulo.contains("impar")) {
+            ejemplos.add(crearEjemplo("4", "Par", "Número par"));
+            ejemplos.add(crearEjemplo("7", "Impar", "Número impar"));
+        } else if (titulo.contains("positivo") || titulo.contains("negativo")) {
+            ejemplos.add(crearEjemplo("5", "Positivo", "Número positivo"));
+            ejemplos.add(crearEjemplo("-3", "Negativo", "Número negativo"));
+            ejemplos.add(crearEjemplo("0", "Cero", "Número cero"));
+        } else {
+            // Ejemplos genéricos
+            ejemplos.add(crearEjemplo("entrada1", "salida1", "Ejemplo 1"));
+            ejemplos.add(crearEjemplo("entrada2", "salida2", "Ejemplo 2"));
+        }
+        
+        return ejemplos;
+    }
+    
+    private EjemploDto crearEjemplo(String entrada, String salida, String descripcion) {
+        EjemploDto ejemplo = new EjemploDto();
+        ejemplo.setEntrada(entrada);
+        ejemplo.setSalida(salida);
+        ejemplo.setDescripcion(descripcion);
+        return ejemplo;
     }
 }
