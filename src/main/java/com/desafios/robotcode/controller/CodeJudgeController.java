@@ -124,6 +124,141 @@ public class CodeJudgeController {
         }
     }
 
+    @PostMapping("/validate-all-loops")
+    public ResponseEntity<?> validateAllLoops() {
+        try {
+            var problemIds = java.util.List.of(
+                201L, 202L, 203L, 204L, 205L, 206L, 207L, 208L, 209L, 210L, 211L, 212L, // Fáciles
+                251L, 252L, 253L, 254L, 255L, 256L, 257L, // Intermedios  
+                281L, 282L, 283L, 284L, 285L, 286L, 287L  // Difíciles
+            );
+            
+            var reports = new java.util.ArrayList<ValidationSummary>();
+            
+            for (Long problemId : problemIds) {
+                try {
+                    ProblemTestingService.ValidationReport report = testingService.validateOfficialSolution(problemId);
+                    
+                    ValidationSummary summary = new ValidationSummary();
+                    summary.problemId = problemId;
+                    summary.problemTitle = report.problemTitle;
+                    summary.allTestsPassed = report.allTestsPassed;
+                    summary.passedTests = report.passedTests;
+                    summary.totalTests = report.totalTests;
+                    summary.executionTime = report.totalExecutionTime;
+                    summary.summary = report.summary;
+                    
+                    reports.add(summary);
+                    
+                } catch (Exception e) {
+                    ValidationSummary summary = new ValidationSummary();
+                    summary.problemId = problemId;
+                    summary.problemTitle = "Error";
+                    summary.allTestsPassed = false;
+                    summary.summary = "Error: " + e.getMessage();
+                    reports.add(summary);
+                }
+            }
+            
+            return ResponseEntity.ok(reports);
+            
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of(
+                "error", "Error validando problemas: " + e.getMessage()
+            ));
+        }
+    }
+
+    @PostMapping("/validate-all-functions")
+    public ResponseEntity<?> validateAllFunctions() {
+        try {
+            var problemIds = java.util.List.of(
+                301L, 302L, 303L, 304L, 305L, 306L, 307L, 308L, 309L, 310L, 311L, 312L, // Fáciles
+                351L, 352L, 353L, 354L, 355L, 356L, 357L, // Intermedios  
+                381L, 382L, 383L, 384L, 385L, 386L, 387L  // Difíciles
+            );
+            
+            var reports = new java.util.ArrayList<ValidationSummary>();
+            
+            for (Long problemId : problemIds) {
+                try {
+                    ProblemTestingService.ValidationReport report = testingService.validateOfficialSolution(problemId);
+                    
+                    ValidationSummary summary = new ValidationSummary();
+                    summary.problemId = problemId;
+                    summary.problemTitle = report.problemTitle;
+                    summary.allTestsPassed = report.allTestsPassed;
+                    summary.passedTests = report.passedTests;
+                    summary.totalTests = report.totalTests;
+                    summary.executionTime = report.totalExecutionTime;
+                    summary.summary = report.summary;
+                    
+                    reports.add(summary);
+                    
+                } catch (Exception e) {
+                    ValidationSummary summary = new ValidationSummary();
+                    summary.problemId = problemId;
+                    summary.problemTitle = "Error";
+                    summary.allTestsPassed = false;
+                    summary.summary = "Error: " + e.getMessage();
+                    reports.add(summary);
+                }
+            }
+            
+            return ResponseEntity.ok(reports);
+            
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of(
+                "error", "Error validando problemas: " + e.getMessage()
+            ));
+        }
+    }
+
+    @PostMapping("/validate-all-lists")
+    public ResponseEntity<?> validateAllLists() {
+        try {
+            var problemIds = java.util.List.of(
+                401L, 402L, 403L, 404L, 405L, 406L, 407L, 408L, 409L, 410L, 411L, 412L, // Fáciles
+                451L, 452L, 453L, 454L, 455L, 456L, 457L, // Intermedios  
+                481L, 482L, 483L, 484L, 485L, 486L, 487L  // Difíciles
+            );
+            
+            var reports = new java.util.ArrayList<ValidationSummary>();
+            
+            for (Long problemId : problemIds) {
+                try {
+                    ProblemTestingService.ValidationReport report = testingService.validateOfficialSolution(problemId);
+                    
+                    ValidationSummary summary = new ValidationSummary();
+                    summary.problemId = problemId;
+                    summary.problemTitle = report.problemTitle;
+                    summary.allTestsPassed = report.allTestsPassed;
+                    summary.passedTests = report.passedTests;
+                    summary.totalTests = report.totalTests;
+                    summary.executionTime = report.totalExecutionTime;
+                    summary.summary = report.summary;
+                    
+                    reports.add(summary);
+                    
+                } catch (Exception e) {
+                    ValidationSummary summary = new ValidationSummary();
+                    summary.problemId = problemId;
+                    summary.problemTitle = "Error";
+                    summary.allTestsPassed = false;
+                    summary.summary = "Error: " + e.getMessage();
+                    reports.add(summary);
+                }
+            }
+            
+            return ResponseEntity.ok(reports);
+            
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of(
+                "error", "Error validando problemas: " + e.getMessage()
+            ));
+        }
+    }
+
     /**
      * Obtener información del sistema de ejecución
      */

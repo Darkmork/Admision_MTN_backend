@@ -73,6 +73,186 @@ public class ProblemaController {
         }
     }
 
+    @GetMapping("/loops")
+    public ResponseEntity<List<ProblemaDto>> getProblemasLoops() {
+        try {
+            // Buscar el tema de loops por nombre
+            Optional<Tema> temaLoops = temaService.findAll().stream()
+                .filter(t -> "Bucles".equals(t.getNombre()))
+                .findFirst();
+            
+            if (temaLoops.isEmpty()) {
+                // Si no existe el tema, crear uno
+                Tema nuevoTema = new Tema();
+                nuevoTema.setNombre("Bucles");
+                nuevoTema.setDescripcion("Problemas de bucles y estructuras de repetición en Python");
+                nuevoTema.setDificultad(Dificultad.EASY);
+                temaLoops = Optional.of(temaService.save(nuevoTema));
+            }
+            
+            List<ProblemaDto> problemas = problemaService.findByTema(temaLoops.get()).stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+            
+            return ResponseEntity.ok(problemas);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(List.of());
+        }
+    }
+
+    @GetMapping("/funciones")
+    public ResponseEntity<List<ProblemaDto>> getProblemasFunciones() {
+        try {
+            // Buscar el tema de funciones por nombre
+            Optional<Tema> temaFunciones = temaService.findAll().stream()
+                .filter(t -> "Funciones".equals(t.getNombre()))
+                .findFirst();
+            
+            if (temaFunciones.isEmpty()) {
+                // Si no existe el tema, crear uno
+                Tema nuevoTema = new Tema();
+                nuevoTema.setNombre("Funciones");
+                nuevoTema.setDescripcion("Problemas de funciones y programación modular en Python");
+                nuevoTema.setDificultad(Dificultad.EASY);
+                temaFunciones = Optional.of(temaService.save(nuevoTema));
+            }
+            
+            List<ProblemaDto> problemas = problemaService.findByTema(temaFunciones.get()).stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+            
+            return ResponseEntity.ok(problemas);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(List.of());
+        }
+    }
+
+    @GetMapping("/listas")
+    public ResponseEntity<List<ProblemaDto>> getProblemasListas() {
+        try {
+            // Buscar el tema de listas por nombre
+            Optional<Tema> temaListas = temaService.findAll().stream()
+                .filter(t -> "Listas y Arrays".equals(t.getNombre()))
+                .findFirst();
+            
+            if (temaListas.isEmpty()) {
+                // Si no existe el tema, crear uno
+                Tema nuevoTema = new Tema();
+                nuevoTema.setNombre("Listas y Arrays");
+                nuevoTema.setDescripcion("Problemas de listas y arrays en Python");
+                nuevoTema.setDificultad(Dificultad.EASY);
+                temaListas = Optional.of(temaService.save(nuevoTema));
+            }
+            
+            List<ProblemaDto> problemas = problemaService.findByTema(temaListas.get()).stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+            
+            return ResponseEntity.ok(problemas);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(List.of());
+        }
+    }
+
+    @GetMapping("/diccionarios")
+    public ResponseEntity<List<ProblemaDto>> getProblemasDiccionarios() {
+        try {
+            // Buscar el tema de diccionarios por nombre
+            Optional<Tema> temaDiccionarios = temaService.findAll().stream()
+                .filter(t -> "Diccionarios".equals(t.getNombre()))
+                .findFirst();
+            
+            if (temaDiccionarios.isEmpty()) {
+                // Si no existe el tema, crear uno
+                Tema nuevoTema = new Tema();
+                nuevoTema.setNombre("Diccionarios");
+                nuevoTema.setDescripcion("Problemas de diccionarios y estructuras de datos clave-valor en Python");
+                nuevoTema.setDificultad(Dificultad.EASY);
+                temaDiccionarios = Optional.of(temaService.save(nuevoTema));
+            }
+            
+            List<ProblemaDto> problemas = problemaService.findByTema(temaDiccionarios.get()).stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+            
+            return ResponseEntity.ok(problemas);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(List.of());
+        }
+    }
+
+    @GetMapping("/algoritmos")
+    public ResponseEntity<List<ProblemaDto>> getProblemasAlgoritmos() {
+        try {
+            // Buscar el tema de algoritmos por nombre
+            Optional<Tema> temaAlgoritmos = temaService.findAll().stream()
+                .filter(t -> "Algoritmos".equals(t.getNombre()))
+                .findFirst();
+            
+            if (temaAlgoritmos.isEmpty()) {
+                // Si no existe el tema, crear uno
+                Tema nuevoTema = new Tema();
+                nuevoTema.setNombre("Algoritmos");
+                nuevoTema.setDescripcion("Problemas de algoritmos y estructuras de datos en Python");
+                nuevoTema.setDificultad(Dificultad.EASY);
+                temaAlgoritmos = Optional.of(temaService.save(nuevoTema));
+            }
+            
+            List<ProblemaDto> problemas = problemaService.findByTema(temaAlgoritmos.get()).stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+            
+            return ResponseEntity.ok(problemas);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(List.of());
+        }
+    }
+
+    @GetMapping("/poo")
+    public ResponseEntity<List<ProblemaDto>> getProblemasPOO() {
+        try {
+            // Buscar problemas de POO por rango de IDs (701-767)
+            List<ProblemaDto> problemas = problemaService.findAll().stream()
+                .filter(p -> p.getId() >= 701 && p.getId() <= 767)
+                .map(this::toDto)
+                .collect(Collectors.toList());
+            
+            return ResponseEntity.ok(problemas);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(List.of());
+        }
+    }
+
+    @GetMapping("/data-science")
+    public ResponseEntity<List<ProblemaDto>> getProblemasDataScience() {
+        try {
+            // Buscar problemas de ciencia de datos por rango de IDs (801-867)
+            List<ProblemaDto> problemas = problemaService.findAll().stream()
+                .filter(p -> p.getId() >= 801 && p.getId() <= 867)
+                .map(this::toDto)
+                .collect(Collectors.toList());
+            
+            return ResponseEntity.ok(problemas);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(List.of());
+        }
+    }
+
+    @GetMapping("/machine-learning")
+    public ResponseEntity<List<ProblemaDto>> getProblemasMachineLearning() {
+        try {
+            // Buscar problemas de machine learning por rango de IDs (901-967)
+            List<ProblemaDto> problemas = problemaService.findAll().stream()
+                .filter(p -> p.getId() >= 901 && p.getId() <= 967)
+                .map(this::toDto)
+                .collect(Collectors.toList());
+            
+            return ResponseEntity.ok(problemas);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(List.of());
+        }
+    }
+
     @GetMapping("/tema/{temaId}")
     public ResponseEntity<List<ProblemaDto>> getProblemasByTema(@PathVariable Long temaId) {
         Optional<Tema> temaOpt = temaService.findById(temaId);
@@ -399,6 +579,340 @@ public class ProblemaController {
         }
     }
 
+    // Endpoint temporal para debuggear problema 401
+    @GetMapping("/debug/401")
+    public ResponseEntity<Map<String, Object>> debugProblema401() {
+        try {
+            Optional<Problema> problemaOpt = problemaService.findById(401L);
+            if (problemaOpt.isEmpty()) {
+                return ResponseEntity.ok(Map.of(
+                    "error", "Problema 401 no encontrado"
+                ));
+            }
+            
+            Problema problema = problemaOpt.get();
+            Map<String, Object> debugInfo = new HashMap<>();
+            
+            debugInfo.put("id", problema.getId());
+            debugInfo.put("titulo", problema.getTitulo());
+            debugInfo.put("descripcion", problema.getDescripcion());
+            debugInfo.put("testCasesJson", problema.getTestCasesJson());
+            debugInfo.put("solucionCorrecta", problema.getSolucionCorrecta());
+            
+            // Parsear test cases
+            try {
+                ObjectMapper mapper = new ObjectMapper();
+                List<Map<String, Object>> testCases = mapper.readValue(
+                    problema.getTestCasesJson(), 
+                    new TypeReference<List<Map<String, Object>>>() {}
+                );
+                debugInfo.put("testCasesParsed", testCases);
+                debugInfo.put("testCasesCount", testCases.size());
+            } catch (Exception e) {
+                debugInfo.put("parseError", e.getMessage());
+            }
+            
+            // Generar ejemplos
+            List<EjemploDto> ejemplos = generarEjemplosDesdeTestCases(problema);
+            debugInfo.put("ejemplos", ejemplos);
+            debugInfo.put("ejemplosCount", ejemplos.size());
+            
+            return ResponseEntity.ok(debugInfo);
+            
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of(
+                "error", "Error debuggeando problema 401: " + e.getMessage()
+            ));
+        }
+    }
+
+    // Endpoint para migrar problemas de listas
+    @PostMapping("/migrar-listas")
+    public ResponseEntity<String> migrarProblemasListas() {
+        try {
+            System.out.println("=== MIGRANDO PROBLEMAS DE LISTAS ===");
+            
+            // Crear o encontrar el tema 'Listas y Arrays'
+            Optional<Tema> temaListasOpt = temaService.findAll().stream()
+                .filter(t -> "Listas y Arrays".equals(t.getNombre()))
+                .findFirst();
+            
+            Tema temaListas;
+            if (temaListasOpt.isEmpty()) {
+                Tema nuevoTema = new Tema();
+                nuevoTema.setNombre("Listas y Arrays");
+                nuevoTema.setDescripcion("Problemas de listas y arrays en Python");
+                temaListas = temaService.save(nuevoTema);
+            } else {
+                temaListas = temaListasOpt.get();
+            }
+            
+            // Corregir específicamente el problema 401
+            Optional<Problema> problema401Opt = problemaService.findById(401L);
+            if (problema401Opt.isPresent()) {
+                Problema problema401 = problema401Opt.get();
+                problema401.setTestCasesJson("[{\"input\":\"acceder_lista()\",\"expectedOutput\":\"2\"}]");
+                problemaService.save(problema401);
+                System.out.println("✅ Problema 401 corregido");
+            } else {
+                // Crear el problema 401 si no existe
+                Problema problema401 = new Problema();
+                problema401.setId(401L);
+                problema401.setTitulo("Crear y Acceder");
+                problema401.setDescripcion("Crea una lista con los números 1, 2, 3. Luego, devuelve el segundo elemento.");
+                problema401.setCodigoInicial("def acceder_lista():\n  mi_lista = [1, 2, 3]\n  # Tu código aquí\n  return None");
+                problema401.setSolucionCorrecta("def acceder_lista():\n  mi_lista = [1, 2, 3]\n  return mi_lista[1]");
+                problema401.setTestCasesJson("[{\"input\":\"acceder_lista()\",\"expectedOutput\":\"2\"}]");
+                problema401.setTema(temaListas);
+                problema401.setDificultad(Dificultad.EASY);
+                problemaService.save(problema401);
+                System.out.println("✅ Problema 401 creado");
+            }
+            
+            return ResponseEntity.ok("Migración de problemas de listas completada. Problema 401 corregido.");
+            
+        } catch (Exception e) {
+            String error = "Error durante la migración: " + e.getMessage();
+            System.err.println(error);
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(error);
+        }
+    }
+
+    // Endpoint para corregir JSON malformado en todos los problemas
+    @PostMapping("/corregir-json")
+    public ResponseEntity<Map<String, Object>> corregirJsonMalformado() {
+        try {
+            System.out.println("=== CORRIGIENDO JSON MALFORMADO ===");
+            
+            List<Problema> todosLosProblemas = problemaService.findAll();
+            Map<String, Object> resultado = new HashMap<>();
+            int corregidos = 0;
+            int errores = 0;
+            List<String> problemasCorregidos = new ArrayList<>();
+            
+            for (Problema problema : todosLosProblemas) {
+                try {
+                    String testCasesJson = problema.getTestCasesJson();
+                    if (testCasesJson != null && !testCasesJson.isEmpty()) {
+                        
+                        // Corregir valores booleanos sin comillas
+                        String jsonCorregido = testCasesJson
+                            .replaceAll(":\\s*True\\s*([,}])", ": \"True\"$1")
+                            .replaceAll(":\\s*False\\s*([,}])", ": \"False\"$1")
+                            .replaceAll(":\\s*None\\s*([,}])", ": \"None\"$1");
+                        
+                        // Verificar si el JSON es válido
+                        try {
+                            ObjectMapper mapper = new ObjectMapper();
+                            mapper.readValue(jsonCorregido, new TypeReference<List<Map<String, Object>>>() {});
+                            
+                            // Si llegamos aquí, el JSON es válido
+                            if (!jsonCorregido.equals(testCasesJson)) {
+                                problema.setTestCasesJson(jsonCorregido);
+                                problemaService.save(problema);
+                                corregidos++;
+                                problemasCorregidos.add("ID " + problema.getId() + ": " + problema.getTitulo());
+                                System.out.println("✅ Corregido problema " + problema.getId() + ": " + problema.getTitulo());
+                            }
+                            
+                        } catch (Exception e) {
+                            System.err.println("❌ Error en problema " + problema.getId() + ": " + e.getMessage());
+                            errores++;
+                        }
+                    }
+                } catch (Exception e) {
+                    System.err.println("❌ Error procesando problema " + problema.getId() + ": " + e.getMessage());
+                    errores++;
+                }
+            }
+            
+            resultado.put("totalProblemas", todosLosProblemas.size());
+            resultado.put("corregidos", corregidos);
+            resultado.put("errores", errores);
+            resultado.put("problemasCorregidos", problemasCorregidos);
+            
+            System.out.println("=== RESUMEN ===");
+            System.out.println("Total problemas: " + todosLosProblemas.size());
+            System.out.println("Corregidos: " + corregidos);
+            System.out.println("Errores: " + errores);
+            
+            return ResponseEntity.ok(resultado);
+            
+        } catch (Exception e) {
+            String error = "Error durante la corrección: " + e.getMessage();
+            System.err.println(error);
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(Map.of("error", error));
+        }
+    }
+
+    // Endpoint para migrar problemas de diccionarios
+    @PostMapping("/migrar-diccionarios")
+    public ResponseEntity<String> migrarProblemasDiccionarios() {
+        try {
+            System.out.println("=== MIGRANDO PROBLEMAS DE DICCIONARIOS ===");
+            
+            // Crear o encontrar el tema 'Diccionarios'
+            Optional<Tema> temaDiccionariosOpt = temaService.findAll().stream()
+                .filter(t -> "Diccionarios".equals(t.getNombre()))
+                .findFirst();
+            
+            Tema temaDiccionarios;
+            if (temaDiccionariosOpt.isEmpty()) {
+                Tema nuevoTema = new Tema();
+                nuevoTema.setNombre("Diccionarios");
+                nuevoTema.setDescripcion("Problemas de diccionarios y estructuras de datos clave-valor en Python");
+                temaDiccionarios = temaService.save(nuevoTema);
+            } else {
+                temaDiccionarios = temaDiccionariosOpt.get();
+            }
+            
+            // Crear algunos problemas de diccionarios de ejemplo
+            crearProblemaDiccionario(501L, "Acceder a Valor en Diccionario",
+                "Dado un diccionario y una clave, devuelve el valor asociado a esa clave.",
+                "def acceder_valor_diccionario(diccionario, clave):\n  # Tu código aquí\n  return None",
+                "def acceder_valor_diccionario(diccionario, clave):\n  return diccionario[clave]",
+                "[{\"input\":\"{\\\"nombre\\\":\\\"Robot\\\"}, \\\"nombre\\\"\",\"expectedOutput\":\"Robot\"}, {\"input\":\"{\\\"edad\\\":25}, \\\"edad\\\"\",\"expectedOutput\":\"25\"}, {\"input\":\"{\\\"ciudad\\\":\\\"Madrid\\\"}, \\\"ciudad\\\"\",\"expectedOutput\":\"Madrid\"}]",
+                temaDiccionarios, Dificultad.EASY);
+            
+            return ResponseEntity.ok("Migración de problemas de diccionarios completada exitosamente!");
+            
+        } catch (Exception e) {
+            String error = "Error durante la migración: " + e.getMessage();
+            System.err.println(error);
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(error);
+        }
+    }
+    
+    private void crearProblemaDiccionario(Long id, String titulo, String descripcion, String codigoInicial, 
+                                        String solucionCorrecta, String testCasesJson, Tema tema, Dificultad dificultad) {
+        if (!problemaService.findById(id).isPresent()) {
+            Problema problema = new Problema();
+            problema.setId(id);
+            problema.setTitulo(titulo);
+            problema.setDescripcion(descripcion);
+            problema.setCodigoInicial(codigoInicial);
+            problema.setSolucionCorrecta(solucionCorrecta);
+            problema.setTestCasesJson(testCasesJson);
+            problema.setTema(tema);
+            problema.setDificultad(dificultad);
+            problemaService.save(problema);
+            System.out.println("✅ Problema de diccionario creado: " + titulo);
+        }
+    }
+
+    // Endpoint para verificar problemas de diccionarios faltantes
+    @GetMapping("/verificar-diccionarios")
+    public ResponseEntity<Map<String, Object>> verificarProblemasDiccionarios() {
+        try {
+            System.out.println("=== VERIFICANDO PROBLEMAS DE DICCIONARIOS ===");
+            
+            // Buscar el tema de diccionarios
+            Optional<Tema> temaDiccionariosOpt = temaService.findAll().stream()
+                .filter(t -> "Diccionarios".equals(t.getNombre()))
+                .findFirst();
+            
+            if (temaDiccionariosOpt.isEmpty()) {
+                return ResponseEntity.ok(Map.of(
+                    "error", "Tema 'Diccionarios' no encontrado",
+                    "totalEsperado", 26,
+                    "totalEncontrado", 0
+                ));
+            }
+            
+            Tema temaDiccionarios = temaDiccionariosOpt.get();
+            List<Problema> problemasExistentes = problemaService.findByTema(temaDiccionarios);
+            
+            // IDs esperados para diccionarios (501-567)
+            List<Long> idsEsperados = new ArrayList<>();
+            for (long i = 501; i <= 512; i++) idsEsperados.add(i); // Fácil (12)
+            for (long i = 531; i <= 537; i++) idsEsperados.add(i); // Intermedio (7)
+            for (long i = 561; i <= 567; i++) idsEsperados.add(i); // Difícil (7)
+            
+            List<Long> idsExistentes = problemasExistentes.stream()
+                .map(Problema::getId)
+                .collect(Collectors.toList());
+            
+            List<Long> idsFaltantes = idsEsperados.stream()
+                .filter(id -> !idsExistentes.contains(id))
+                .collect(Collectors.toList());
+            
+            Map<String, Object> resultado = new HashMap<>();
+            resultado.put("totalEsperado", 26);
+            resultado.put("totalEncontrado", problemasExistentes.size());
+            resultado.put("idsExistentes", idsExistentes);
+            resultado.put("idsFaltantes", idsFaltantes);
+            resultado.put("problemasFaltantes", idsFaltantes.size());
+            
+            System.out.println("📊 Problemas de diccionarios encontrados: " + problemasExistentes.size() + "/26");
+            if (!idsFaltantes.isEmpty()) {
+                System.out.println("❌ IDs faltantes: " + idsFaltantes);
+            }
+            
+            return ResponseEntity.ok(resultado);
+            
+        } catch (Exception e) {
+            String error = "Error durante la verificación: " + e.getMessage();
+            System.err.println(error);
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(Map.of("error", error));
+        }
+    }
+
+    // Endpoint para completar problemas de diccionarios faltantes
+    @PostMapping("/completar-diccionarios")
+    public ResponseEntity<String> completarProblemasDiccionarios() {
+        try {
+            System.out.println("=== COMPLETANDO PROBLEMAS DE DICCIONARIOS ===");
+            
+            // Buscar el tema de diccionarios
+            Optional<Tema> temaDiccionariosOpt = temaService.findAll().stream()
+                .filter(t -> "Diccionarios".equals(t.getNombre()))
+                .findFirst();
+            
+            if (temaDiccionariosOpt.isEmpty()) {
+                return ResponseEntity.ok("Tema 'Diccionarios' no encontrado");
+            }
+            
+            Tema temaDiccionarios = temaDiccionariosOpt.get();
+            List<Problema> problemasExistentes = problemaService.findByTema(temaDiccionarios);
+            
+            // IDs esperados para diccionarios
+            List<Long> idsEsperados = new ArrayList<>();
+            for (long i = 501; i <= 512; i++) idsEsperados.add(i); // Fácil (12)
+            for (long i = 531; i <= 537; i++) idsEsperados.add(i); // Intermedio (7)
+            for (long i = 561; i <= 567; i++) idsEsperados.add(i); // Difícil (7)
+            
+            List<Long> idsExistentes = problemasExistentes.stream()
+                .map(Problema::getId)
+                .collect(Collectors.toList());
+            
+            List<Long> idsFaltantes = idsEsperados.stream()
+                .filter(id -> !idsExistentes.contains(id))
+                .collect(Collectors.toList());
+            
+            System.out.println("📊 Problemas existentes: " + problemasExistentes.size() + "/26");
+            System.out.println("❌ IDs faltantes: " + idsFaltantes);
+            
+            // Crear los problemas faltantes
+            int creados = 0;
+            for (Long id : idsFaltantes) {
+                // Agregar problemas faltantes según sea necesario
+                // Por ahora no hay problemas faltantes ya que el rango está corregido
+            }
+            
+            return ResponseEntity.ok("Completados " + creados + " problemas de diccionarios faltantes. Total: " + (problemasExistentes.size() + creados) + "/26");
+            
+        } catch (Exception e) {
+            String error = "Error completando problemas: " + e.getMessage();
+            System.err.println(error);
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(error);
+        }
+    }
+
     private ProblemaDto toDto(Problema problema) {
         ProblemaDto dto = new ProblemaDto();
         dto.setId(problema.getId());
@@ -479,17 +993,24 @@ public class ProblemaController {
         if (titulo.contains("edad") || titulo.contains("mayor")) {
             ejemplos.add(crearEjemplo("18", "Mayor de edad", "Edad de mayoría"));
             ejemplos.add(crearEjemplo("16", "Menor de edad", "Edad menor"));
+            ejemplos.add(crearEjemplo("21", "Mayor de edad", "Edad adulta"));
         } else if (titulo.contains("par") || titulo.contains("impar")) {
             ejemplos.add(crearEjemplo("4", "Par", "Número par"));
             ejemplos.add(crearEjemplo("7", "Impar", "Número impar"));
+            ejemplos.add(crearEjemplo("10", "Par", "Número par"));
         } else if (titulo.contains("positivo") || titulo.contains("negativo")) {
             ejemplos.add(crearEjemplo("5", "Positivo", "Número positivo"));
             ejemplos.add(crearEjemplo("-3", "Negativo", "Número negativo"));
             ejemplos.add(crearEjemplo("0", "Cero", "Número cero"));
+        } else if (titulo.contains("diccionario") || titulo.contains("dict")) {
+            ejemplos.add(crearEjemplo("{\"nombre\": \"Robot\"}", "Robot", "Acceso a valor"));
+            ejemplos.add(crearEjemplo("{\"edad\": 25}", "25", "Valor numérico"));
+            ejemplos.add(crearEjemplo("{\"activo\": true}", "True", "Valor booleano"));
         } else {
             // Ejemplos genéricos
             ejemplos.add(crearEjemplo("entrada1", "salida1", "Ejemplo 1"));
             ejemplos.add(crearEjemplo("entrada2", "salida2", "Ejemplo 2"));
+            ejemplos.add(crearEjemplo("entrada3", "salida3", "Ejemplo 3"));
         }
         
         return ejemplos;

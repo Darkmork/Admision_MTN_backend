@@ -58,7 +58,124 @@ public class ValidationController {
         try {
             // Get all conditional problems that have solution code
             var problems = problemaRepository.findAll().stream()
-                .filter(p -> p.getTema() != null && "conditionals".equals(p.getTema().getNombre()))
+                .filter(p -> p.getTema() != null && "Condicionales".equals(p.getTema().getNombre()))
+                .filter(p -> p.getSolucionCorrecta() != null)
+                .toList();
+
+            var results = new java.util.ArrayList<ValidationSummary>();
+
+            for (Problema problema : problems) {
+                String functionName = extractFunctionName(problema.getSolucionCorrecta());
+                if (functionName != null) {
+                    TestCaseValidationService.ValidationResult result = validationService.validateTestCases(
+                        problema.getSolucionCorrecta(),
+                        problema.getTestCasesJson(),
+                        functionName
+                    );
+                    
+                    results.add(new ValidationSummary(
+                        problema.getId(),
+                        problema.getTitulo(),
+                        result.isSuccess(),
+                        result.getMessage(),
+                        result.getTestResults() != null ? result.getTestResults().size() : 0,
+                        result.getTestResults() != null ? 
+                            (int) result.getTestResults().stream().mapToLong(r -> r.isPassed() ? 1 : 0).sum() : 0
+                    ));
+                }
+            }
+
+            return ResponseEntity.ok(results);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error en validación masiva: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/all-loops")
+    public ResponseEntity<?> validateAllLoopProblems() {
+        try {
+            // Get all loop problems that have solution code
+            var problems = problemaRepository.findAll().stream()
+                .filter(p -> p.getTema() != null && "Bucles".equals(p.getTema().getNombre()))
+                .filter(p -> p.getSolucionCorrecta() != null)
+                .toList();
+
+            var results = new java.util.ArrayList<ValidationSummary>();
+
+            for (Problema problema : problems) {
+                String functionName = extractFunctionName(problema.getSolucionCorrecta());
+                if (functionName != null) {
+                    TestCaseValidationService.ValidationResult result = validationService.validateTestCases(
+                        problema.getSolucionCorrecta(),
+                        problema.getTestCasesJson(),
+                        functionName
+                    );
+                    
+                    results.add(new ValidationSummary(
+                        problema.getId(),
+                        problema.getTitulo(),
+                        result.isSuccess(),
+                        result.getMessage(),
+                        result.getTestResults() != null ? result.getTestResults().size() : 0,
+                        result.getTestResults() != null ? 
+                            (int) result.getTestResults().stream().mapToLong(r -> r.isPassed() ? 1 : 0).sum() : 0
+                    ));
+                }
+            }
+
+            return ResponseEntity.ok(results);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error en validación masiva: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/all-functions")
+    public ResponseEntity<?> validateAllFunctionProblems() {
+        try {
+            // Get all function problems that have solution code
+            var problems = problemaRepository.findAll().stream()
+                .filter(p -> p.getTema() != null && "Funciones".equals(p.getTema().getNombre()))
+                .filter(p -> p.getSolucionCorrecta() != null)
+                .toList();
+
+            var results = new java.util.ArrayList<ValidationSummary>();
+
+            for (Problema problema : problems) {
+                String functionName = extractFunctionName(problema.getSolucionCorrecta());
+                if (functionName != null) {
+                    TestCaseValidationService.ValidationResult result = validationService.validateTestCases(
+                        problema.getSolucionCorrecta(),
+                        problema.getTestCasesJson(),
+                        functionName
+                    );
+                    
+                    results.add(new ValidationSummary(
+                        problema.getId(),
+                        problema.getTitulo(),
+                        result.isSuccess(),
+                        result.getMessage(),
+                        result.getTestResults() != null ? result.getTestResults().size() : 0,
+                        result.getTestResults() != null ? 
+                            (int) result.getTestResults().stream().mapToLong(r -> r.isPassed() ? 1 : 0).sum() : 0
+                    ));
+                }
+            }
+
+            return ResponseEntity.ok(results);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error en validación masiva: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/all-lists")
+    public ResponseEntity<?> validateAllListProblems() {
+        try {
+            // Get all list problems that have solution code
+            var problems = problemaRepository.findAll().stream()
+                .filter(p -> p.getTema() != null && "Listas y Arrays".equals(p.getTema().getNombre()))
                 .filter(p -> p.getSolucionCorrecta() != null)
                 .toList();
 
