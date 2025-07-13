@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.stream.Collectors;
+import com.desafios.robotcode.model.RolUsuario;
 
 @RestController
 @RequestMapping("/api/usuarios")
@@ -182,8 +183,6 @@ public class UsuarioController {
     // Endpoint para debug completo de un usuario
     @GetMapping("/{id}/debug")
     public ResponseEntity<String> debugUsuario(@PathVariable Long id) {
-        System.out.println("=== DEBUG COMPLETO USUARIO ID: " + id + " ===");
-        
         Optional<Usuario> usuarioOpt = usuarioService.findById(id);
         if (usuarioOpt.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -199,9 +198,28 @@ public class UsuarioController {
         debug.append("Puntaje: ").append(usuario.getPuntaje()).append("\n");
         debug.append("Fecha Registro: ").append(usuario.getFechaRegistro()).append("\n");
         
-        System.out.println(debug.toString());
-        
         return ResponseEntity.ok(debug.toString());
+    }
+
+    // Endpoint para actualizar rol de usuario a ADMIN
+    @PutMapping("/{id}/role/admin")
+    public ResponseEntity<UsuarioDto> setUserAsAdmin(@PathVariable Long id) {
+        Optional<Usuario> usuarioOpt = usuarioService.findById(id);
+        if (usuarioOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        
+        Usuario usuario = usuarioOpt.get();
+        usuario.setRol(RolUsuario.ADMIN);
+        Usuario updated = usuarioService.save(usuario);
+        
+        System.out.println("=== USUARIO PROMOVIDO A ADMIN ===");
+        System.out.println("Usuario: " + usuario.getUsername() + " (ID: " + usuario.getId() + ")");
+        System.out.println("Rol anterior: " + usuarioOpt.get().getRol());
+        System.out.println("Rol nuevo: " + updated.getRol());
+        System.out.println("=================================");
+        
+        return ResponseEntity.ok(toDto(updated));
     }
 
     // Utilidad interna para mapear entidad a DTO
