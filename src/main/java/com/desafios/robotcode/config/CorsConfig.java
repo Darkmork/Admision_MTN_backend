@@ -13,7 +13,13 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/api/**")
-                        .allowedOriginPatterns("http://localhost:*", "http://127.0.0.1:*") // Permite cualquier puerto local
+                        .allowedOriginPatterns(
+                            "http://localhost:*",
+                            "http://127.0.0.1:*",
+                            "https://robotcode-arena.vercel.app",
+                            "https://robotcode-arena-qwtf24q85-darkmorks-projects.vercel.app",
+                            "https://*.vercel.app"
+                        ) // Permite cualquier puerto local y dominios de Vercel
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(true);
