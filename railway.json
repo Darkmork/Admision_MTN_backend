@@ -5,23 +5,10 @@
     "buildCommand": "./mvnw clean install -DskipTests"
   },
   "deploy": {
-    "startCommand": "./mvnw spring-boot:run -Dspring.profiles.active=prod",
-    "healthcheckPath": "/api/health",
+    "startCommand": "./start.sh",
+    "healthcheckPath": "/health",
     "healthcheckTimeout": 300,
     "restartPolicyType": "ON_FAILURE",
-    "restartPolicyMaxRetries": 3
-  },
-  "environments": {
-    "production": {
-      "variables": {
-        "SPRING_PROFILES_ACTIVE": "prod",
-        "EMAIL_USERNAME": "jorge.gangale@mtn.cl",
-        "EMAIL_PASSWORD": "eiyv rmur unbh jynh",
-        "EMAIL_FROM": "jorge.gangale@mtn.cl",
-        "DEEPSEEK_API_KEY": "sk-0834832a545645e88bf30b5e4327777b",
-        "APP_BASE_URL": "https://robotcode-arena.vercel.app",
-        "CORS_ORIGINS": "https://robotcode-arena.vercel.app,https://robotcode-arena.vercel.app/*"
-      }
-    }
+    "restartPolicyMaxRetries": 10
   }
 } 
