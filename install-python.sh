@@ -2,21 +2,23 @@
 
 echo "🐍 Instalando Python..."
 
-# Actualizar sistema
-apt-get update
+# Verificar si Python ya está instalado
+if command -v python3 &> /dev/null; then
+    echo "✅ Python3 ya está instalado"
+    python3 --version
+else
+    echo "❌ Python3 no está disponible"
+    exit 1
+fi
 
-# Instalar Python y dependencias
-apt-get install -y python3 python3-pip python3-dev python3-venv
+# Instalar librerías de Python si pip está disponible
+if command -v pip3 &> /dev/null; then
+    echo "📦 Instalando librerías de Python..."
+    pip3 install numpy pandas matplotlib scikit-learn scipy seaborn
+    echo "✅ Librerías instaladas"
+else
+    echo "⚠️ pip3 no está disponible, saltando instalación de librerías"
+fi
 
-# Crear enlace simbólico
-ln -sf /usr/bin/python3 /usr/bin/python
-
-# Verificar instalación
-python3 --version
-pip3 --version
-
-# Instalar librerías de Python
-pip3 install numpy pandas matplotlib scikit-learn scipy seaborn
-
-echo "✅ Python instalado correctamente"
+echo "✅ Script completado"
 python3 --version
