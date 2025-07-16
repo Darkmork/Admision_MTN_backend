@@ -289,59 +289,6 @@ public class CodeJudgeController {
     }
 
     /**
-     * Verificar si Python está disponible en el sistema
-     */
-    @GetMapping("/health/python")
-    public ResponseEntity<?> checkPythonHealth() {
-        try {
-            System.out.println("🩺 HEALTH CHECK: Verificando Python...");
-            
-            // Verificar si Python está disponible ejecutando un comando simple
-            ProcessBuilder pb = new ProcessBuilder("python3", "--version");
-            pb.environment().put("PATH", System.getenv("PATH"));
-            Process process = pb.start();
-            
-            boolean finished = process.waitFor(5, java.util.concurrent.TimeUnit.SECONDS);
-            
-            if (finished && process.exitValue() == 0) {
-                // Leer la versión de Python
-                java.io.BufferedReader reader = new java.io.BufferedReader(
-                    new java.io.InputStreamReader(process.getInputStream()));
-                String version = reader.readLine();
-                
-                System.out.println("✅ Python disponible: " + version);
-                
-                return ResponseEntity.ok(java.util.Map.of(
-                    "status", "healthy",
-                    "python_available", true,
-                    "python_version", version != null ? version : "Unknown",
-                    "path", System.getenv("PATH"),
-                    "timestamp", System.currentTimeMillis()
-                ));
-            } else {
-                System.out.println("❌ Python no disponible - Exit code: " + process.exitValue());
-                return ResponseEntity.status(503).body(java.util.Map.of(
-                    "status", "unhealthy",
-                    "python_available", false,
-                    "error", "Python no está disponible o no responde",
-                    "exit_code", process.exitValue(),
-                    "path", System.getenv("PATH"),
-                    "timestamp", System.currentTimeMillis()
-                ));
-            }
-        } catch (Exception e) {
-            System.out.println("💥 Error verificando Python: " + e.getMessage());
-            return ResponseEntity.status(503).body(java.util.Map.of(
-                "status", "unhealthy",
-                "python_available", false,
-                "error", "Error verificando Python: " + e.getMessage(),
-                "path", System.getenv("PATH"),
-                "timestamp", System.currentTimeMillis()
-            ));
-        }
-    }
-
-    /**
      * Ejecutar código de manera flexible (nuevo sistema mejorado)
      */
     @PostMapping("/execute-flexible")

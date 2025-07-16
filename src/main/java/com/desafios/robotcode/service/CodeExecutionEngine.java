@@ -142,22 +142,6 @@ public class CodeExecutionEngine {
     }
 
     private ExecutionResult executePython(Path sourceFile, ExecutionRequest request) throws IOException, InterruptedException {
-        // Diagnóstico: Verificar disponibilidad de Python
-        System.out.println("🐍 DIAGNÓSTICO PYTHON:");
-        System.out.println("PATH: " + System.getenv("PATH"));
-        System.out.println("PYTHONPATH: " + System.getenv("PYTHONPATH"));
-        System.out.println("Working Directory: " + System.getProperty("user.dir"));
-        
-        // Verificar si python3 está disponible
-        try {
-            ProcessBuilder pb = new ProcessBuilder("which", "python3");
-            Process process = pb.start();
-            process.waitFor();
-            System.out.println("which python3 exit code: " + process.exitValue());
-        } catch (Exception e) {
-            System.out.println("Error checking python3 availability: " + e.getMessage());
-        }
-        
         // Primero verificar la sintaxis compilando sin ejecutar
         List<String> compileCommand = new ArrayList<>();
         compileCommand.add("python3");
