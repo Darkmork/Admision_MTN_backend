@@ -1,0 +1,12 @@
+[phases.setup]
+nixPkgs = ["python311", "python311Packages.pip", "python311Packages.numpy", "python311Packages.pandas", "python311Packages.matplotlib", "python311Packages.scikitlearn", "python311Packages.scipy", "python311Packages.seaborn"]
+
+[phases.build]
+cmds = ["./mvnw clean package -DskipTests"]
+
+[phases.start]
+cmd = "java -jar target/*.jar"
+
+[variables]
+JAVA_VERSION = "17"
+PYTHON_VERSION = "3.11"
