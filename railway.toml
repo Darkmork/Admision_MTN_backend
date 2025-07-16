@@ -1,5 +1,5 @@
 [build]
-builder = "heroku"
+builder = "nixpacks"
 
 [deploy]
 startCommand = "./mvnw spring-boot:run"
