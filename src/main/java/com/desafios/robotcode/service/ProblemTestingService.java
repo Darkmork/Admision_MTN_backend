@@ -25,6 +25,12 @@ public class ProblemTestingService {
     @Autowired
     private ProblemaRepository problemaRepository;
 
+    @Autowired
+    private DockerExecutorService dockerExecutorService;
+
+    @Autowired
+    private PistonExecutorService pistonExecutorService;
+
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public static class TestCase {
@@ -270,35 +276,57 @@ public class ProblemTestingService {
         result.expectedOutput = testCase.expectedOutput;
         
         try {
-            // Usar el ejecutor flexible para Python
+            // Priorizar el ejecutor Docker para Python si está disponible
             if ("python3".equals(language) || "python".equals(language)) {
-                FlexibleCodeExecutor.ExecutionResult execResult = flexibleExecutor.executePythonFlexibly(userCode, testCase.input);
-                result.executionTime = execResult.executionTime;
-                
-                if (execResult.status == FlexibleCodeExecutor.ExecutionStatus.SUCCESS) {
-                    result.actualOutput = execResult.stdout.trim();
-                    // Usar comparación flexible
-                    result.passed = flexibleExecutor.compareOutputsFlexibly(result.expectedOutput, result.actualOutput);
-                    result.status = result.passed ? TestStatus.PASSED : TestStatus.FAILED;
+                // Intentar con Docker primero
+                if (dockerExecutorService.isDockerAvailable()) {
+                    DockerExecutorService.ExecutionResult dockerResult = dockerExecutorService.executeCode(userCode, testCase.input);
+                    result.executionTime = dockerResult.executionTime;
                     
-                    if (!result.passed) {
-                        result.errorMessage = generateFlexibleDiffMessage(result.expectedOutput, result.actualOutput);
+                    if (dockerResult.exitCode == 0 && !dockerResult.timedOut) {
+                        result.actualOutput = dockerResult.output.trim();
+                        result.passed = flexibleExecutor.compareOutputsFlexibly(result.expectedOutput, result.actualOutput);
+                        result.status = result.passed ? TestStatus.PASSED : TestStatus.FAILED;
+                        
+                        if (!result.passed) {
+                            result.errorMessage = generateFlexibleDiffMessage(result.expectedOutput, result.actualOutput);
+                        }
+                    } else {
+                        result.passed = false;
+                        result.actualOutput = dockerResult.error;
+                        result.errorMessage = dockerResult.error;
+                        result.status = dockerResult.timedOut ? TestStatus.TIMEOUT : TestStatus.ERROR;
                     }
                 } else {
-                    result.passed = false;
-                    result.actualOutput = execResult.stderr;
-                    result.errorMessage = execResult.errorMessage;
+                    // Fallback al ejecutor flexible si Docker no está disponible
+                    FlexibleCodeExecutor.ExecutionResult execResult = flexibleExecutor.executePythonFlexibly(userCode, testCase.input);
+                    result.executionTime = execResult.executionTime;
                     
-                    switch (execResult.status) {
-                        case COMPILATION_ERROR:
-                            result.status = TestStatus.COMPILATION_ERROR;
-                            break;
-                        case TIME_LIMIT_EXCEEDED:
-                            result.status = TestStatus.TIMEOUT;
-                            break;
-                        default:
-                            result.status = TestStatus.ERROR;
-                            break;
+                    if (execResult.status == FlexibleCodeExecutor.ExecutionStatus.SUCCESS) {
+                        result.actualOutput = execResult.stdout.trim();
+                        // Usar comparación flexible
+                        result.passed = flexibleExecutor.compareOutputsFlexibly(result.expectedOutput, result.actualOutput);
+                        result.status = result.passed ? TestStatus.PASSED : TestStatus.FAILED;
+                        
+                        if (!result.passed) {
+                            result.errorMessage = generateFlexibleDiffMessage(result.expectedOutput, result.actualOutput);
+                        }
+                    } else {
+                        result.passed = false;
+                        result.actualOutput = execResult.stderr;
+                        result.errorMessage = execResult.errorMessage;
+                        
+                        switch (execResult.status) {
+                            case COMPILATION_ERROR:
+                                result.status = TestStatus.COMPILATION_ERROR;
+                                break;
+                            case TIME_LIMIT_EXCEEDED:
+                                result.status = TestStatus.TIMEOUT;
+                                break;
+                            default:
+                                result.status = TestStatus.ERROR;
+                                break;
+                        }
                     }
                 }
             } else {
@@ -411,35 +439,76 @@ public class ProblemTestingService {
         result.expectedOutput = testCase.expectedOutput;
         
         try {
-            // Usar el ejecutor flexible para Python
+            // Priorizar Piston API para Python (más confiable y gratuito)
             if ("python3".equals(language) || "python".equals(language)) {
-                FlexibleCodeExecutor.ExecutionResult execResult = flexibleExecutor.executePythonFlexibly(userCode, testCase.input);
-                result.executionTime = execResult.executionTime;
-                
-                if (execResult.status == FlexibleCodeExecutor.ExecutionStatus.SUCCESS) {
-                    result.actualOutput = execResult.stdout.trim();
-                    // Usar comparación flexible
-                    result.passed = flexibleExecutor.compareOutputsFlexibly(result.expectedOutput, result.actualOutput);
-                    result.status = result.passed ? TestStatus.PASSED : TestStatus.FAILED;
+                // Intentar con Piston API primero
+                if (pistonExecutorService.isPistonAvailable()) {
+                    PistonExecutorService.ExecutionResult pistonResult = pistonExecutorService.executeCode(userCode, testCase.input);
+                    result.executionTime = pistonResult.executionTime;
                     
-                    if (!result.passed) {
-                        result.errorMessage = generateFlexibleDiffMessage(result.expectedOutput, result.actualOutput);
+                    if (pistonResult.success) {
+                        result.actualOutput = pistonResult.output.trim();
+                        result.passed = flexibleExecutor.compareOutputsFlexibly(result.expectedOutput, result.actualOutput);
+                        result.status = result.passed ? TestStatus.PASSED : TestStatus.FAILED;
+                        
+                        if (!result.passed) {
+                            result.errorMessage = generateFlexibleDiffMessage(result.expectedOutput, result.actualOutput);
+                        }
+                    } else {
+                        result.passed = false;
+                        result.actualOutput = pistonResult.stderr;
+                        result.errorMessage = pistonResult.errorMessage;
+                        result.status = TestStatus.ERROR;
+                    }
+                } else if (dockerExecutorService.isDockerAvailable()) {
+                    // Fallback a Docker si Piston no está disponible
+                    DockerExecutorService.ExecutionResult dockerResult = dockerExecutorService.executeCode(userCode, testCase.input);
+                    result.executionTime = dockerResult.executionTime;
+                    
+                    if (dockerResult.exitCode == 0 && !dockerResult.timedOut) {
+                        result.actualOutput = dockerResult.output.trim();
+                        result.passed = flexibleExecutor.compareOutputsFlexibly(result.expectedOutput, result.actualOutput);
+                        result.status = result.passed ? TestStatus.PASSED : TestStatus.FAILED;
+                        
+                        if (!result.passed) {
+                            result.errorMessage = generateFlexibleDiffMessage(result.expectedOutput, result.actualOutput);
+                        }
+                    } else {
+                        result.passed = false;
+                        result.actualOutput = dockerResult.error;
+                        result.errorMessage = dockerResult.error;
+                        result.status = dockerResult.timedOut ? TestStatus.TIMEOUT : TestStatus.ERROR;
                     }
                 } else {
-                    result.passed = false;
-                    result.actualOutput = execResult.stderr;
-                    result.errorMessage = execResult.errorMessage;
+                    // Fallback al ejecutor flexible si ni Piston ni Docker están disponibles
+                    FlexibleCodeExecutor.ExecutionResult execResult = flexibleExecutor.executePythonFlexibly(userCode, testCase.input);
+                    result.executionTime = execResult.executionTime;
                     
-                    switch (execResult.status) {
-                        case COMPILATION_ERROR:
-                            result.status = TestStatus.COMPILATION_ERROR;
-                            break;
-                        case TIME_LIMIT_EXCEEDED:
-                            result.status = TestStatus.TIMEOUT;
-                            break;
-                        default:
-                            result.status = TestStatus.ERROR;
-                            break;
+                    if (execResult.status == FlexibleCodeExecutor.ExecutionStatus.SUCCESS) {
+                        result.actualOutput = execResult.stdout.trim();
+                        // Usar comparación flexible
+                        result.passed = flexibleExecutor.compareOutputsFlexibly(result.expectedOutput, result.actualOutput);
+                        result.status = result.passed ? TestStatus.PASSED : TestStatus.FAILED;
+                        
+                        if (!result.passed) {
+                            result.errorMessage = generateFlexibleDiffMessage(result.expectedOutput, result.actualOutput);
+                        }
+                    } else {
+                        result.passed = false;
+                        result.actualOutput = execResult.stderr;
+                        result.errorMessage = execResult.errorMessage;
+                        
+                        switch (execResult.status) {
+                            case COMPILATION_ERROR:
+                                result.status = TestStatus.COMPILATION_ERROR;
+                                break;
+                            case TIME_LIMIT_EXCEEDED:
+                                result.status = TestStatus.TIMEOUT;
+                                break;
+                            default:
+                                result.status = TestStatus.ERROR;
+                                break;
+                        }
                     }
                 }
             } else {

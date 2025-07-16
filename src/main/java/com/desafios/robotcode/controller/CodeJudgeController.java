@@ -4,6 +4,8 @@ import com.desafios.robotcode.service.CodeExecutionEngine;
 import com.desafios.robotcode.service.FlexibleCodeExecutor;
 import com.desafios.robotcode.service.ProblemTestingService;
 import com.desafios.robotcode.service.AdvancedCodeEvaluator;
+import com.desafios.robotcode.service.DockerExecutorService;
+import com.desafios.robotcode.service.PistonExecutorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +28,12 @@ public class CodeJudgeController {
 
     @Autowired
     private AdvancedCodeEvaluator advancedEvaluator;
+
+    @Autowired
+    private DockerExecutorService dockerExecutorService;
+
+    @Autowired
+    private PistonExecutorService pistonExecutorService;
 
     /**
      * Ejecutar código directamente (estilo Judge0)
@@ -278,14 +286,126 @@ public class CodeJudgeController {
                 "Flexible code execution",
                 "Smart function detection",
                 "Flexible output comparison",
-                "Multiple execution strategies"
+                "Multiple execution strategies",
+                "Docker sandbox execution"
             ),
             "limits", Map.of(
                 "timeoutSeconds", 10,
                 "maxOutputSize", "10KB",
                 "maxMemoryMB", 128
+            ),
+            "docker", Map.of(
+                "available", dockerExecutorService.isDockerAvailable(),
+                "imageName", "robotcode-python:latest",
+                "memoryLimit", "128m",
+                "cpuLimit", "0.5"
+            ),
+            "piston", Map.of(
+                "available", pistonExecutorService.isPistonAvailable(),
+                "info", pistonExecutorService.getPistonInfo(),
+                "priority", "primary"
             )
         ));
+    }
+
+    /**
+     * Validar código usando Docker sandbox
+     */
+    @PostMapping("/validate-docker/{problemId}")
+    public ResponseEntity<?> validateCodeWithDocker(
+            @PathVariable Long problemId,
+            @RequestBody ValidationRequest request) {
+        try {
+            // Verificar que Docker esté disponible
+            if (!dockerExecutorService.isDockerAvailable()) {
+                return ResponseEntity.status(503).body(Map.of(
+                    "error", "Docker no está disponible en este servidor",
+                    "suggestion", "Use el endpoint /validate/{problemId} para validación sin Docker"
+                ));
+            }
+            
+            // Obtener el problema
+            var problema = testingService.findProblemaById(problemId);
+            if (problema == null) {
+                return ResponseEntity.notFound().build();
+            }
+            
+            // Usar Docker para validar
+            DockerExecutorService.ValidationResult result = dockerExecutorService.validateCode(
+                request.code, problema.getTestCasesJson()
+            );
+            
+            // Convertir resultado a formato de respuesta
+            Map<String, Object> response = Map.of(
+                "problemId", problemId,
+                "problemTitle", problema.getTitulo(),
+                "allTestsPassed", result.passed,
+                "passedTests", result.correctTests,
+                "totalTests", result.totalTests,
+                "successRate", result.successRate,
+                "summary", result.summary,
+                "totalExecutionTime", result.totalExecutionTime,
+                "testResults", result.testResults,
+                "executionMethod", "docker"
+            );
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of(
+                "error", "Error validando código con Docker: " + e.getMessage()
+            ));
+        }
+    }
+
+    /**
+     * Validar código usando Piston API
+     */
+    @PostMapping("/validate-piston/{problemId}")
+    public ResponseEntity<?> validateCodeWithPiston(
+            @PathVariable Long problemId,
+            @RequestBody ValidationRequest request) {
+        try {
+            // Verificar que Piston esté disponible
+            if (!pistonExecutorService.isPistonAvailable()) {
+                return ResponseEntity.status(503).body(Map.of(
+                    "error", "Piston API no está disponible",
+                    "suggestion", "Use el endpoint /validate/{problemId} para validación con fallback"
+                ));
+            }
+            
+            // Obtener el problema
+            var problema = testingService.findProblemaById(problemId);
+            if (problema == null) {
+                return ResponseEntity.notFound().build();
+            }
+            
+            // Usar Piston para validar
+            PistonExecutorService.ValidationResult result = pistonExecutorService.validateCode(
+                request.code, problema.getTestCasesJson()
+            );
+            
+            // Convertir resultado a formato de respuesta
+            Map<String, Object> response = Map.of(
+                "problemId", problemId,
+                "problemTitle", problema.getTitulo(),
+                "allTestsPassed", result.passed,
+                "passedTests", result.correctTests,
+                "totalTests", result.totalTests,
+                "successRate", result.successRate,
+                "summary", result.summary,
+                "totalExecutionTime", result.totalExecutionTime,
+                "testResults", result.testResults,
+                "executionMethod", "piston"
+            );
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of(
+                "error", "Error validando código con Piston API: " + e.getMessage()
+            ));
+        }
     }
 
     /**
