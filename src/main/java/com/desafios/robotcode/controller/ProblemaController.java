@@ -73,6 +73,28 @@ public class ProblemaController {
         }
     }
 
+    @GetMapping("/condicionales-frontend")
+    public ResponseEntity<List<FrontendProblemaDto>> getProblemasCondicionalesFrontend() {
+        try {
+            Optional<Tema> temaCondicionales = temaService.findAll().stream()
+                .filter(t -> "Condicionales".equals(t.getNombre()))
+                .findFirst();
+            if (temaCondicionales.isEmpty()) {
+                Tema nuevoTema = new Tema();
+                nuevoTema.setNombre("Condicionales");
+                nuevoTema.setDescripcion("Problemas de condicionales en Python");
+                nuevoTema.setDificultad(Dificultad.EASY);
+                temaCondicionales = Optional.of(temaService.save(nuevoTema));
+            }
+            List<FrontendProblemaDto> problemas = problemaService.findByTema(temaCondicionales.get()).stream()
+                .map(this::toFrontendDto)
+                .collect(Collectors.toList());
+            return ResponseEntity.ok(problemas);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(List.of());
+        }
+    }
+
     @GetMapping("/loops")
     public ResponseEntity<List<ProblemaDto>> getProblemasLoops() {
         try {
@@ -94,6 +116,28 @@ public class ProblemaController {
                 .map(this::toDto)
                 .collect(Collectors.toList());
             
+            return ResponseEntity.ok(problemas);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(List.of());
+        }
+    }
+
+    @GetMapping("/loops-frontend")
+    public ResponseEntity<List<FrontendProblemaDto>> getProblemasLoopsFrontend() {
+        try {
+            Optional<Tema> temaLoops = temaService.findAll().stream()
+                .filter(t -> "Bucles".equals(t.getNombre()))
+                .findFirst();
+            if (temaLoops.isEmpty()) {
+                Tema nuevoTema = new Tema();
+                nuevoTema.setNombre("Bucles");
+                nuevoTema.setDescripcion("Problemas de bucles y estructuras de repetición en Python");
+                nuevoTema.setDificultad(Dificultad.EASY);
+                temaLoops = Optional.of(temaService.save(nuevoTema));
+            }
+            List<FrontendProblemaDto> problemas = problemaService.findByTema(temaLoops.get()).stream()
+                .map(this::toFrontendDto)
+                .collect(Collectors.toList());
             return ResponseEntity.ok(problemas);
         } catch (Exception e) {
             return ResponseEntity.status(500).body(List.of());
@@ -127,6 +171,28 @@ public class ProblemaController {
         }
     }
 
+    @GetMapping("/funciones-frontend")
+    public ResponseEntity<List<FrontendProblemaDto>> getProblemasFuncionesFrontend() {
+        try {
+            Optional<Tema> temaFunciones = temaService.findAll().stream()
+                .filter(t -> "Funciones".equals(t.getNombre()))
+                .findFirst();
+            if (temaFunciones.isEmpty()) {
+                Tema nuevoTema = new Tema();
+                nuevoTema.setNombre("Funciones");
+                nuevoTema.setDescripcion("Problemas de funciones y programación modular en Python");
+                nuevoTema.setDificultad(Dificultad.EASY);
+                temaFunciones = Optional.of(temaService.save(nuevoTema));
+            }
+            List<FrontendProblemaDto> problemas = problemaService.findByTema(temaFunciones.get()).stream()
+                .map(this::toFrontendDto)
+                .collect(Collectors.toList());
+            return ResponseEntity.ok(problemas);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(List.of());
+        }
+    }
+
     @GetMapping("/listas")
     public ResponseEntity<List<ProblemaDto>> getProblemasListas() {
         try {
@@ -148,6 +214,28 @@ public class ProblemaController {
                 .map(this::toDto)
                 .collect(Collectors.toList());
             
+            return ResponseEntity.ok(problemas);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(List.of());
+        }
+    }
+
+    @GetMapping("/listas-frontend")
+    public ResponseEntity<List<FrontendProblemaDto>> getProblemasListasFrontend() {
+        try {
+            Optional<Tema> temaListas = temaService.findAll().stream()
+                .filter(t -> "Listas y Arrays".equals(t.getNombre()))
+                .findFirst();
+            if (temaListas.isEmpty()) {
+                Tema nuevoTema = new Tema();
+                nuevoTema.setNombre("Listas y Arrays");
+                nuevoTema.setDescripcion("Problemas de listas y arrays en Python");
+                nuevoTema.setDificultad(Dificultad.EASY);
+                temaListas = Optional.of(temaService.save(nuevoTema));
+            }
+            List<FrontendProblemaDto> problemas = problemaService.findByTema(temaListas.get()).stream()
+                .map(this::toFrontendDto)
+                .collect(Collectors.toList());
             return ResponseEntity.ok(problemas);
         } catch (Exception e) {
             return ResponseEntity.status(500).body(List.of());
@@ -181,6 +269,28 @@ public class ProblemaController {
         }
     }
 
+    @GetMapping("/diccionarios-frontend")
+    public ResponseEntity<List<FrontendProblemaDto>> getProblemasDiccionariosFrontend() {
+        try {
+            Optional<Tema> temaDiccionarios = temaService.findAll().stream()
+                .filter(t -> "Diccionarios".equals(t.getNombre()))
+                .findFirst();
+            if (temaDiccionarios.isEmpty()) {
+                Tema nuevoTema = new Tema();
+                nuevoTema.setNombre("Diccionarios");
+                nuevoTema.setDescripcion("Problemas de diccionarios y estructuras de datos clave-valor en Python");
+                nuevoTema.setDificultad(Dificultad.EASY);
+                temaDiccionarios = Optional.of(temaService.save(nuevoTema));
+            }
+            List<FrontendProblemaDto> problemas = problemaService.findByTema(temaDiccionarios.get()).stream()
+                .map(this::toFrontendDto)
+                .collect(Collectors.toList());
+            return ResponseEntity.ok(problemas);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(List.of());
+        }
+    }
+
     @GetMapping("/algoritmos")
     public ResponseEntity<List<ProblemaDto>> getProblemasAlgoritmos() {
         try {
@@ -208,6 +318,28 @@ public class ProblemaController {
         }
     }
 
+    @GetMapping("/algoritmos-frontend")
+    public ResponseEntity<List<FrontendProblemaDto>> getProblemasAlgoritmosFrontend() {
+        try {
+            Optional<Tema> temaAlgoritmos = temaService.findAll().stream()
+                .filter(t -> "Algoritmos".equals(t.getNombre()))
+                .findFirst();
+            if (temaAlgoritmos.isEmpty()) {
+                Tema nuevoTema = new Tema();
+                nuevoTema.setNombre("Algoritmos");
+                nuevoTema.setDescripcion("Problemas de algoritmos y estructuras de datos en Python");
+                nuevoTema.setDificultad(Dificultad.EASY);
+                temaAlgoritmos = Optional.of(temaService.save(nuevoTema));
+            }
+            List<FrontendProblemaDto> problemas = problemaService.findByTema(temaAlgoritmos.get()).stream()
+                .map(this::toFrontendDto)
+                .collect(Collectors.toList());
+            return ResponseEntity.ok(problemas);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(List.of());
+        }
+    }
+
     @GetMapping("/poo")
     public ResponseEntity<List<ProblemaDto>> getProblemasPOO() {
         try {
@@ -217,6 +349,19 @@ public class ProblemaController {
                 .map(this::toDto)
                 .collect(Collectors.toList());
             
+            return ResponseEntity.ok(problemas);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(List.of());
+        }
+    }
+
+    @GetMapping("/poo-frontend")
+    public ResponseEntity<List<FrontendProblemaDto>> getProblemasPOOFrontend() {
+        try {
+            List<FrontendProblemaDto> problemas = problemaService.findAll().stream()
+                .filter(p -> p.getId() >= 701 && p.getId() <= 767)
+                .map(this::toFrontendDto)
+                .collect(Collectors.toList());
             return ResponseEntity.ok(problemas);
         } catch (Exception e) {
             return ResponseEntity.status(500).body(List.of());
@@ -238,6 +383,19 @@ public class ProblemaController {
         }
     }
 
+    @GetMapping("/data-science-frontend")
+    public ResponseEntity<List<FrontendProblemaDto>> getProblemasDataScienceFrontend() {
+        try {
+            List<FrontendProblemaDto> problemas = problemaService.findAll().stream()
+                .filter(p -> p.getId() >= 801 && p.getId() <= 867)
+                .map(this::toFrontendDto)
+                .collect(Collectors.toList());
+            return ResponseEntity.ok(problemas);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(List.of());
+        }
+    }
+
     @GetMapping("/machine-learning")
     public ResponseEntity<List<ProblemaDto>> getProblemasMachineLearning() {
         try {
@@ -247,6 +405,19 @@ public class ProblemaController {
                 .map(this::toDto)
                 .collect(Collectors.toList());
             
+            return ResponseEntity.ok(problemas);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(List.of());
+        }
+    }
+
+    @GetMapping("/machine-learning-frontend")
+    public ResponseEntity<List<FrontendProblemaDto>> getProblemasMachineLearningFrontend() {
+        try {
+            List<FrontendProblemaDto> problemas = problemaService.findAll().stream()
+                .filter(p -> p.getId() >= 901 && p.getId() <= 967)
+                .map(this::toFrontendDto)
+                .collect(Collectors.toList());
             return ResponseEntity.ok(problemas);
         } catch (Exception e) {
             return ResponseEntity.status(500).body(List.of());
@@ -934,6 +1105,87 @@ public class ProblemaController {
         dto.setEjemplos(generarEjemplosDesdeTestCases(problema));
         
         return dto;
+    }
+
+    private FrontendProblemaDto toFrontendDto(Problema problema) {
+        FrontendProblemaDto dto = new FrontendProblemaDto();
+        // ID frontend: cond-easy-101, etc.
+        dto.setId(generarFrontendId(problema));
+        dto.setTopic(problema.getTema() != null ? mapearTemaATopic(problema.getTema().getNombre()) : "");
+        dto.setTitle(problema.getTitulo());
+        dto.setDescription(problema.getDescripcion());
+        dto.setDifficulty(problema.getDificultad() != null ? mapearDificultadFrontend(problema.getDificultad().name()) : "");
+        dto.setDefaultCode(problema.getCodigoInicial());
+        dto.setSolutionCode(problema.getSolucionCorrecta());
+        dto.setAuthorSignature("RobotCode");
+        // Ejemplos
+        dto.setExamples(generarExamplesDesdeTestCases(problema));
+        // Datasets (test cases)
+        dto.setDatasets(parsearDatasets(problema.getTestCasesJson()));
+        return dto;
+    }
+
+    private String generarFrontendId(Problema problema) {
+        // Ejemplo: cond-easy-101
+        String topic = problema.getTema() != null ? mapearTemaATopic(problema.getTema().getNombre()) : "cond";
+        String dificultad = problema.getDificultad() != null ? problema.getDificultad().name().toLowerCase() : "easy";
+        return topic.substring(0, Math.min(4, topic.length())) + "-" + dificultad.substring(0, 3) + "-" + problema.getId();
+    }
+
+    private String mapearDificultadFrontend(String dificultad) {
+        switch (dificultad) {
+            case "EASY": return "Fácil";
+            case "INTERMEDIATE": return "Intermedio";
+            case "HARD": return "Difícil";
+            default: return dificultad;
+        }
+    }
+
+    private List<FrontendProblemaDto.ExampleDto> generarExamplesDesdeTestCases(Problema problema) {
+        List<FrontendProblemaDto.ExampleDto> ejemplos = new ArrayList<>();
+        try {
+            if (problema.getTestCasesJson() != null && !problema.getTestCasesJson().isEmpty()) {
+                ObjectMapper mapper = new ObjectMapper();
+                List<Map<String, Object>> testCases = mapper.readValue(
+                    problema.getTestCasesJson(),
+                    new TypeReference<List<Map<String, Object>>>() {}
+                );
+                int maxEjemplos = Math.min(3, testCases.size());
+                for (int i = 0; i < maxEjemplos; i++) {
+                    Map<String, Object> testCase = testCases.get(i);
+                    FrontendProblemaDto.ExampleDto ejemplo = new FrontendProblemaDto.ExampleDto();
+                    ejemplo.setInput(testCase.get("input").toString());
+                    ejemplo.setOutput(testCase.get("expectedOutput").toString());
+                    ejemplo.setExplanation("Ejemplo " + (i + 1));
+                    ejemplos.add(ejemplo);
+                }
+            }
+        } catch (Exception e) {
+            // Si hay error, dejar la lista vacía
+        }
+        return ejemplos;
+    }
+
+    private List<FrontendProblemaDto.DatasetDto> parsearDatasets(String testCasesJson) {
+        List<FrontendProblemaDto.DatasetDto> datasets = new ArrayList<>();
+        try {
+            if (testCasesJson != null && !testCasesJson.isEmpty()) {
+                ObjectMapper mapper = new ObjectMapper();
+                List<Map<String, Object>> testCases = mapper.readValue(
+                    testCasesJson,
+                    new TypeReference<List<Map<String, Object>>>() {}
+                );
+                for (Map<String, Object> testCase : testCases) {
+                    FrontendProblemaDto.DatasetDto dataset = new FrontendProblemaDto.DatasetDto();
+                    dataset.setInput(testCase.get("input").toString());
+                    dataset.setExpectedOutput(testCase.get("expectedOutput").toString());
+                    datasets.add(dataset);
+                }
+            }
+        } catch (Exception e) {
+            // Si hay error, dejar la lista vacía
+        }
+        return datasets;
     }
     
     private String mapearTemaATopic(String nombreTema) {
