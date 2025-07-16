@@ -171,6 +171,13 @@ public class PistonExecutorService {
                 ExecutionResult result = executeCode(code, input);
                 totalExecutionTime += result.executionTime;
                 
+                // Rate limiting: esperar 250ms entre requests para evitar 429 errors
+                try {
+                    Thread.sleep(250);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+                
                 boolean passed = false;
                 String actual = "";
                 String error = "";
