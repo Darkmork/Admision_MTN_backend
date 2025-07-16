@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ArrayList;
 import com.fasterxml.jackson.core.type.TypeReference;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/problemas")
@@ -74,7 +75,7 @@ public class ProblemaController {
     }
 
     @GetMapping("/condicionales-frontend")
-    public ResponseEntity<List<FrontendProblemaDto>> getProblemasCondicionalesFrontend() {
+    public ResponseEntity<?> getProblemasCondicionalesFrontend() {
         try {
             Optional<Tema> temaCondicionales = temaService.findAll().stream()
                 .filter(t -> "Condicionales".equals(t.getNombre()))
@@ -87,11 +88,18 @@ public class ProblemaController {
                 temaCondicionales = Optional.of(temaService.save(nuevoTema));
             }
             List<FrontendProblemaDto> problemas = problemaService.findByTema(temaCondicionales.get()).stream()
-                .map(this::toFrontendDto)
+                .map(p -> {
+                    try { return toFrontendDto(p); } catch (Exception e) { System.err.println("Error mapeando problema ID " + p.getId() + ": " + e.getMessage()); return null; }
+                })
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
             return ResponseEntity.ok(problemas);
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(List.of());
+            System.err.println("Error en getProblemasCondicionalesFrontend: " + e.getMessage());
+            e.printStackTrace();
+            Map<String, Object> error = new HashMap<>();
+            error.put("error", "No se pudieron obtener los problemas de condicionales: " + e.getMessage());
+            return ResponseEntity.status(500).body(error);
         }
     }
 
@@ -123,7 +131,7 @@ public class ProblemaController {
     }
 
     @GetMapping("/loops-frontend")
-    public ResponseEntity<List<FrontendProblemaDto>> getProblemasLoopsFrontend() {
+    public ResponseEntity<?> getProblemasLoopsFrontend() {
         try {
             Optional<Tema> temaLoops = temaService.findAll().stream()
                 .filter(t -> "Bucles".equals(t.getNombre()))
@@ -136,11 +144,18 @@ public class ProblemaController {
                 temaLoops = Optional.of(temaService.save(nuevoTema));
             }
             List<FrontendProblemaDto> problemas = problemaService.findByTema(temaLoops.get()).stream()
-                .map(this::toFrontendDto)
+                .map(p -> {
+                    try { return toFrontendDto(p); } catch (Exception e) { System.err.println("Error mapeando problema ID " + p.getId() + ": " + e.getMessage()); return null; }
+                })
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
             return ResponseEntity.ok(problemas);
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(List.of());
+            System.err.println("Error en getProblemasLoopsFrontend: " + e.getMessage());
+            e.printStackTrace();
+            Map<String, Object> error = new HashMap<>();
+            error.put("error", "No se pudieron obtener los problemas de loops: " + e.getMessage());
+            return ResponseEntity.status(500).body(error);
         }
     }
 
@@ -172,7 +187,7 @@ public class ProblemaController {
     }
 
     @GetMapping("/funciones-frontend")
-    public ResponseEntity<List<FrontendProblemaDto>> getProblemasFuncionesFrontend() {
+    public ResponseEntity<?> getProblemasFuncionesFrontend() {
         try {
             Optional<Tema> temaFunciones = temaService.findAll().stream()
                 .filter(t -> "Funciones".equals(t.getNombre()))
@@ -185,11 +200,18 @@ public class ProblemaController {
                 temaFunciones = Optional.of(temaService.save(nuevoTema));
             }
             List<FrontendProblemaDto> problemas = problemaService.findByTema(temaFunciones.get()).stream()
-                .map(this::toFrontendDto)
+                .map(p -> {
+                    try { return toFrontendDto(p); } catch (Exception e) { System.err.println("Error mapeando problema ID " + p.getId() + ": " + e.getMessage()); return null; }
+                })
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
             return ResponseEntity.ok(problemas);
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(List.of());
+            System.err.println("Error en getProblemasFuncionesFrontend: " + e.getMessage());
+            e.printStackTrace();
+            Map<String, Object> error = new HashMap<>();
+            error.put("error", "No se pudieron obtener los problemas de funciones: " + e.getMessage());
+            return ResponseEntity.status(500).body(error);
         }
     }
 
@@ -221,7 +243,7 @@ public class ProblemaController {
     }
 
     @GetMapping("/listas-frontend")
-    public ResponseEntity<List<FrontendProblemaDto>> getProblemasListasFrontend() {
+    public ResponseEntity<?> getProblemasListasFrontend() {
         try {
             Optional<Tema> temaListas = temaService.findAll().stream()
                 .filter(t -> "Listas y Arrays".equals(t.getNombre()))
@@ -234,11 +256,18 @@ public class ProblemaController {
                 temaListas = Optional.of(temaService.save(nuevoTema));
             }
             List<FrontendProblemaDto> problemas = problemaService.findByTema(temaListas.get()).stream()
-                .map(this::toFrontendDto)
+                .map(p -> {
+                    try { return toFrontendDto(p); } catch (Exception e) { System.err.println("Error mapeando problema ID " + p.getId() + ": " + e.getMessage()); return null; }
+                })
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
             return ResponseEntity.ok(problemas);
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(List.of());
+            System.err.println("Error en getProblemasListasFrontend: " + e.getMessage());
+            e.printStackTrace();
+            Map<String, Object> error = new HashMap<>();
+            error.put("error", "No se pudieron obtener los problemas de listas: " + e.getMessage());
+            return ResponseEntity.status(500).body(error);
         }
     }
 
@@ -270,7 +299,7 @@ public class ProblemaController {
     }
 
     @GetMapping("/diccionarios-frontend")
-    public ResponseEntity<List<FrontendProblemaDto>> getProblemasDiccionariosFrontend() {
+    public ResponseEntity<?> getProblemasDiccionariosFrontend() {
         try {
             Optional<Tema> temaDiccionarios = temaService.findAll().stream()
                 .filter(t -> "Diccionarios".equals(t.getNombre()))
@@ -283,11 +312,18 @@ public class ProblemaController {
                 temaDiccionarios = Optional.of(temaService.save(nuevoTema));
             }
             List<FrontendProblemaDto> problemas = problemaService.findByTema(temaDiccionarios.get()).stream()
-                .map(this::toFrontendDto)
+                .map(p -> {
+                    try { return toFrontendDto(p); } catch (Exception e) { System.err.println("Error mapeando problema ID " + p.getId() + ": " + e.getMessage()); return null; }
+                })
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
             return ResponseEntity.ok(problemas);
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(List.of());
+            System.err.println("Error en getProblemasDiccionariosFrontend: " + e.getMessage());
+            e.printStackTrace();
+            Map<String, Object> error = new HashMap<>();
+            error.put("error", "No se pudieron obtener los problemas de diccionarios: " + e.getMessage());
+            return ResponseEntity.status(500).body(error);
         }
     }
 
@@ -319,7 +355,7 @@ public class ProblemaController {
     }
 
     @GetMapping("/algoritmos-frontend")
-    public ResponseEntity<List<FrontendProblemaDto>> getProblemasAlgoritmosFrontend() {
+    public ResponseEntity<?> getProblemasAlgoritmosFrontend() {
         try {
             Optional<Tema> temaAlgoritmos = temaService.findAll().stream()
                 .filter(t -> "Algoritmos".equals(t.getNombre()))
@@ -332,11 +368,18 @@ public class ProblemaController {
                 temaAlgoritmos = Optional.of(temaService.save(nuevoTema));
             }
             List<FrontendProblemaDto> problemas = problemaService.findByTema(temaAlgoritmos.get()).stream()
-                .map(this::toFrontendDto)
+                .map(p -> {
+                    try { return toFrontendDto(p); } catch (Exception e) { System.err.println("Error mapeando problema ID " + p.getId() + ": " + e.getMessage()); return null; }
+                })
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
             return ResponseEntity.ok(problemas);
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(List.of());
+            System.err.println("Error en getProblemasAlgoritmosFrontend: " + e.getMessage());
+            e.printStackTrace();
+            Map<String, Object> error = new HashMap<>();
+            error.put("error", "No se pudieron obtener los problemas de algoritmos: " + e.getMessage());
+            return ResponseEntity.status(500).body(error);
         }
     }
 
@@ -356,15 +399,22 @@ public class ProblemaController {
     }
 
     @GetMapping("/poo-frontend")
-    public ResponseEntity<List<FrontendProblemaDto>> getProblemasPOOFrontend() {
+    public ResponseEntity<?> getProblemasPOOFrontend() {
         try {
             List<FrontendProblemaDto> problemas = problemaService.findAll().stream()
                 .filter(p -> p.getId() >= 701 && p.getId() <= 767)
-                .map(this::toFrontendDto)
+                .map(p -> {
+                    try { return toFrontendDto(p); } catch (Exception e) { System.err.println("Error mapeando problema ID " + p.getId() + ": " + e.getMessage()); return null; }
+                })
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
             return ResponseEntity.ok(problemas);
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(List.of());
+            System.err.println("Error en getProblemasPOOFrontend: " + e.getMessage());
+            e.printStackTrace();
+            Map<String, Object> error = new HashMap<>();
+            error.put("error", "No se pudieron obtener los problemas de POO: " + e.getMessage());
+            return ResponseEntity.status(500).body(error);
         }
     }
 
@@ -384,15 +434,22 @@ public class ProblemaController {
     }
 
     @GetMapping("/data-science-frontend")
-    public ResponseEntity<List<FrontendProblemaDto>> getProblemasDataScienceFrontend() {
+    public ResponseEntity<?> getProblemasDataScienceFrontend() {
         try {
             List<FrontendProblemaDto> problemas = problemaService.findAll().stream()
                 .filter(p -> p.getId() >= 801 && p.getId() <= 867)
-                .map(this::toFrontendDto)
+                .map(p -> {
+                    try { return toFrontendDto(p); } catch (Exception e) { System.err.println("Error mapeando problema ID " + p.getId() + ": " + e.getMessage()); return null; }
+                })
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
             return ResponseEntity.ok(problemas);
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(List.of());
+            System.err.println("Error en getProblemasDataScienceFrontend: " + e.getMessage());
+            e.printStackTrace();
+            Map<String, Object> error = new HashMap<>();
+            error.put("error", "No se pudieron obtener los problemas de ciencia de datos: " + e.getMessage());
+            return ResponseEntity.status(500).body(error);
         }
     }
 
@@ -412,15 +469,22 @@ public class ProblemaController {
     }
 
     @GetMapping("/machine-learning-frontend")
-    public ResponseEntity<List<FrontendProblemaDto>> getProblemasMachineLearningFrontend() {
+    public ResponseEntity<?> getProblemasMachineLearningFrontend() {
         try {
             List<FrontendProblemaDto> problemas = problemaService.findAll().stream()
                 .filter(p -> p.getId() >= 901 && p.getId() <= 967)
-                .map(this::toFrontendDto)
+                .map(p -> {
+                    try { return toFrontendDto(p); } catch (Exception e) { System.err.println("Error mapeando problema ID " + p.getId() + ": " + e.getMessage()); return null; }
+                })
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
             return ResponseEntity.ok(problemas);
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(List.of());
+            System.err.println("Error en getProblemasMachineLearningFrontend: " + e.getMessage());
+            e.printStackTrace();
+            Map<String, Object> error = new HashMap<>();
+            error.put("error", "No se pudieron obtener los problemas de machine learning: " + e.getMessage());
+            return ResponseEntity.status(500).body(error);
         }
     }
 
@@ -1109,19 +1173,24 @@ public class ProblemaController {
 
     private FrontendProblemaDto toFrontendDto(Problema problema) {
         FrontendProblemaDto dto = new FrontendProblemaDto();
-        // ID frontend: cond-easy-101, etc.
-        dto.setId(generarFrontendId(problema));
-        dto.setTopic(problema.getTema() != null ? mapearTemaATopic(problema.getTema().getNombre()) : "");
-        dto.setTitle(problema.getTitulo());
-        dto.setDescription(problema.getDescripcion());
-        dto.setDifficulty(problema.getDificultad() != null ? mapearDificultadFrontend(problema.getDificultad().name()) : "");
-        dto.setDefaultCode(problema.getCodigoInicial());
-        dto.setSolutionCode(problema.getSolucionCorrecta());
-        dto.setAuthorSignature("RobotCode");
-        // Ejemplos
-        dto.setExamples(generarExamplesDesdeTestCases(problema));
-        // Datasets (test cases)
-        dto.setDatasets(parsearDatasets(problema.getTestCasesJson()));
+        try {
+            dto.setId(generarFrontendId(problema));
+            dto.setTopic(problema.getTema() != null ? mapearTemaATopic(problema.getTema().getNombre()) : "");
+            dto.setTitle(problema.getTitulo());
+            dto.setDescription(problema.getDescripcion());
+            dto.setDifficulty(problema.getDificultad() != null ? mapearDificultadFrontend(problema.getDificultad().name()) : "");
+            dto.setDefaultCode(problema.getCodigoInicial());
+            dto.setSolutionCode(problema.getSolucionCorrecta());
+            dto.setAuthorSignature("RobotCode");
+            dto.setExamples(generarExamplesDesdeTestCases(problema));
+            dto.setDatasets(parsearDatasets(problema.getTestCasesJson()));
+        } catch (Exception e) {
+            System.err.println("Error mapeando FrontendProblemaDto para problema ID " + problema.getId() + ": " + e.getMessage());
+            dto.setId("error");
+            dto.setTitle("Error al mapear problema");
+            dto.setDescription(e.getMessage());
+            dto.setDatasets(new ArrayList<>());
+        }
         return dto;
     }
 
@@ -1154,14 +1223,14 @@ public class ProblemaController {
                 for (int i = 0; i < maxEjemplos; i++) {
                     Map<String, Object> testCase = testCases.get(i);
                     FrontendProblemaDto.ExampleDto ejemplo = new FrontendProblemaDto.ExampleDto();
-                    ejemplo.setInput(testCase.get("input").toString());
-                    ejemplo.setOutput(testCase.get("expectedOutput").toString());
+                    ejemplo.setInput(String.valueOf(testCase.getOrDefault("input", "")));
+                    ejemplo.setOutput(String.valueOf(testCase.getOrDefault("expectedOutput", "")));
                     ejemplo.setExplanation("Ejemplo " + (i + 1));
                     ejemplos.add(ejemplo);
                 }
             }
         } catch (Exception e) {
-            // Si hay error, dejar la lista vacía
+            System.err.println("Error generando ejemplos para problema ID " + problema.getId() + ": " + e.getMessage());
         }
         return ejemplos;
     }
@@ -1177,13 +1246,13 @@ public class ProblemaController {
                 );
                 for (Map<String, Object> testCase : testCases) {
                     FrontendProblemaDto.DatasetDto dataset = new FrontendProblemaDto.DatasetDto();
-                    dataset.setInput(testCase.get("input").toString());
-                    dataset.setExpectedOutput(testCase.get("expectedOutput").toString());
+                    dataset.setInput(String.valueOf(testCase.getOrDefault("input", "")));
+                    dataset.setExpectedOutput(String.valueOf(testCase.getOrDefault("expectedOutput", "")));
                     datasets.add(dataset);
                 }
             }
         } catch (Exception e) {
-            // Si hay error, dejar la lista vacía
+            System.err.println("Error parseando datasets: " + e.getMessage());
         }
         return datasets;
     }
