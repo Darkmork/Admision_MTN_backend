@@ -1,8 +1,8 @@
 [build]
-builder = "nixpacks"
+builder = "dockerfile"
 
 [deploy]
-startCommand = "./mvnw spring-boot:run"
+startCommand = "java -jar target/*.jar"
 healthcheckPath = "/api/health"
 healthcheckTimeout = 300
 restartPolicyType = "on_failure"
@@ -10,4 +10,5 @@ restartPolicyMaxRetries = 3
 
 [env]
 JAVA_VERSION = "17"
-PYTHON_VERSION = "3.11" 
+PYTHON_VERSION = "3.11"
+SPRING_PROFILES_ACTIVE = "prod" 

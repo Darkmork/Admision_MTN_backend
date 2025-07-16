@@ -1,5 +1,15 @@
+[providers]
+java = "17"
+python = "3.11"
+
 [phases.setup]
-nixPkgs = ["python311", "python311Packages.pip", "python311Packages.numpy", "python311Packages.pandas", "python311Packages.matplotlib", "python311Packages.scikitlearn", "python311Packages.scipy", "python311Packages.seaborn"]
+nixPkgs = ["python311", "python311Packages.pip", "python311Packages.setuptools", "python311Packages.wheel"]
+
+[phases.install]
+cmds = [
+    "python3 -m pip install --user numpy pandas matplotlib scikit-learn scipy seaborn",
+    "chmod +x ./mvnw"
+]
 
 [phases.build]
 cmds = ["./mvnw clean package -DskipTests"]
@@ -8,5 +18,5 @@ cmds = ["./mvnw clean package -DskipTests"]
 cmd = "java -jar target/*.jar"
 
 [variables]
-JAVA_VERSION = "17"
-PYTHON_VERSION = "3.11"
+NIXPACKS_PYTHON_VERSION = "3.11"
+PATH = "/usr/bin:/bin:/usr/local/bin:$PATH"
