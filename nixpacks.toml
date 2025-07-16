@@ -1,0 +1,23 @@
+[providers]
+java = "17"
+
+[phases.setup]
+dependsOn = ["java"]
+nixPkgs = ["python3", "python3Packages.pip", "python3Packages.numpy", "python3Packages.pandas", "python3Packages.matplotlib"]
+
+[phases.install]
+dependsOn = ["setup"]
+cmds = [
+    "chmod +x install-python.sh",
+    "./install-python.sh",
+    "chmod +x ./mvnw"
+]
+
+[phases.build]
+dependsOn = ["install"]
+cmds = ["./mvnw clean package -DskipTests"]
+
+[variables]
+NIXPACKS_PYTHON_VERSION = "3.11"
+PYTHONPATH = "/usr/lib/python3.11/site-packages:/usr/local/lib/python3.11/site-packages"
+PATH = "/usr/bin:/bin:/usr/local/bin"
