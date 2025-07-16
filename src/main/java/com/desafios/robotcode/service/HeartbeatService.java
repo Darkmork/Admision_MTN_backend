@@ -19,8 +19,10 @@ public class HeartbeatService {
     private final AtomicLong requestCount = new AtomicLong(0);
     private final AtomicLong lastRequestTime = new AtomicLong(System.currentTimeMillis());
     
-    @Autowired
-    private RestTemplate restTemplate;
+    // Eliminar la inyección de RestTemplate como bean
+    // @Autowired
+    // private RestTemplate restTemplate;
+    private final RestTemplate restTemplate = new RestTemplate();
 
     /**
      * Heartbeat interno cada 30 segundos para mantener la aplicación activa
