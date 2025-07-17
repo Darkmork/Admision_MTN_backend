@@ -1,1 +1,1 @@
-# Force redeploy Wed Jul 16 22:15:01 -04 2025 - improved type parsing for lists and complex types
+# Force redeploy Wed Jul 16 22:25:55 -04 2025 - comprehensive type parsing and edge case handling
