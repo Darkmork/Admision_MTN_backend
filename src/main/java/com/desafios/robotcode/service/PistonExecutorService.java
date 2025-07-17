@@ -221,9 +221,11 @@ public class PistonExecutorService {
             // Test simple para verificar conectividad
             String testCode = "print('test')";
             ExecutionResult result = executeCode(testCode, "");
-            return result.success && result.output.contains("test");
+            boolean available = result.success && result.output.contains("test");
+            logger.info("Piston API availability check: {} (output: '{}')", available, result.output);
+            return available;
         } catch (Exception e) {
-            logger.warn("Piston API no disponible", e);
+            logger.error("Piston API no disponible", e);
             return false;
         }
     }

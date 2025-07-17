@@ -6,6 +6,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,6 +17,8 @@ import java.util.Optional;
 
 @Service
 public class ProblemTestingService {
+    
+    private static final Logger logger = LoggerFactory.getLogger(ProblemTestingService.class);
 
     @Autowired
     private CodeExecutionEngine executionEngine;
@@ -157,13 +161,20 @@ public class ProblemTestingService {
             List<TestCase> testCases = parseTestCases(problema.getTestCasesJson());
             report.totalTests = testCases.size();
             
+            // Verificar disponibilidad de Piston API una sola vez al inicio
+            boolean pistonAvailable = false;
+            if ("python3".equals(language) || "python".equals(language)) {
+                pistonAvailable = pistonExecutorService.isPistonAvailable();
+                logger.info("Piston API availability for problem {}: {}", problemId, pistonAvailable);
+            }
+            
             long totalTime = 0;
             int passedCount = 0;
             
             // Ejecutar cada test case
             for (int i = 0; i < testCases.size(); i++) {
                 TestCase testCase = testCases.get(i);
-                TestResult testResult = executeTestCase(userCode, language, testCase, i + 1);
+                TestResult testResult = executeTestCaseWithMethod(userCode, language, testCase, i + 1, pistonAvailable);
                 
                 report.testResults.add(testResult);
                 totalTime += testResult.executionTime;
@@ -433,7 +444,7 @@ public class ProblemTestingService {
         return result;
     }
 
-    private TestResult executeTestCase(String userCode, String language, TestCase testCase, int testNumber) {
+    private TestResult executeTestCaseWithMethod(String userCode, String language, TestCase testCase, int testNumber, boolean usePiston) {
         TestResult result = new TestResult();
         result.input = testCase.input;
         result.expectedOutput = testCase.expectedOutput;
@@ -441,8 +452,9 @@ public class ProblemTestingService {
         try {
             // Priorizar Piston API para Python (más confiable y gratuito)
             if ("python3".equals(language) || "python".equals(language)) {
-                // Intentar con Piston API primero
-                if (pistonExecutorService.isPistonAvailable()) {
+                // Usar Piston API si está disponible
+                if (usePiston) {
+                    logger.info("Using Piston API for test {}", testNumber);
                     PistonExecutorService.ExecutionResult pistonResult = pistonExecutorService.executeCode(userCode, testCase.input);
                     result.executionTime = pistonResult.executionTime;
                     
