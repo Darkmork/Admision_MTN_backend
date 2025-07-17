@@ -467,9 +467,15 @@ public class ProblemTestingService {
                             result.errorMessage = generateFlexibleDiffMessage(result.expectedOutput, result.actualOutput);
                         }
                     } else {
+                        // Si Piston falla con rate limiting, marcar como tal pero no como error grave
                         result.passed = false;
-                        result.actualOutput = pistonResult.stderr;
-                        result.errorMessage = pistonResult.errorMessage;
+                        if (pistonResult.errorMessage != null && pistonResult.errorMessage.contains("429")) {
+                            result.actualOutput = "Rate limiting - intenta nuevamente en unos segundos";
+                            result.errorMessage = "Piston API temporalmente saturado (rate limit)";
+                        } else {
+                            result.actualOutput = pistonResult.stderr;
+                            result.errorMessage = pistonResult.errorMessage;
+                        }
                         result.status = TestStatus.ERROR;
                     }
                 } else if (dockerExecutorService.isDockerAvailable()) {

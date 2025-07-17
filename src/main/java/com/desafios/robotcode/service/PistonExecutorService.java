@@ -171,9 +171,9 @@ public class PistonExecutorService {
                 ExecutionResult result = executeCode(code, input);
                 totalExecutionTime += result.executionTime;
                 
-                // Rate limiting: esperar 300ms entre requests para evitar 429 errors
+                // Rate limiting: esperar 500ms entre requests para evitar 429 errors
                 try {
-                    Thread.sleep(300);
+                    Thread.sleep(500);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
@@ -218,11 +218,31 @@ public class PistonExecutorService {
      */
     public boolean isPistonAvailable() {
         try {
-            // Test simple para verificar conectividad
-            String testCode = "print('test')";
-            ExecutionResult result = executeCode(testCode, "");
-            boolean available = result.success && result.output.contains("test");
-            logger.info("Piston API availability check: {} (output: '{}')", available, result.output);
+            // Test simple para verificar conectividad (sin usar executeCode para evitar rate limiting)
+            ObjectNode payload = objectMapper.createObjectNode();
+            payload.put("language", "python");
+            payload.put("version", PYTHON_VERSION);
+            payload.put("stdin", "");
+            
+            ArrayNode files = objectMapper.createArrayNode();
+            ObjectNode file = objectMapper.createObjectNode();
+            file.put("content", "print('test')");
+            files.add(file);
+            payload.set("files", files);
+            
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<String> request = new HttpEntity<>(payload.toString(), headers);
+            
+            ResponseEntity<String> response = restTemplate.postForEntity(PISTON_API_URL, request, String.class);
+            
+            JsonNode responseJson = objectMapper.readTree(response.getBody());
+            JsonNode runResult = responseJson.get("run");
+            
+            boolean available = runResult.get("code").asInt() == 0 && 
+                               runResult.get("stdout").asText().contains("test");
+            
+            logger.info("Piston API availability check: {} (status: {})", available, response.getStatusCode());
             return available;
         } catch (Exception e) {
             logger.error("Piston API no disponible", e);
