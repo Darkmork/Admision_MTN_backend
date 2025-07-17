@@ -168,15 +168,15 @@ public class PistonExecutorService {
                 String input = testCase.get("input").asText();
                 String expected = testCase.get("expectedOutput").asText();
                 
-                ExecutionResult result = executeCode(code, input);
-                totalExecutionTime += result.executionTime;
-                
-                // Rate limiting: esperar 500ms entre requests para evitar 429 errors
+                // Rate limiting: esperar 600ms ANTES de cada request para evitar 429 errors
                 try {
-                    Thread.sleep(500);
+                    Thread.sleep(600);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
+                
+                ExecutionResult result = executeCode(code, input);
+                totalExecutionTime += result.executionTime;
                 
                 boolean passed = false;
                 String actual = "";
