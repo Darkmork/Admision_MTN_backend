@@ -96,16 +96,19 @@ public class PistonExecutorService {
         long startTime = System.currentTimeMillis();
         
         try {
+            // Crear código ejecutable que llame a la función automáticamente
+            String executableCode = createExecutableCode(code, input);
+            
             // Preparar el payload para Piston API
             ObjectNode payload = objectMapper.createObjectNode();
             payload.put("language", "python");
             payload.put("version", PYTHON_VERSION);
-            payload.put("stdin", input);
+            payload.put("stdin", "");  // Sin stdin ya que pasamos input directamente al código
             
             // Crear array de archivos
             ArrayNode files = objectMapper.createArrayNode();
             ObjectNode file = objectMapper.createObjectNode();
-            file.put("content", code);
+            file.put("content", executableCode);
             files.add(file);
             payload.set("files", files);
             
@@ -255,5 +258,87 @@ public class PistonExecutorService {
      */
     public String getPistonInfo() {
         return String.format("Piston API - URL: %s, Python Version: %s", PISTON_API_URL, PYTHON_VERSION);
+    }
+    
+    /**
+     * Crea código ejecutable que llama automáticamente a la función definida
+     */
+    private String createExecutableCode(String userCode, String input) {
+        // Extraer el nombre de la función del código del usuario
+        String functionName = extractFunctionName(userCode);
+        if (functionName == null) {
+            throw new RuntimeException("No se pudo encontrar una función en el código del usuario");
+        }
+        
+        StringBuilder executableCode = new StringBuilder();
+        executableCode.append(userCode).append("\n\n");
+        executableCode.append("# Código de ejecución automática\n");
+        executableCode.append("try:\n");
+        executableCode.append("    input_str = ").append(quoteString(input)).append("\n");
+        executableCode.append("    \n");
+        executableCode.append("    if ',' in input_str:\n");
+        executableCode.append("        # Múltiples parámetros\n");
+        executableCode.append("        params_str = input_str.split(',')\n");
+        executableCode.append("        params = []\n");
+        executableCode.append("        for param in params_str:\n");
+        executableCode.append("            param = param.strip()\n");
+        executableCode.append("            try:\n");
+        executableCode.append("                if '.' in param:\n");
+        executableCode.append("                    params.append(float(param))\n");
+        executableCode.append("                else:\n");
+        executableCode.append("                    params.append(int(param))\n");
+        executableCode.append("            except ValueError:\n");
+        executableCode.append("                if param.startswith(\"'\") and param.endswith(\"'\"):\n");
+        executableCode.append("                    params.append(param[1:-1])\n");
+        executableCode.append("                elif param.startswith('\"') and param.endswith('\"'):\n");
+        executableCode.append("                    params.append(param[1:-1])\n");
+        executableCode.append("                else:\n");
+        executableCode.append("                    params.append(param)\n");
+        executableCode.append("        result = ").append(functionName).append("(*params)\n");
+        executableCode.append("    else:\n");
+        executableCode.append("        # Un solo parámetro\n");
+        executableCode.append("        param = input_str.strip()\n");
+        executableCode.append("        try:\n");
+        executableCode.append("            if '.' in param:\n");
+        executableCode.append("                param = float(param)\n");
+        executableCode.append("            else:\n");
+        executableCode.append("                param = int(param)\n");
+        executableCode.append("        except ValueError:\n");
+        executableCode.append("            if param.startswith(\"'\") and param.endswith(\"'\"):\n");
+        executableCode.append("                param = param[1:-1]\n");
+        executableCode.append("            elif param.startswith('\"') and param.endswith('\"'):\n");
+        executableCode.append("                param = param[1:-1]\n");
+        executableCode.append("        result = ").append(functionName).append("(param)\n");
+        executableCode.append("    \n");
+        executableCode.append("    print(result)\n");
+        executableCode.append("except Exception as e:\n");
+        executableCode.append("    print(f'Error: {e}')\n");
+        
+        return executableCode.toString();
+    }
+    
+    /**
+     * Extrae el nombre de la función del código del usuario
+     */
+    private String extractFunctionName(String code) {
+        String[] lines = code.split("\n");
+        for (String line : lines) {
+            line = line.trim();
+            if (line.startsWith("def ")) {
+                int start = line.indexOf("def ") + 4;
+                int end = line.indexOf("(");
+                if (end > start) {
+                    return line.substring(start, end).trim();
+                }
+            }
+        }
+        return null;
+    }
+    
+    /**
+     * Envuelve una cadena en comillas y escapa caracteres especiales
+     */
+    private String quoteString(String str) {
+        return "\"" + str.replace("\\", "\\\\").replace("\"", "\\\"") + "\"";
     }
 }
