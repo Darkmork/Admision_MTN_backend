@@ -378,11 +378,11 @@ public class PistonExecutorService {
         executableCode.append("        # Para strings, imprimir sin comillas adicionales\n");
         executableCode.append("        print(result)\n");
         executableCode.append("    elif isinstance(result, dict):\n");
-        executableCode.append("        # Para diccionarios, usar formato JSON con espaciado específico\n");
+        executableCode.append("        # Para diccionarios, usar formato JSON con espacios (', ', ': ')\n");
         executableCode.append("        print(json.dumps(result, separators=(', ', ': ')))\n");
         executableCode.append("    elif isinstance(result, (list, tuple)):\n");
-        executableCode.append("        # Para listas y tuplas, usar formato JSON con espaciado\n");
-        executableCode.append("        print(json.dumps(result, separators=(', ', ': ')))\n");
+        executableCode.append("        # Para listas y tuplas, usar formato compacto sin espacios (',', ': ')\n");
+        executableCode.append("        print(json.dumps(result, separators=(',', ': ')))\n");
         executableCode.append("    else:\n");
         executableCode.append("        print(result)\n");
         executableCode.append("except Exception as e:\n");
