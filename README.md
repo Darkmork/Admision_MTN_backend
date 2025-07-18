@@ -1,1 +1,1 @@
-# Force redeploy Thu Jul 17 21:33:38 -04 2025 - different JSON formatting for dicts vs lists
+# Force redeploy Thu Jul 17 21:45:43 -04 2025 - fix function calls without parameters detection
