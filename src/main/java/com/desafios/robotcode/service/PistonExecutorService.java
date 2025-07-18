@@ -367,6 +367,8 @@ public class PistonExecutorService {
         executableCode.append("        result = ").append(functionName).append("(*params)\n");
         executableCode.append("    \n");
         executableCode.append("    # Manejar output para compatibilidad con diferentes formatos esperados\n");
+        executableCode.append("    import json\n");
+        executableCode.append("    \n");
         executableCode.append("    if result is None:\n");
         executableCode.append("        print('null')\n");
         executableCode.append("    elif isinstance(result, bool):\n");
@@ -375,9 +377,12 @@ public class PistonExecutorService {
         executableCode.append("    elif isinstance(result, str):\n");
         executableCode.append("        # Para strings, imprimir sin comillas adicionales\n");
         executableCode.append("        print(result)\n");
-        executableCode.append("    elif isinstance(result, (list, tuple, dict)):\n");
-        executableCode.append("        # Para estructuras de datos complejas, usar repr\n");
-        executableCode.append("        print(repr(result))\n");
+        executableCode.append("    elif isinstance(result, dict):\n");
+        executableCode.append("        # Para diccionarios, usar formato JSON con comillas dobles\n");
+        executableCode.append("        print(json.dumps(result, separators=(',', ': ')))\n");
+        executableCode.append("    elif isinstance(result, (list, tuple)):\n");
+        executableCode.append("        # Para listas y tuplas, usar formato JSON\n");
+        executableCode.append("        print(json.dumps(result, separators=(',', ': ')))\n");
         executableCode.append("    else:\n");
         executableCode.append("        print(result)\n");
         executableCode.append("except Exception as e:\n");
