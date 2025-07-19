@@ -1,1 +1,1 @@
-# Force redeploy Sat Jul 19 13:40:15 -04 2025 - rebuild after Railway crash
+# Force redeploy Sat Jul 19 13:44:14 -04 2025 - memory optimizations to fix OOM crashes

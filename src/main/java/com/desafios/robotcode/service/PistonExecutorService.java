@@ -270,7 +270,7 @@ public class PistonExecutorService {
             throw new RuntimeException("No se pudo encontrar una función en el código del usuario");
         }
         
-        StringBuilder executableCode = new StringBuilder();
+        StringBuilder executableCode = new StringBuilder(1024); // Pre-allocate capacity
         executableCode.append(userCode).append("\n\n");
         executableCode.append("# Código de ejecución automática\n");
         executableCode.append("try:\n");
