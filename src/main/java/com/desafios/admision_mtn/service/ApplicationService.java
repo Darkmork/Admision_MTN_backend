@@ -42,51 +42,53 @@ public class ApplicationService {
 
             // Crear entidad Student
             Student student = new Student();
-            student.setFirstName(request.getFirstName());
-            student.setLastName(request.getLastName());
+            student.setFirstName(toUpperCase(request.getFirstName()));
+            student.setLastName(toUpperCase(request.getLastName()));
+            student.setMaternalLastName(toUpperCase(request.getMaternalLastName()));
             student.setRut(request.getRut());
             student.setBirthDate(LocalDate.parse(request.getBirthDate(), DateTimeFormatter.ISO_LOCAL_DATE));
             student.setEmail(request.getStudentEmail());
-            student.setAddress(request.getStudentAddress());
+            student.setAddress(toUpperCase(request.getStudentAddress()));
             student.setGradeApplied(request.getGrade());
-            student.setCurrentSchool(request.getCurrentSchool());
-            student.setAdditionalNotes(request.getAdditionalNotes());
+            student.setSchoolApplied(request.getSchoolApplied());
+            student.setCurrentSchool(toUpperCase(request.getCurrentSchool()));
+            student.setAdditionalNotes(toUpperCase(request.getAdditionalNotes()));
 
             // Crear entidad Parent (Padre)
             Parent father = new Parent();
-            father.setFullName(request.getParent1Name());
+            father.setFullName(toUpperCase(request.getParent1Name()));
             father.setRut(request.getParent1Rut());
             father.setEmail(request.getParent1Email());
             father.setPhone(request.getParent1Phone());
-            father.setAddress(request.getParent1Address());
-            father.setProfession(request.getParent1Profession());
+            father.setAddress(toUpperCase(request.getParent1Address()));
+            father.setProfession(toUpperCase(request.getParent1Profession()));
             father.setParentType(Parent.ParentType.FATHER);
 
             // Crear entidad Parent (Madre)
             Parent mother = new Parent();
-            mother.setFullName(request.getParent2Name());
+            mother.setFullName(toUpperCase(request.getParent2Name()));
             mother.setRut(request.getParent2Rut());
             mother.setEmail(request.getParent2Email());
             mother.setPhone(request.getParent2Phone());
-            mother.setAddress(request.getParent2Address());
-            mother.setProfession(request.getParent2Profession());
+            mother.setAddress(toUpperCase(request.getParent2Address()));
+            mother.setProfession(toUpperCase(request.getParent2Profession()));
             mother.setParentType(Parent.ParentType.MOTHER);
 
             // Crear entidad Supporter
             Supporter supporter = new Supporter();
-            supporter.setFullName(request.getSupporterName());
+            supporter.setFullName(toUpperCase(request.getSupporterName()));
             supporter.setRut(request.getSupporterRut());
             supporter.setEmail(request.getSupporterEmail());
             supporter.setPhone(request.getSupporterPhone());
-            supporter.setRelationship(parseRelationship(request.getSupporterRelation()));
+            supporter.setRelationship(parseRelationship(toUpperCase(request.getSupporterRelation())));
 
             // Crear entidad Guardian
             Guardian guardian = new Guardian();
-            guardian.setFullName(request.getGuardianName());
+            guardian.setFullName(toUpperCase(request.getGuardianName()));
             guardian.setRut(request.getGuardianRut());
             guardian.setEmail(request.getGuardianEmail());
             guardian.setPhone(request.getGuardianPhone());
-            guardian.setRelationship(parseGuardianRelationship(request.getGuardianRelation()));
+            guardian.setRelationship(parseGuardianRelationship(toUpperCase(request.getGuardianRelation())));
 
             // Crear entidad Application
             Application application = new Application();
@@ -275,5 +277,12 @@ public class ApplicationService {
             log.error("Error deleting all data", e);
             throw new RuntimeException("Error limpiando la base de datos: " + e.getMessage());
         }
+    }
+
+    /**
+     * Convierte texto a mayúsculas, manejando valores nulos
+     */
+    private String toUpperCase(String text) {
+        return text != null ? text.trim().toUpperCase() : null;
     }
 }

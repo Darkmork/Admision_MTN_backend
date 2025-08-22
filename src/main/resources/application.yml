@@ -23,6 +23,14 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
+        # Forzar regeneración de metadatos y deshabilitar cache
+        cache:
+          use_second_level_cache: false
+          use_query_cache: false
+        order_updates: true
+        order_inserts: true
+        connection:
+          autocommit: false
     database: postgresql
     defer-datasource-initialization: false
   

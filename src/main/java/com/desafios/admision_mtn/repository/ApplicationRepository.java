@@ -31,6 +31,7 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
            "JOIN FETCH a.student s " +
            "WHERE LOWER(s.firstName) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
            "OR LOWER(s.lastName) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
+           "OR LOWER(s.maternalLastName) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
            "OR LOWER(s.rut) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
     List<Application> findByStudentNameOrRutContainingIgnoreCase(@Param("searchTerm") String searchTerm);
     

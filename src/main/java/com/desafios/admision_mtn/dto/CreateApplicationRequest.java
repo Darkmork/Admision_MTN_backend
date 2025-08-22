@@ -7,11 +7,14 @@ import lombok.Data;
 public class CreateApplicationRequest {
 
     // Datos del estudiante
-    @NotBlank(message = "El nombre es obligatorio")
+    @NotBlank(message = "Los nombres son obligatorios")
     private String firstName;
     
-    @NotBlank(message = "Los apellidos son obligatorios")
+    @NotBlank(message = "El apellido paterno es obligatorio")
     private String lastName;
+    
+    @NotBlank(message = "El apellido materno es obligatorio")
+    private String maternalLastName;
     
     @NotBlank(message = "El RUT es obligatorio")
     private String rut;
@@ -26,6 +29,9 @@ public class CreateApplicationRequest {
     
     @NotBlank(message = "El grado es obligatorio")
     private String grade;
+    
+    @NotBlank(message = "El colegio es obligatorio")
+    private String schoolApplied; // "MONTE_TABOR" para niños, "NAZARET" para niñas
     
     private String currentSchool;
     private String additionalNotes;

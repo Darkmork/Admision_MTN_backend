@@ -26,6 +26,8 @@ import java.util.Map;
 public class ApplicationController {
 
     private final ApplicationService applicationService;
+    private final com.desafios.admision_mtn.service.UserService userService;
+    private final com.desafios.admision_mtn.repository.UserRepository userRepository;
 
     @PostMapping
     public ResponseEntity<ApplicationResponse> createApplication(
@@ -33,10 +35,13 @@ public class ApplicationController {
         try {
             // Obtener el email del usuario autenticado
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication == null || authentication.getName() == null) {
+                throw new RuntimeException("Usuario no autenticado");
+            }
             String userEmail = authentication.getName();
             
             log.info("Creating application for user: {}", userEmail);
-            log.info("Student name: {} {}", request.getFirstName(), request.getLastName());
+            log.info("Student name: {} {} {}", request.getFirstName(), request.getLastName(), request.getMaternalLastName());
             
             ApplicationResponse response = applicationService.createApplication(request, userEmail);
             return ResponseEntity.ok(response);
@@ -144,6 +149,10 @@ public class ApplicationController {
             studentInfo.put("id", application.getStudent().getId());
             studentInfo.put("firstName", application.getStudent().getFirstName());
             studentInfo.put("lastName", application.getStudent().getLastName());
+            studentInfo.put("maternalLastName", application.getStudent().getMaternalLastName());
+            studentInfo.put("fullName", application.getStudent().getFirstName() + " " + 
+                           application.getStudent().getLastName() + " " + 
+                           application.getStudent().getMaternalLastName());
             studentInfo.put("rut", application.getStudent().getRut());
             studentInfo.put("gradeApplied", application.getStudent().getGradeApplied());
             studentInfo.put("birthDate", application.getStudent().getBirthDate());
@@ -300,6 +309,60 @@ public class ApplicationController {
         } catch (Exception e) {
             log.error("Error updating application status by documents for application {}", id, e);
             return ResponseEntity.badRequest().build();
+        }
+    }
+    
+    // Endpoint temporal para debugging autenticación
+    @GetMapping("/public/debug-users")
+    public ResponseEntity<Map<String, Object>> debugUsers() {
+        try {
+            Map<String, Object> debug = new HashMap<>();
+            debug.put("message", "Debug endpoint funcionando");
+            debug.put("timestamp", LocalDateTime.now());
+            
+            // Intentar buscar usuario directamente
+            try {
+                java.util.Optional<com.desafios.admision_mtn.entity.User> userOpt = 
+                    userService.findByEmail("admin@test.cl");
+                
+                if (userOpt.isPresent()) {
+                    com.desafios.admision_mtn.entity.User user = userOpt.get();
+                    debug.put("userFound", true);
+                    debug.put("userEmail", user.getEmail());
+                    debug.put("userActive", user.getActive());
+                    debug.put("userEmailVerified", user.getEmailVerified());
+                    debug.put("userEnabled", user.isEnabled());
+                    debug.put("userRole", user.getRole().name());
+                } else {
+                    debug.put("userFound", false);
+                }
+                
+                // Probar con otros emails para ver si encuentra alguno
+                java.util.Optional<com.desafios.admision_mtn.entity.User> userOpt2 = 
+                    userService.findByEmail("jorge.gangale@mtn.cl");
+                debug.put("foundJorgeUser", userOpt2.isPresent());
+                
+                // Contar total de usuarios usando repository
+                long totalUsers = userRepository.count();
+                debug.put("totalUsersInSpring", totalUsers);
+                
+                // Listar los emails de los usuarios que Spring SÍ ve
+                java.util.List<String> springEmails = userRepository.findAll()
+                    .stream()
+                    .map(u -> u.getEmail())
+                    .collect(java.util.stream.Collectors.toList());
+                debug.put("springUserEmails", springEmails);
+                
+            } catch (Exception e) {
+                debug.put("userServiceError", e.getMessage());
+            }
+            
+            return ResponseEntity.ok(debug);
+        } catch (Exception e) {
+            log.error("Error in debug endpoint", e);
+            Map<String, Object> errorDebug = new HashMap<>();
+            errorDebug.put("error", e.getMessage());
+            return ResponseEntity.badRequest().body(errorDebug);
         }
     }
 }

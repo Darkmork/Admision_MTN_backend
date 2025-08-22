@@ -83,7 +83,7 @@ public interface InterviewRepository extends JpaRepository<Interview, Long> {
     
     // Buscar por nombre de estudiante
     @Query("SELECT i FROM Interview i WHERE " +
-           "LOWER(CONCAT(i.application.student.firstName, ' ', i.application.student.lastName)) " +
+           "LOWER(CONCAT(i.application.student.firstName, ' ', i.application.student.lastName, ' ', i.application.student.maternalLastName)) " +
            "LIKE LOWER(CONCAT('%', :studentName, '%'))")
     List<Interview> findByStudentNameContaining(@Param("studentName") String studentName);
     
@@ -161,7 +161,7 @@ public interface InterviewRepository extends JpaRepository<Interview, Long> {
     // Buscar entrevistas por múltiples criterios con paginación
     @Query("SELECT i FROM Interview i WHERE " +
            "(:searchTerm IS NULL OR " +
-           "LOWER(CONCAT(i.application.student.firstName, ' ', i.application.student.lastName)) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
+           "LOWER(CONCAT(i.application.student.firstName, ' ', i.application.student.lastName, ' ', i.application.student.maternalLastName)) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
            "LOWER(CONCAT(i.interviewer.firstName, ' ', i.interviewer.lastName)) LIKE LOWER(CONCAT('%', :searchTerm, '%'))) " +
            "ORDER BY i.scheduledDate DESC, i.scheduledTime DESC")
     Page<Interview> findBySearchTerm(@Param("searchTerm") String searchTerm, Pageable pageable);

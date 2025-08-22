@@ -120,7 +120,20 @@ public class JwtService {
 
     // Obtener la clave de firma
     private SecretKey getSignInKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        // Para JWT, siempre usar la clave directamente como string
+        // No intentar decodificar base64 ya que JWT usa base64 URL-safe internamente
+        byte[] keyBytes = secretKey.getBytes();
+        
+        // Asegurar que tenga al menos 256 bits (32 bytes) para HS256
+        if (keyBytes.length < 32) {
+            // Extender la clave si es muy corta
+            byte[] extendedKey = new byte[32];
+            for (int i = 0; i < extendedKey.length; i++) {
+                extendedKey[i] = keyBytes[i % keyBytes.length];
+            }
+            keyBytes = extendedKey;
+        }
+        
         return Keys.hmacShaKeyFor(keyBytes);
     }
 

@@ -127,7 +127,9 @@ public class Interview {
     // Métodos de conveniencia
     public String getStudentName() {
         return application != null && application.getStudent() != null ?
-            application.getStudent().getFirstName() + " " + application.getStudent().getLastName() : "";
+            application.getStudent().getFirstName() + " " + 
+            application.getStudent().getLastName() + " " + 
+            application.getStudent().getMaternalLastName() : "";
     }
 
     public String getParentNames() {

@@ -23,7 +23,9 @@ public class ApplicationResponse {
         response.setSuccess(true);
         response.setMessage("Postulación creada exitosamente");
         response.setId(application.getId());
-        response.setStudentName(application.getStudent().getFirstName() + " " + application.getStudent().getLastName());
+        response.setStudentName(application.getStudent().getFirstName() + " " + 
+                               application.getStudent().getLastName() + " " + 
+                               application.getStudent().getMaternalLastName());
         response.setGrade(application.getStudent().getGradeApplied());
         response.setStatus(application.getStatus().name());
         response.setSubmissionDate(application.getSubmissionDate());

@@ -23,10 +23,13 @@ public class Student {
     private Long id;
 
     @Column(name = "first_name", nullable = false)
-    private String firstName;
+    private String firstName; // Nombres
 
-    @Column(name = "last_name", nullable = false)
-    private String lastName;
+    @Column(name = "paternal_last_name", nullable = false)
+    private String lastName; // Apellido Paterno
+
+    @Column(name = "maternal_last_name", nullable = false)
+    private String maternalLastName; // Apellido Materno
 
     @Column(name = "rut", nullable = false, unique = true)
     private String rut;
@@ -42,6 +45,9 @@ public class Student {
 
     @Column(name = "grade_applied", nullable = false)
     private String gradeApplied;
+
+    @Column(name = "school_applied", nullable = false)
+    private String schoolApplied; // "MONTE_TABOR" para niños, "NAZARET" para niñas
 
     @Column(name = "current_school")
     private String currentSchool; // Solo para estudiantes con escolaridad previa
