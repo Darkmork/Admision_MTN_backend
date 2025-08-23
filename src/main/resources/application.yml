@@ -1,17 +1,17 @@
 server:
-  port: 8080
+  port: ${SERVER_PORT:8080}
   servlet:
-    context-path: /
+    context-path: ${CONTEXT_PATH:/}
 
 spring:
   application:
     name: admision-mtn
   
-  # Configuración de base de datos PostgreSQL
+  # Configuración de base de datos PostgreSQL - USAR VARIABLES DE ENTORNO
   datasource:
-    url: jdbc:postgresql://localhost:5432/Admisión_MTN_DB
-    username: admin
-    password: admin123
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:Admisión_MTN_DB}
+    username: ${DB_USERNAME:admin}
+    password: ${DB_PASSWORD:admin123}
     driver-class-name: org.postgresql.Driver
   
   # Configuración JPA
@@ -34,20 +34,27 @@ spring:
     database: postgresql
     defer-datasource-initialization: false
   
-  # Configuración de Mail
+  # Configuración de Mail Institucional - USAR VARIABLES DE ENTORNO
   mail:
-    host: smtp.gmail.com
-    port: 587
-    username: ${MAIL_USERNAME:jorge.gangale@mtn.cl}
-    password: ${MAIL_PASSWORD:aepg xtjo kunu nvwn}
+    host: ${SMTP_HOST:smtp.gmail.com}
+    port: ${SMTP_PORT:587}
+    username: ${SMTP_USERNAME:admision@mtn.cl}
+    password: ${SMTP_PASSWORD:your_institutional_app_password_here}
     properties:
       mail:
         smtp:
-          auth: true
+          auth: ${SMTP_AUTH:true}
           starttls:
-            enable: true
+            enable: ${SMTP_STARTTLS:true}
           ssl:
-            trust: smtp.gmail.com
+            trust: ${SMTP_HOST:smtp.gmail.com}
+          # Configuración adicional para volumen institucional
+          connectiontimeout: 30000
+          timeout: 30000
+          writetimeout: 30000
+    # Configuración de protocolo mejorada para institucional
+    default-encoding: UTF-8
+    protocol: smtp
   
   # DevTools
   devtools:
@@ -59,8 +66,8 @@ spring:
   # Configuración multipart
   servlet:
     multipart:
-      max-file-size: 10MB
-      max-request-size: 10MB
+      max-file-size: ${MAX_FILE_SIZE:10MB}
+      max-request-size: ${MAX_REQUEST_SIZE:50MB}
       enabled: true
 
 # Configuración CORS
@@ -81,17 +88,34 @@ cors:
     - "*"
   allow-credentials: true
 
-# Configuración JWT
+# Configuración JWT - CAMBIAR SECRET EN PRODUCCIÓN
 jwt:
   secret: ${JWT_SECRET:myVerySecureJWTSecretKey1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789SECURE_KEY_FOR_HS512_ALGORITHM_MINIMUM_512_BITS_REQUIRED}
-  expiration: 86400000 # 24 horas en milisegundos
+  expiration: ${JWT_EXPIRATION_TIME:86400000} # 24 horas en milisegundos
 
 # Configuración de archivos
 app:
   upload:
-    dir: uploads
-    max-file-size: 10MB
-    max-request-size: 10MB
+    dir: ${UPLOAD_PATH:uploads}
+    max-file-size: ${MAX_FILE_SIZE:10MB}
+    max-request-size: ${MAX_REQUEST_SIZE:50MB}
+  # Configuración institucional de emails
+  institutional-email:
+    from-name: ${INSTITUTIONAL_EMAIL_FROM_NAME:Colegio Monte Tabor y Nazaret - Sistema de Admisión}
+    reply-to: ${INSTITUTIONAL_EMAIL_REPLY_TO:admision@mtn.cl}
+    support-email: ${INSTITUTIONAL_EMAIL_SUPPORT:soporte@mtn.cl}
+    website: ${INSTITUTIONAL_WEBSITE:www.mtn.cl}
+    phone: ${INSTITUTIONAL_PHONE:+56 2 2234 5678}
+    # Límites y control de volumen
+    max-emails-per-hour: ${MAX_EMAILS_PER_HOUR:50}
+    max-emails-per-day: ${MAX_EMAILS_PER_DAY:200}
+    max-emails-per-month: ${MAX_EMAILS_PER_MONTH:5000}
+    # Rate limiting y retry
+    retry-attempts: ${EMAIL_RETRY_ATTEMPTS:4}
+    retry-delay-minutes: ${EMAIL_RETRY_DELAY_MINUTES:5}
+    queue-max-size: ${EMAIL_QUEUE_MAX_SIZE:100}
+  # Base URL para tracking y respuestas
+  base-url: ${APP_BASE_URL:http://localhost:8080}
 
 # Configuración de logging
 logging:
