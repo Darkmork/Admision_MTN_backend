@@ -9,7 +9,7 @@ spring:
   
   # Configuración de base de datos PostgreSQL
   datasource:
-    url: jdbc:postgresql://localhost:5432/Admision_MTN_DB
+    url: jdbc:postgresql://localhost:5432/Admisión_MTN_DB
     username: admin
     password: admin123
     driver-class-name: org.postgresql.Driver

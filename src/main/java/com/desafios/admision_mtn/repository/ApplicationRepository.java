@@ -19,10 +19,10 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
     
     @Query("SELECT a FROM Application a " +
            "JOIN FETCH a.student " +
-           "JOIN FETCH a.father " +
-           "JOIN FETCH a.mother " +
-           "JOIN FETCH a.supporter " +
-           "JOIN FETCH a.guardian " +
+           "LEFT JOIN FETCH a.father " +
+           "LEFT JOIN FETCH a.mother " +
+           "LEFT JOIN FETCH a.supporter " +
+           "LEFT JOIN FETCH a.guardian " +
            "JOIN FETCH a.applicantUser " +
            "WHERE a.applicantUser = :user")
     List<Application> findByApplicantUserWithStudent(@Param("user") User user);
@@ -39,11 +39,14 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
     
     @Query("SELECT a FROM Application a " +
            "JOIN FETCH a.student " +
-           "JOIN FETCH a.father " +
-           "JOIN FETCH a.mother " +
-           "JOIN FETCH a.supporter " +
-           "JOIN FETCH a.guardian " +
-           "JOIN FETCH a.applicantUser " +
+           "LEFT JOIN FETCH a.father " +
+           "LEFT JOIN FETCH a.mother " +
+           "LEFT JOIN FETCH a.supporter " +
+           "LEFT JOIN FETCH a.guardian " +
+           "LEFT JOIN FETCH a.applicantUser " +
            "ORDER BY a.createdAt DESC")
     List<Application> findAllWithRelations();
+
+    // Simple method without complex joins for testing
+    List<Application> findAllByOrderByCreatedAtDesc();
 }

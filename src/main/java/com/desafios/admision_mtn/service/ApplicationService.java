@@ -129,7 +129,10 @@ public class ApplicationService {
     }
 
     public List<Application> getAllApplications() {
-        return applicationRepository.findAllWithRelations();
+        // Temporarily use simple method for testing
+        List<Application> applications = applicationRepository.findAllByOrderByCreatedAtDesc();
+        log.info("Found {} applications using simple query", applications.size());
+        return applications;
     }
 
     public Application getApplicationById(Long id) {

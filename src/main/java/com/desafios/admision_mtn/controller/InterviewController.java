@@ -7,6 +7,7 @@ import com.desafios.admision_mtn.entity.Interview.InterviewType;
 import com.desafios.admision_mtn.entity.Interview.InterviewMode;
 import com.desafios.admision_mtn.service.InterviewService;
 import com.desafios.admision_mtn.service.InterviewNotificationService;
+import com.desafios.admision_mtn.service.PersonalizedEmailService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +34,7 @@ public class InterviewController {
 
     private final InterviewService interviewService;
     private final InterviewNotificationService notificationService;
+    private final PersonalizedEmailService personalizedEmailService;
 
     // CRUD básico
     @PostMapping
@@ -306,9 +308,8 @@ public class InterviewController {
             
             switch (notificationType.toLowerCase()) {
                 case "scheduled":
-                    // Convertir InterviewResponse a Interview para el servicio de notificaciones
-                    // Necesitamos obtener la entidad completa
-                    notificationService.sendInterviewScheduledNotification(getInterviewEntity(id));
+                    // Usar el servicio de emails personalizados
+                    personalizedEmailService.sendPersonalizedInterviewNotification(getInterviewEntity(id));
                     break;
                 case "confirmed":
                     notificationService.sendInterviewConfirmedNotification(getInterviewEntity(id));

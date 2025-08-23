@@ -31,6 +31,7 @@ public class InterviewService {
     private final ApplicationRepository applicationRepository;
     private final UserRepository userRepository;
     private final InterviewNotificationService notificationService;
+    private final PersonalizedEmailService personalizedEmailService;
 
     // CRUD básico
     public InterviewResponse createInterview(CreateInterviewRequest request) {
@@ -71,6 +72,10 @@ public class InterviewService {
         log.info("Entrevista creada exitosamente con ID: {}", savedInterview.getId());
         
         // Enviar notificación por email a la familia
+        // Enviar notificación personalizada con tracking y respuestas automáticas
+        personalizedEmailService.sendPersonalizedInterviewNotification(savedInterview);
+        
+        // También enviar la notificación tradicional como backup
         notificationService.sendInterviewScheduledNotification(savedInterview);
         
         return InterviewResponse.from(savedInterview);

@@ -28,6 +28,7 @@ public class ApplicationController {
     private final ApplicationService applicationService;
     private final com.desafios.admision_mtn.service.UserService userService;
     private final com.desafios.admision_mtn.repository.UserRepository userRepository;
+    private final com.desafios.admision_mtn.repository.ApplicationRepository applicationRepository;
 
     @PostMapping
     public ResponseEntity<ApplicationResponse> createApplication(
@@ -312,6 +313,27 @@ public class ApplicationController {
         }
     }
     
+    // Endpoint para debugging base de datos
+    @GetMapping("/public/debug-database")
+    public ResponseEntity<Map<String, Object>> debugDatabase() {
+        try {
+            Map<String, Object> debug = new HashMap<>();
+            debug.put("message", "Debug database connection");
+            debug.put("timestamp", LocalDateTime.now());
+            
+            // Contar aplicaciones directamente con repository
+            long applicationCount = applicationRepository.count();
+            debug.put("applicationCount", applicationCount);
+            
+            return ResponseEntity.ok(debug);
+        } catch (Exception e) {
+            log.error("Error in debug database endpoint", e);
+            Map<String, Object> errorDebug = new HashMap<>();
+            errorDebug.put("error", e.getMessage());
+            return ResponseEntity.badRequest().body(errorDebug);
+        }
+    }
+
     // Endpoint temporal para debugging autenticación
     @GetMapping("/public/debug-users")
     public ResponseEntity<Map<String, Object>> debugUsers() {
