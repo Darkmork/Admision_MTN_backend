@@ -5,7 +5,9 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,10 +15,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Profile("dev")
 @RestController
 @RequestMapping("/api/debug")
 @RequiredArgsConstructor
 @Slf4j
+@PreAuthorize("hasRole('ADMIN')")
 // 🔒 SEGURIDAD: Sin @CrossOrigin - usa configuración global de SecurityConfig
 public class DebugController {
     
