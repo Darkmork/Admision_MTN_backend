@@ -1,8 +1,10 @@
 package com.desafios.admision_mtn.config;
 
 import com.desafios.admision_mtn.filter.JwtRequestFilter;
+import com.desafios.admision_mtn.security.RateLimitingFilter;
 import com.desafios.admision_mtn.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -10,6 +12,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,14 +23,20 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
     
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtRequestFilter jwtRequestFilter;
+    private final RateLimitingFilter rateLimitingFilter;
+    
+    @Value("${ALLOWED_ORIGINS:http://localhost:3000,http://localhost:5173,http://localhost:5174,http://localhost:5175,http://localhost:5176,http://localhost:5177}")
+    private String allowedOrigins;
     
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -53,16 +62,49 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authz -> authz
-                .requestMatchers("/api/auth/**", "/api/usuario-auth/**", "/api/email/**").permitAll()
-                .requestMatchers("/api/public/**").permitAll()
-                .requestMatchers("/api/applications/public/**").permitAll()
-                .requestMatchers("/api/documents/public/**").permitAll()
-                .requestMatchers("/api/schedules/public/**").permitAll()
-                .requestMatchers("/api/evaluations/public/**").permitAll()
-                .requestMatchers("/api/rut/**").permitAll()
+                // 🔒 ENDPOINTS PÚBLICOS ESENCIALES
+                .requestMatchers("/api/auth/**").permitAll() // Login, registro
+                .requestMatchers("/api/rut/**").permitAll() // Validación RUT chileno
+                .requestMatchers("/api/documents/public/types").permitAll() // Solo tipos de documentos
+                
+                // 📚 DOCUMENTACIÓN API SWAGGER/OpenAPI
+                .requestMatchers("/swagger-ui/**").permitAll() // Swagger UI
+                .requestMatchers("/swagger-ui.html").permitAll() // Swagger UI HTML
+                .requestMatchers("/v3/api-docs/**").permitAll() // OpenAPI JSON/YAML
+                .requestMatchers("/api-docs/**").permitAll() // Documentos API
+                .requestMatchers("/swagger-resources/**").permitAll() // Recursos Swagger
+                
+                // 📊 MONITOREO Y OBSERVABILIDAD - Actuator
+                .requestMatchers("/actuator/health").permitAll() // Health check público
+                .requestMatchers("/actuator/info").permitAll() // Información básica
+                .requestMatchers("/actuator/prometheus").permitAll() // Métricas Prometheus
+                .requestMatchers("/actuator/**").hasRole("ADMIN") // Otros endpoints solo para admins
+                
+                // 🔓 ENDPOINTS PÚBLICOS DE DESARROLLO (temporal para integración)
+                .requestMatchers("/api/applications/public/all").permitAll() // Lista de aplicaciones para desarrollo
+                .requestMatchers("/api/applications/public/test-data").permitAll() // Datos de prueba
+                .requestMatchers("/api/applications/public/mock-applications").permitAll() // Aplicaciones mock
+                .requestMatchers("/api/applications/public/debug-database").permitAll() // Debug BD
+                .requestMatchers("/api/applications/public/debug-users").permitAll() // Debug usuarios
+                .requestMatchers("/api/applications/public/reset-database").permitAll() // Reset BD (solo desarrollo)
+                .requestMatchers("/api/applications/public/debug-jpa").permitAll() // Debug JPA
+                .requestMatchers("/api/applications/public/debug-connection").permitAll() // Debug conexión BD
+                .requestMatchers("/api/applications/test").permitAll() // Test básico
+                
+                // 🚨 ENDPOINTS REMOVIDOS POR SEGURIDAD:
+                // - /api/test/** (expone contraseñas y datos sensibles)
+                // - /api/debug/** (acceso directo a BD y usuarios)
+                // - /api/public/** (demasiado genérico)
+                // - /api/documents/public/** (acceso a documentos privados)
+                // - /api/schedules/public/** (horarios privados)
+                // - /api/evaluations/public/** (evaluaciones confidenciales)
+                // - /api/email/** y /api/emails/** (no encontrados en controllers)
+                // - /api/usuario-auth/** (no encontrado en controllers)
+                
                 .anyRequest().authenticated()
             )
             .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint))
+            .addFilterBefore(rateLimitingFilter, UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
         
         return http.build();
@@ -71,10 +113,31 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
+        
+        // 🔒 SEGURIDAD: Orígenes específicos desde configuración  
+        configuration.setAllowedOrigins(Arrays.asList(allowedOrigins.split(",")));
+        
+        // 🔒 SEGURIDAD: Solo métodos HTTP necesarios
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("*"));
+        
+        // 🔒 SEGURIDAD: Headers específicos necesarios para JWT y contenido
+        configuration.setAllowedHeaders(Arrays.asList(
+            "Authorization", 
+            "Content-Type", 
+            "Accept",
+            "Origin",
+            "Access-Control-Request-Method",
+            "Access-Control-Request-Headers"
+        ));
+        
+        // 🔒 SEGURIDAD: Headers expuestos para el frontend
+        configuration.setExposedHeaders(Arrays.asList("Authorization"));
+        
+        // 🔒 SEGURIDAD: Permitir credenciales solo para orígenes específicos
         configuration.setAllowCredentials(true);
+        
+        // 🔒 SEGURIDAD: Cache de preflight por 1 hora para performance
+        configuration.setMaxAge(3600L);
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

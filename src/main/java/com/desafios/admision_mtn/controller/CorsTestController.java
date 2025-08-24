@@ -1,21 +1,18 @@
 package com.desafios.admision_mtn.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/cors-test")
-@CrossOrigin(
-    origins = {"http://localhost:3000", "http://localhost:5173", "http://127.0.0.1:3000", "http://127.0.0.1:5173", "https://admision-mtn.vercel.app"},
-    methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS},
-    allowedHeaders = {"*"},
-    allowCredentials = "true",
-    maxAge = 3600
-)
+@RequiredArgsConstructor
+@PreAuthorize("hasRole('ADMIN')")
+// 🔒 SEGURIDAD: Sin @CrossOrigin - usa configuración global de SecurityConfig
 public class CorsTestController {
 
     @GetMapping("/simple")

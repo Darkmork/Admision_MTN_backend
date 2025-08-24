@@ -57,4 +57,17 @@ public interface EvaluationRepository extends JpaRepository<Evaluation, Long> {
     
     // Verificar si un evaluador tiene evaluaciones
     boolean existsByEvaluatorId(Long evaluatorId);
+    
+    // Métodos adicionales para el dashboard
+    @Query("SELECT COUNT(e) FROM Evaluation e WHERE e.evaluationType = :type")
+    long countByType(@Param("type") Evaluation.EvaluationType type);
+    
+    @Query("SELECT COUNT(e) FROM Evaluation e WHERE e.status = :status")
+    long countByStatus(@Param("status") Evaluation.EvaluationStatus status);
+    
+    @Query("SELECT e FROM Evaluation e WHERE e.completionDate >= :fromDate AND e.status = com.desafios.admision_mtn.entity.Evaluation.EvaluationStatus.COMPLETED ORDER BY e.completionDate DESC")
+    List<Evaluation> findCompletedFromDate(@Param("fromDate") java.time.LocalDateTime fromDate);
+    
+    @Query("SELECT COUNT(e) FROM Evaluation e WHERE e.status = :status AND e.createdAt <= :cutoffDate")
+    long countOverdueEvaluations(@Param("status") Evaluation.EvaluationStatus status, @Param("cutoffDate") java.time.LocalDateTime cutoffDate);
 }

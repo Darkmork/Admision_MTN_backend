@@ -11,7 +11,9 @@ import com.desafios.admision_mtn.model.EstadoProgreso;
 import com.desafios.admision_mtn.service.ProgresoUsuarioService;
 import com.desafios.admision_mtn.service.UsuarioService;
 import com.desafios.admision_mtn.service.ProblemaService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,19 +22,16 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/progresos")
+@RequiredArgsConstructor
+@PreAuthorize("hasRole('ADMIN')")
+// 🔒 SEGURIDAD: Sin @CrossOrigin - usa configuración global de SecurityConfig
 public class ProgresoUsuarioController {
 
     private final ProgresoUsuarioService progresoUsuarioService;
     private final UsuarioService usuarioService;
     private final ProblemaService problemaService;
 
-    public ProgresoUsuarioController(ProgresoUsuarioService progresoUsuarioService,
-                                     UsuarioService usuarioService,
-                                     ProblemaService problemaService) {
-        this.progresoUsuarioService = progresoUsuarioService;
-        this.usuarioService = usuarioService;
-        this.problemaService = problemaService;
-    }
+    // Constructor eliminado - usando @RequiredArgsConstructor
 
     @GetMapping("/usuario/{usuarioId}")
     public ResponseEntity<List<ProgresoUsuarioDto>> getProgresoPorUsuario(@PathVariable Long usuarioId) {

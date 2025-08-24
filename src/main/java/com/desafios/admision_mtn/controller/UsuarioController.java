@@ -4,10 +4,11 @@ import com.desafios.admision_mtn.dto.UsuarioAuthRequestDto;
 import com.desafios.admision_mtn.dto.UsuarioDto;
 import com.desafios.admision_mtn.model.Usuario;
 import com.desafios.admision_mtn.service.UsuarioService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.Optional;
 import java.util.List;
@@ -17,22 +18,15 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/usuarios")
-@CrossOrigin(
-    origins = {"http://localhost:3000", "http://localhost:5173", "http://localhost:5174", "http://127.0.0.1:3000", "http://127.0.0.1:5173", "http://127.0.0.1:5174", "https://admision-mtn.vercel.app"},
-    methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS},
-    allowedHeaders = {"*"},
-    allowCredentials = "true",
-    maxAge = 3600
-)
+@RequiredArgsConstructor
+@PreAuthorize("hasRole('ADMIN')")
+// 🔒 SEGURIDAD: Sin @CrossOrigin - usa configuración global de SecurityConfig
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
     private final PasswordEncoder passwordEncoder;
 
-    public UsuarioController(UsuarioService usuarioService, PasswordEncoder passwordEncoder) {
-        this.usuarioService = usuarioService;
-        this.passwordEncoder = passwordEncoder;
-    }
+    // Constructor eliminado - usando @RequiredArgsConstructor
 
     @GetMapping
     public List<UsuarioDto> getAllUsuarios() {

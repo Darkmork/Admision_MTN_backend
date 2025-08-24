@@ -393,9 +393,9 @@ public class EvaluationService {
 
     private User.UserRole getRequiredRoleForEvaluationType(Evaluation.EvaluationType evaluationType) {
         return switch (evaluationType) {
-            case LANGUAGE_EXAM -> User.UserRole.TEACHER_LANGUAGE;
-            case MATHEMATICS_EXAM -> User.UserRole.TEACHER_MATHEMATICS;
-            case ENGLISH_EXAM -> User.UserRole.TEACHER_ENGLISH;
+            case LANGUAGE_EXAM -> User.UserRole.TEACHER;
+            case MATHEMATICS_EXAM -> User.UserRole.TEACHER;
+            case ENGLISH_EXAM -> User.UserRole.TEACHER;
             case CYCLE_DIRECTOR_REPORT, CYCLE_DIRECTOR_INTERVIEW -> User.UserRole.CYCLE_DIRECTOR;
             case PSYCHOLOGICAL_INTERVIEW -> User.UserRole.PSYCHOLOGIST;
         };

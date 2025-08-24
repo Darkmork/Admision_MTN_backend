@@ -31,6 +31,9 @@ public interface InterviewRepository extends JpaRepository<Interview, Long> {
     
     List<Interview> findByApplicationId(Long applicationId);
     
+    // Buscar la primera entrevista de una aplicación
+    Optional<Interview> findFirstByApplicationIdOrderByScheduledDateAsc(Long applicationId);
+    
     // Búsquedas por fecha
     List<Interview> findByScheduledDate(LocalDate date);
     
@@ -83,7 +86,7 @@ public interface InterviewRepository extends JpaRepository<Interview, Long> {
     
     // Buscar por nombre de estudiante
     @Query("SELECT i FROM Interview i WHERE " +
-           "LOWER(CONCAT(i.application.student.firstName, ' ', i.application.student.lastName)) " +
+           "LOWER(CONCAT(i.application.student.firstName, ' ', i.application.student.lastName, ' ', i.application.student.maternalLastName)) " +
            "LIKE LOWER(CONCAT('%', :studentName, '%'))")
     List<Interview> findByStudentNameContaining(@Param("studentName") String studentName);
     
@@ -161,8 +164,18 @@ public interface InterviewRepository extends JpaRepository<Interview, Long> {
     // Buscar entrevistas por múltiples criterios con paginación
     @Query("SELECT i FROM Interview i WHERE " +
            "(:searchTerm IS NULL OR " +
-           "LOWER(CONCAT(i.application.student.firstName, ' ', i.application.student.lastName)) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
+           "LOWER(CONCAT(i.application.student.firstName, ' ', i.application.student.lastName, ' ', i.application.student.maternalLastName)) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
            "LOWER(CONCAT(i.interviewer.firstName, ' ', i.interviewer.lastName)) LIKE LOWER(CONCAT('%', :searchTerm, '%'))) " +
            "ORDER BY i.scheduledDate DESC, i.scheduledTime DESC")
     Page<Interview> findBySearchTerm(@Param("searchTerm") String searchTerm, Pageable pageable);
+    
+    // Métodos adicionales para el dashboard
+    @Query("SELECT i FROM Interview i WHERE i.scheduledDate BETWEEN :startDate AND :endDate ORDER BY i.scheduledDate")
+    List<Interview> findUpcomingInterviews(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+    
+    @Query("SELECT i FROM Interview i WHERE i.completedAt >= :fromDate AND i.status = 'COMPLETED' ORDER BY i.completedAt DESC")
+    List<Interview> findCompletedFromDate(@Param("fromDate") LocalDateTime fromDate);
+    
+    // Buscar entrevistas por múltiples aplicaciones (para el workflow)
+    List<Interview> findByApplication_IdOrderByCreatedAtDesc(Long applicationId);
 }

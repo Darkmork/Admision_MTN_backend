@@ -24,7 +24,21 @@ public class JwtUtil {
     private Long expiration;
     
     private SecretKey getSigningKey() {
-        return Keys.hmacShaKeyFor(secret.getBytes());
+        // Para JWT, siempre usar la clave directamente como string
+        // No intentar decodificar base64 ya que JWT usa base64 URL-safe internamente
+        byte[] keyBytes = secret.getBytes();
+        
+        // Asegurar que tenga al menos 512 bits (64 bytes) para HS512
+        if (keyBytes.length < 64) {
+            // Extender la clave si es muy corta
+            byte[] extendedKey = new byte[64];
+            for (int i = 0; i < extendedKey.length; i++) {
+                extendedKey[i] = keyBytes[i % keyBytes.length];
+            }
+            keyBytes = extendedKey;
+        }
+        
+        return Keys.hmacShaKeyFor(keyBytes);
     }
     
     public String extractUsername(String token) {

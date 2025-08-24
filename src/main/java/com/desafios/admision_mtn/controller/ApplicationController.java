@@ -4,6 +4,15 @@ import com.desafios.admision_mtn.dto.ApplicationResponse;
 import com.desafios.admision_mtn.dto.CreateApplicationRequest;
 import com.desafios.admision_mtn.entity.Application;
 import com.desafios.admision_mtn.service.ApplicationService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,21 +31,74 @@ import java.util.Map;
 @RequestMapping("/api/applications")
 @RequiredArgsConstructor
 @Slf4j
-@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5173", "http://localhost:5174", "http://localhost:5175", "http://localhost:5176"})
+@Tag(name = "Applications", description = "Sistema de gestión de postulaciones de admisión escolar")
+// 🔒 SEGURIDAD: Sin @CrossOrigin - usa configuración global de SecurityConfig
 public class ApplicationController {
 
     private final ApplicationService applicationService;
+    private final com.desafios.admision_mtn.service.UserService userService;
+    private final com.desafios.admision_mtn.repository.UserRepository userRepository;
+    private final com.desafios.admision_mtn.repository.ApplicationRepository applicationRepository;
+    private final org.springframework.jdbc.core.JdbcTemplate jdbcTemplate;
 
+    @Operation(
+        summary = "Crear nueva postulación", 
+        description = "Crea una nueva postulación de admisión para un estudiante. Requiere autenticación de apoderado.",
+        security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200", 
+            description = "Postulación creada exitosamente",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ApplicationResponse.class),
+                examples = @ExampleObject(value = """
+                    {
+                        "success": true,
+                        "message": "Postulación creada exitosamente",
+                        "applicationId": 123,
+                        "status": "DRAFT"
+                    }
+                    """)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "400", 
+            description = "Datos de postulación inválidos",
+            content = @Content(
+                mediaType = "application/json",
+                examples = @ExampleObject(value = """
+                    {
+                        "success": false,
+                        "message": "Error en los datos de postulación"
+                    }
+                    """)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "401", 
+            description = "Usuario no autenticado"
+        )
+    })
     @PostMapping
     public ResponseEntity<ApplicationResponse> createApplication(
-            @Valid @RequestBody CreateApplicationRequest request) {
+        @Parameter(
+            description = "Datos de la nueva postulación",
+            required = true,
+            schema = @Schema(implementation = CreateApplicationRequest.class)
+        )
+        @Valid @RequestBody CreateApplicationRequest request) {
         try {
             // Obtener el email del usuario autenticado
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication == null || authentication.getName() == null) {
+                throw new RuntimeException("Usuario no autenticado");
+            }
             String userEmail = authentication.getName();
             
             log.info("Creating application for user: {}", userEmail);
-            log.info("Student name: {} {}", request.getFirstName(), request.getLastName());
+            log.info("Student name: {} {} {}", request.getFirstName(), request.getLastName(), request.getMaternalLastName());
             
             ApplicationResponse response = applicationService.createApplication(request, userEmail);
             return ResponseEntity.ok(response);
@@ -49,6 +111,25 @@ public class ApplicationController {
         }
     }
 
+    @Operation(
+        summary = "Obtener mis postulaciones", 
+        description = "Obtiene todas las postulaciones del usuario autenticado (apoderado).",
+        security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200", 
+            description = "Lista de postulaciones del usuario",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = Application.class)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "401", 
+            description = "Usuario no autenticado"
+        )
+    })
     @GetMapping("/my-applications")
     public ResponseEntity<List<Application>> getMyApplications() {
         try {
@@ -64,8 +145,33 @@ public class ApplicationController {
         }
     }
 
+    @Operation(
+        summary = "Obtener postulación por ID", 
+        description = "Obtiene los detalles completos de una postulación específica.",
+        security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200", 
+            description = "Detalles de la postulación",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = Application.class)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "404", 
+            description = "Postulación no encontrada"
+        ),
+        @ApiResponse(
+            responseCode = "401", 
+            description = "Usuario no autenticado"
+        )
+    })
     @GetMapping("/{id}")
-    public ResponseEntity<Application> getApplicationById(@PathVariable Long id) {
+    public ResponseEntity<Application> getApplicationById(
+        @Parameter(description = "ID de la postulación", required = true, example = "123")
+        @PathVariable Long id) {
         try {
             Application application = applicationService.getApplicationById(id);
             return ResponseEntity.ok(application);
@@ -77,6 +183,25 @@ public class ApplicationController {
     }
 
     // Endpoints para administradores
+    @Operation(
+        summary = "[ADMIN] Obtener todas las postulaciones", 
+        description = "Obtiene todas las postulaciones del sistema. Solo para administradores.",
+        security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200", 
+            description = "Lista completa de postulaciones",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = Application.class)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "403", 
+            description = "Acceso denegado - requiere rol ADMIN"
+        )
+    })
     @GetMapping("/admin/all")
     public ResponseEntity<List<Application>> getAllApplications() {
         try {
@@ -89,10 +214,39 @@ public class ApplicationController {
         }
     }
 
+    @Operation(
+        summary = "[ADMIN] Actualizar estado de postulación", 
+        description = "Actualiza el estado de una postulación específica. Estados válidos: DRAFT, SUBMITTED, UNDER_REVIEW, INTERVIEW_SCHEDULED, EXAM_SCHEDULED, APPROVED, REJECTED, WAITLIST.",
+        security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200", 
+            description = "Estado actualizado exitosamente",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = Application.class)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "400", 
+            description = "Estado inválido"
+        ),
+        @ApiResponse(
+            responseCode = "404", 
+            description = "Postulación no encontrada"
+        ),
+        @ApiResponse(
+            responseCode = "403", 
+            description = "Acceso denegado - requiere rol ADMIN"
+        )
+    })
     @PutMapping("/admin/{id}/status")
     public ResponseEntity<Application> updateApplicationStatus(
-            @PathVariable Long id,
-            @RequestParam String status) {
+        @Parameter(description = "ID de la postulación", required = true, example = "123")
+        @PathVariable Long id,
+        @Parameter(description = "Nuevo estado de la postulación", required = true, example = "APPROVED")
+        @RequestParam String status) {
         try {
             Application.ApplicationStatus applicationStatus = 
                 Application.ApplicationStatus.valueOf(status.toUpperCase());
@@ -144,6 +298,10 @@ public class ApplicationController {
             studentInfo.put("id", application.getStudent().getId());
             studentInfo.put("firstName", application.getStudent().getFirstName());
             studentInfo.put("lastName", application.getStudent().getLastName());
+            studentInfo.put("maternalLastName", application.getStudent().getMaternalLastName());
+            studentInfo.put("fullName", application.getStudent().getFirstName() + " " + 
+                           application.getStudent().getLastName() + " " + 
+                           application.getStudent().getMaternalLastName());
             studentInfo.put("rut", application.getStudent().getRut());
             studentInfo.put("gradeApplied", application.getStudent().getGradeApplied());
             studentInfo.put("birthDate", application.getStudent().getBirthDate());
@@ -300,6 +458,121 @@ public class ApplicationController {
         } catch (Exception e) {
             log.error("Error updating application status by documents for application {}", id, e);
             return ResponseEntity.badRequest().build();
+        }
+    }
+    
+    // Endpoint para debugging base de datos
+    @GetMapping("/public/debug-database")
+    public ResponseEntity<Map<String, Object>> debugDatabase() {
+        try {
+            Map<String, Object> debug = new HashMap<>();
+            debug.put("message", "Debug database connection");
+            debug.put("timestamp", LocalDateTime.now());
+            
+            // Contar aplicaciones directamente con repository
+            long applicationCount = applicationRepository.count();
+            debug.put("applicationCount", applicationCount);
+            
+            return ResponseEntity.ok(debug);
+        } catch (Exception e) {
+            log.error("Error in debug database endpoint", e);
+            Map<String, Object> errorDebug = new HashMap<>();
+            errorDebug.put("error", e.getMessage());
+            return ResponseEntity.badRequest().body(errorDebug);
+        }
+    }
+
+    // Endpoint temporal para debugging conexión de BD
+    @GetMapping("/public/debug-connection")
+    public ResponseEntity<Map<String, Object>> debugConnection() {
+        try {
+            Map<String, Object> debug = new HashMap<>();
+            debug.put("message", "Debug database connection using JdbcTemplate");
+            debug.put("timestamp", LocalDateTime.now());
+            
+            // Usar JdbcTemplate para consultas SQL directas
+            Integer jdbcCount = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM applications", Integer.class);
+            debug.put("jdbcTemplateCount", jdbcCount);
+            
+            // Información de la conexión
+            String currentDb = jdbcTemplate.queryForObject("SELECT current_database()", String.class);
+            String currentUser = jdbcTemplate.queryForObject("SELECT current_user", String.class);
+            debug.put("currentDatabase", currentDb);
+            debug.put("currentUser", currentUser);
+            
+            // Comparar con repository
+            long hibernateCount = applicationRepository.count();
+            debug.put("hibernateRepositoryCount", hibernateCount);
+            
+            // Verificar si hay datos en la tabla
+            if (jdbcCount > 0) {
+                java.util.List<java.util.Map<String, Object>> sampleData = jdbcTemplate.queryForList(
+                    "SELECT id, status, submission_date FROM applications LIMIT 3"
+                );
+                debug.put("jdbcSampleData", sampleData);
+            }
+            
+            return ResponseEntity.ok(debug);
+        } catch (Exception e) {
+            log.error("Error in connection debug endpoint", e);
+            Map<String, Object> errorDebug = new HashMap<>();
+            errorDebug.put("error", e.getMessage());
+            errorDebug.put("exception", e.getClass().getSimpleName());
+            return ResponseEntity.badRequest().body(errorDebug);
+        }
+    }
+    
+    // Endpoint temporal para debugging autenticación
+    @GetMapping("/public/debug-users")
+    public ResponseEntity<Map<String, Object>> debugUsers() {
+        try {
+            Map<String, Object> debug = new HashMap<>();
+            debug.put("message", "Debug endpoint funcionando");
+            debug.put("timestamp", LocalDateTime.now());
+            
+            // Intentar buscar usuario directamente
+            try {
+                java.util.Optional<com.desafios.admision_mtn.entity.User> userOpt = 
+                    userService.findByEmail("admin@test.cl");
+                
+                if (userOpt.isPresent()) {
+                    com.desafios.admision_mtn.entity.User user = userOpt.get();
+                    debug.put("userFound", true);
+                    debug.put("userEmail", user.getEmail());
+                    debug.put("userActive", user.getActive());
+                    debug.put("userEmailVerified", user.getEmailVerified());
+                    debug.put("userEnabled", user.isEnabled());
+                    debug.put("userRole", user.getRole().name());
+                } else {
+                    debug.put("userFound", false);
+                }
+                
+                // Probar con otros emails para ver si encuentra alguno
+                java.util.Optional<com.desafios.admision_mtn.entity.User> userOpt2 = 
+                    userService.findByEmail("jorge.gangale@mtn.cl");
+                debug.put("foundJorgeUser", userOpt2.isPresent());
+                
+                // Contar total de usuarios usando repository
+                long totalUsers = userRepository.count();
+                debug.put("totalUsersInSpring", totalUsers);
+                
+                // Listar los emails de los usuarios que Spring SÍ ve
+                java.util.List<String> springEmails = userRepository.findAll()
+                    .stream()
+                    .map(u -> u.getEmail())
+                    .collect(java.util.stream.Collectors.toList());
+                debug.put("springUserEmails", springEmails);
+                
+            } catch (Exception e) {
+                debug.put("userServiceError", e.getMessage());
+            }
+            
+            return ResponseEntity.ok(debug);
+        } catch (Exception e) {
+            log.error("Error in debug endpoint", e);
+            Map<String, Object> errorDebug = new HashMap<>();
+            errorDebug.put("error", e.getMessage());
+            return ResponseEntity.badRequest().body(errorDebug);
         }
     }
 }

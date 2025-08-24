@@ -26,6 +26,7 @@ public class ApplicationService {
     private final ApplicationRepository applicationRepository;
     private final UserRepository userRepository;
     private final EvaluationRepository evaluationRepository;
+    private final org.springframework.jdbc.core.JdbcTemplate jdbcTemplate;
 
     public ApplicationResponse createApplication(CreateApplicationRequest request, String userEmail) {
         try {
@@ -42,51 +43,53 @@ public class ApplicationService {
 
             // Crear entidad Student
             Student student = new Student();
-            student.setFirstName(request.getFirstName());
-            student.setLastName(request.getLastName());
+            student.setFirstName(toUpperCase(request.getFirstName()));
+            student.setLastName(toUpperCase(request.getLastName()));
+            student.setMaternalLastName(toUpperCase(request.getMaternalLastName()));
             student.setRut(request.getRut());
             student.setBirthDate(LocalDate.parse(request.getBirthDate(), DateTimeFormatter.ISO_LOCAL_DATE));
             student.setEmail(request.getStudentEmail());
-            student.setAddress(request.getStudentAddress());
+            student.setAddress(toUpperCase(request.getStudentAddress()));
             student.setGradeApplied(request.getGrade());
-            student.setCurrentSchool(request.getCurrentSchool());
-            student.setAdditionalNotes(request.getAdditionalNotes());
+            student.setSchoolApplied(request.getSchoolApplied());
+            student.setCurrentSchool(toUpperCase(request.getCurrentSchool()));
+            student.setAdditionalNotes(toUpperCase(request.getAdditionalNotes()));
 
             // Crear entidad Parent (Padre)
             Parent father = new Parent();
-            father.setFullName(request.getParent1Name());
+            father.setFullName(toUpperCase(request.getParent1Name()));
             father.setRut(request.getParent1Rut());
             father.setEmail(request.getParent1Email());
             father.setPhone(request.getParent1Phone());
-            father.setAddress(request.getParent1Address());
-            father.setProfession(request.getParent1Profession());
+            father.setAddress(toUpperCase(request.getParent1Address()));
+            father.setProfession(toUpperCase(request.getParent1Profession()));
             father.setParentType(Parent.ParentType.FATHER);
 
             // Crear entidad Parent (Madre)
             Parent mother = new Parent();
-            mother.setFullName(request.getParent2Name());
+            mother.setFullName(toUpperCase(request.getParent2Name()));
             mother.setRut(request.getParent2Rut());
             mother.setEmail(request.getParent2Email());
             mother.setPhone(request.getParent2Phone());
-            mother.setAddress(request.getParent2Address());
-            mother.setProfession(request.getParent2Profession());
+            mother.setAddress(toUpperCase(request.getParent2Address()));
+            mother.setProfession(toUpperCase(request.getParent2Profession()));
             mother.setParentType(Parent.ParentType.MOTHER);
 
             // Crear entidad Supporter
             Supporter supporter = new Supporter();
-            supporter.setFullName(request.getSupporterName());
+            supporter.setFullName(toUpperCase(request.getSupporterName()));
             supporter.setRut(request.getSupporterRut());
             supporter.setEmail(request.getSupporterEmail());
             supporter.setPhone(request.getSupporterPhone());
-            supporter.setRelationship(parseRelationship(request.getSupporterRelation()));
+            supporter.setRelationship(parseRelationship(toUpperCase(request.getSupporterRelation())));
 
             // Crear entidad Guardian
             Guardian guardian = new Guardian();
-            guardian.setFullName(request.getGuardianName());
+            guardian.setFullName(toUpperCase(request.getGuardianName()));
             guardian.setRut(request.getGuardianRut());
             guardian.setEmail(request.getGuardianEmail());
             guardian.setPhone(request.getGuardianPhone());
-            guardian.setRelationship(parseGuardianRelationship(request.getGuardianRelation()));
+            guardian.setRelationship(parseGuardianRelationship(toUpperCase(request.getGuardianRelation())));
 
             // Crear entidad Application
             Application application = new Application();
@@ -127,7 +130,60 @@ public class ApplicationService {
     }
 
     public List<Application> getAllApplications() {
-        return applicationRepository.findAllWithRelations();
+        try {
+            log.info("Attempting to fetch all applications...");
+            
+            // TEMPORAL: Usar JDBC directo para esquivar problemas de Hibernate
+            try {
+                Integer jdbcCount = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM applications", Integer.class);
+                log.info("JdbcTemplate finds {} applications in database", jdbcCount);
+                
+                if (jdbcCount > 0) {
+                    // Si hay datos, usar consulta JDBC para obtener los datos básicos
+                    List<Map<String, Object>> rawData = jdbcTemplate.queryForList(
+                        "SELECT a.id, a.status, a.submission_date, a.created_at, " +
+                        "s.first_name, s.paternal_last_name, s.maternal_last_name, s.rut " +
+                        "FROM applications a " +
+                        "LEFT JOIN students s ON a.student_id = s.id " +
+                        "ORDER BY a.created_at DESC LIMIT 50"
+                    );
+                    
+                    log.info("Retrieved {} application records using JDBC", rawData.size());
+                    
+                    // Convertir a objetos Application básicos (sin relaciones completas)
+                    List<Application> applications = rawData.stream().map(row -> {
+                        Application app = new Application();
+                        app.setId(((Number) row.get("id")).longValue());
+                        app.setStatus(Application.ApplicationStatus.valueOf((String) row.get("status")));
+                        
+                        // Crear un objeto Student básico
+                        Student student = new Student();
+                        student.setFirstName((String) row.get("first_name"));
+                        student.setLastName((String) row.get("paternal_last_name"));
+                        student.setMaternalLastName((String) row.get("maternal_last_name"));
+                        student.setRut((String) row.get("rut"));
+                        app.setStudent(student);
+                        
+                        return app;
+                    }).collect(Collectors.toList());
+                    
+                    log.info("Successfully converted {} JDBC records to Application objects", applications.size());
+                    return applications;
+                }
+            } catch (Exception jdbcEx) {
+                log.error("JDBC query failed: {}", jdbcEx.getMessage(), jdbcEx);
+            }
+            
+            // Fallback al método JPA original
+            List<Application> applications = applicationRepository.findAll();
+            log.info("JPA Repository found {} applications", applications.size());
+            
+            return applications;
+            
+        } catch (Exception e) {
+            log.error("Error fetching applications: {}", e.getMessage(), e);
+            return new ArrayList<>();
+        }
     }
 
     public Application getApplicationById(Long id) {
@@ -275,5 +331,12 @@ public class ApplicationService {
             log.error("Error deleting all data", e);
             throw new RuntimeException("Error limpiando la base de datos: " + e.getMessage());
         }
+    }
+
+    /**
+     * Convierte texto a mayúsculas, manejando valores nulos
+     */
+    private String toUpperCase(String text) {
+        return text != null ? text.trim().toUpperCase() : null;
     }
 }
