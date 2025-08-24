@@ -12,6 +12,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,6 +27,7 @@ import java.util.Collections;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
     
@@ -78,16 +80,6 @@ public class SecurityConfig {
                 .requestMatchers("/actuator/prometheus").permitAll() // Métricas Prometheus
                 .requestMatchers("/actuator/**").hasRole("ADMIN") // Otros endpoints solo para admins
                 
-                // 🔓 ENDPOINTS PÚBLICOS DE DESARROLLO (temporal para integración)
-                .requestMatchers("/api/applications/public/all").permitAll() // Lista de aplicaciones para desarrollo
-                .requestMatchers("/api/applications/public/test-data").permitAll() // Datos de prueba
-                .requestMatchers("/api/applications/public/mock-applications").permitAll() // Aplicaciones mock
-                .requestMatchers("/api/applications/public/debug-database").permitAll() // Debug BD
-                .requestMatchers("/api/applications/public/debug-users").permitAll() // Debug usuarios
-                .requestMatchers("/api/applications/public/reset-database").permitAll() // Reset BD (solo desarrollo)
-                .requestMatchers("/api/applications/public/debug-jpa").permitAll() // Debug JPA
-                .requestMatchers("/api/applications/public/debug-connection").permitAll() // Debug conexión BD
-                .requestMatchers("/api/applications/test").permitAll() // Test básico
                 
                 // 🚨 ENDPOINTS REMOVIDOS POR SEGURIDAD:
                 // - /api/test/** (expone contraseñas y datos sensibles)
