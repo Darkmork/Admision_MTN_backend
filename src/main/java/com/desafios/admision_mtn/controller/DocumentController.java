@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -97,6 +98,13 @@ public class DocumentController {
     @GetMapping("/view/{documentId}")
     public ResponseEntity<Resource> viewDocument(@PathVariable Long documentId) {
         try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String userEmail = authentication.getName();
+
+            if (!documentService.userOwnsDocument(documentId, userEmail)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+
             Document document = documentService.getDocumentById(documentId);
             Resource resource = documentService.loadFileAsResource(documentId);
             
@@ -116,32 +124,16 @@ public class DocumentController {
         }
     }
 
-    // Endpoint público temporal para desarrollo - permite ver documentos sin autenticación
-    @GetMapping("/public/view/{documentId}")
-    public ResponseEntity<Resource> viewDocumentPublic(@PathVariable Long documentId) {
-        try {
-            log.warn("⚠️ ACCESO PÚBLICO A DOCUMENTO: {} - Solo para desarrollo", documentId);
-            Document document = documentService.getDocumentById(documentId);
-            Resource resource = documentService.loadFileAsResource(documentId);
-            
-            String contentType = document.getContentType();
-            if (contentType == null) {
-                contentType = "application/octet-stream";
-            }
-
-            return ResponseEntity.ok()
-                    .contentType(MediaType.parseMediaType(contentType))
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + document.getOriginalName() + "\"")
-                    .body(resource);
-        } catch (Exception e) {
-            log.error("Error viewing document with ID: {}", documentId, e);
-            return ResponseEntity.notFound().build();
-        }
-    }
-
     @GetMapping("/download/{documentId}")
     public ResponseEntity<Resource> downloadDocument(@PathVariable Long documentId) {
         try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String userEmail = authentication.getName();
+
+            if (!documentService.userOwnsDocument(documentId, userEmail)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+
             Document document = documentService.getDocumentById(documentId);
             Resource resource = documentService.loadFileAsResource(documentId);
             
@@ -166,9 +158,14 @@ public class DocumentController {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String userEmail = authentication.getName();
-            
+
+            if (!documentService.userOwnsDocument(documentId, userEmail)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(createErrorResponse("No tienes permiso para eliminar este documento"));
+            }
+
             log.info("Usuario {} eliminando documento {}", userEmail, documentId);
-            
+
             documentService.deleteDocument(documentId);
             
             Map<String, Object> response = new HashMap<>();

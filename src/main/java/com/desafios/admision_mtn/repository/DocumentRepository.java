@@ -23,6 +23,8 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
     
     @Query("SELECT d FROM Document d WHERE d.application.applicantUser.email = :userEmail ORDER BY d.createdAt DESC")
     List<Document> findByUserEmailOrderByCreatedAtDesc(@Param("userEmail") String userEmail);
-    
+
     Long countByApplication_Id(Long applicationId);
+
+    boolean existsByIdAndApplication_ApplicantUser_Email(Long documentId, String userEmail);
 }
