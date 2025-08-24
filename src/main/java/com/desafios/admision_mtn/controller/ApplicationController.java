@@ -39,6 +39,7 @@ public class ApplicationController {
     private final com.desafios.admision_mtn.service.UserService userService;
     private final com.desafios.admision_mtn.repository.UserRepository userRepository;
     private final com.desafios.admision_mtn.repository.ApplicationRepository applicationRepository;
+    private final org.springframework.jdbc.core.JdbcTemplate jdbcTemplate;
 
     @Operation(
         summary = "Crear nueva postulación", 
@@ -481,6 +482,46 @@ public class ApplicationController {
         }
     }
 
+    // Endpoint temporal para debugging conexión de BD
+    @GetMapping("/public/debug-connection")
+    public ResponseEntity<Map<String, Object>> debugConnection() {
+        try {
+            Map<String, Object> debug = new HashMap<>();
+            debug.put("message", "Debug database connection using JdbcTemplate");
+            debug.put("timestamp", LocalDateTime.now());
+            
+            // Usar JdbcTemplate para consultas SQL directas
+            Integer jdbcCount = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM applications", Integer.class);
+            debug.put("jdbcTemplateCount", jdbcCount);
+            
+            // Información de la conexión
+            String currentDb = jdbcTemplate.queryForObject("SELECT current_database()", String.class);
+            String currentUser = jdbcTemplate.queryForObject("SELECT current_user", String.class);
+            debug.put("currentDatabase", currentDb);
+            debug.put("currentUser", currentUser);
+            
+            // Comparar con repository
+            long hibernateCount = applicationRepository.count();
+            debug.put("hibernateRepositoryCount", hibernateCount);
+            
+            // Verificar si hay datos en la tabla
+            if (jdbcCount > 0) {
+                java.util.List<java.util.Map<String, Object>> sampleData = jdbcTemplate.queryForList(
+                    "SELECT id, status, submission_date FROM applications LIMIT 3"
+                );
+                debug.put("jdbcSampleData", sampleData);
+            }
+            
+            return ResponseEntity.ok(debug);
+        } catch (Exception e) {
+            log.error("Error in connection debug endpoint", e);
+            Map<String, Object> errorDebug = new HashMap<>();
+            errorDebug.put("error", e.getMessage());
+            errorDebug.put("exception", e.getClass().getSimpleName());
+            return ResponseEntity.badRequest().body(errorDebug);
+        }
+    }
+    
     // Endpoint temporal para debugging autenticación
     @GetMapping("/public/debug-users")
     public ResponseEntity<Map<String, Object>> debugUsers() {

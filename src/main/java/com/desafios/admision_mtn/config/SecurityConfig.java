@@ -33,7 +33,7 @@ public class SecurityConfig {
     private final JwtRequestFilter jwtRequestFilter;
     private final RateLimitingFilter rateLimitingFilter;
     
-    @Value("${ALLOWED_ORIGINS:http://localhost:3000,http://localhost:5173}")
+    @Value("${ALLOWED_ORIGINS:http://localhost:3000,http://localhost:5173,http://localhost:5174,http://localhost:5175,http://localhost:5176,http://localhost:5177}")
     private String allowedOrigins;
     
     @Bean
@@ -78,11 +78,21 @@ public class SecurityConfig {
                 .requestMatchers("/actuator/prometheus").permitAll() // Métricas Prometheus
                 .requestMatchers("/actuator/**").hasRole("ADMIN") // Otros endpoints solo para admins
                 
+                // 🔓 ENDPOINTS PÚBLICOS DE DESARROLLO (temporal para integración)
+                .requestMatchers("/api/applications/public/all").permitAll() // Lista de aplicaciones para desarrollo
+                .requestMatchers("/api/applications/public/test-data").permitAll() // Datos de prueba
+                .requestMatchers("/api/applications/public/mock-applications").permitAll() // Aplicaciones mock
+                .requestMatchers("/api/applications/public/debug-database").permitAll() // Debug BD
+                .requestMatchers("/api/applications/public/debug-users").permitAll() // Debug usuarios
+                .requestMatchers("/api/applications/public/reset-database").permitAll() // Reset BD (solo desarrollo)
+                .requestMatchers("/api/applications/public/debug-jpa").permitAll() // Debug JPA
+                .requestMatchers("/api/applications/public/debug-connection").permitAll() // Debug conexión BD
+                .requestMatchers("/api/applications/test").permitAll() // Test básico
+                
                 // 🚨 ENDPOINTS REMOVIDOS POR SEGURIDAD:
                 // - /api/test/** (expone contraseñas y datos sensibles)
                 // - /api/debug/** (acceso directo a BD y usuarios)
                 // - /api/public/** (demasiado genérico)
-                // - /api/applications/public/** (expone aplicaciones sin autenticación)
                 // - /api/documents/public/** (acceso a documentos privados)
                 // - /api/schedules/public/** (horarios privados)
                 // - /api/evaluations/public/** (evaluaciones confidenciales)

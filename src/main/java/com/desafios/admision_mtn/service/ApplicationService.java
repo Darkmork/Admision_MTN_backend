@@ -26,6 +26,7 @@ public class ApplicationService {
     private final ApplicationRepository applicationRepository;
     private final UserRepository userRepository;
     private final EvaluationRepository evaluationRepository;
+    private final org.springframework.jdbc.core.JdbcTemplate jdbcTemplate;
 
     public ApplicationResponse createApplication(CreateApplicationRequest request, String userEmail) {
         try {
@@ -129,10 +130,60 @@ public class ApplicationService {
     }
 
     public List<Application> getAllApplications() {
-        // Temporarily use simple method for testing
-        List<Application> applications = applicationRepository.findAllByOrderByCreatedAtDesc();
-        log.info("Found {} applications using simple query", applications.size());
-        return applications;
+        try {
+            log.info("Attempting to fetch all applications...");
+            
+            // TEMPORAL: Usar JDBC directo para esquivar problemas de Hibernate
+            try {
+                Integer jdbcCount = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM applications", Integer.class);
+                log.info("JdbcTemplate finds {} applications in database", jdbcCount);
+                
+                if (jdbcCount > 0) {
+                    // Si hay datos, usar consulta JDBC para obtener los datos básicos
+                    List<Map<String, Object>> rawData = jdbcTemplate.queryForList(
+                        "SELECT a.id, a.status, a.submission_date, a.created_at, " +
+                        "s.first_name, s.paternal_last_name, s.maternal_last_name, s.rut " +
+                        "FROM applications a " +
+                        "LEFT JOIN students s ON a.student_id = s.id " +
+                        "ORDER BY a.created_at DESC LIMIT 50"
+                    );
+                    
+                    log.info("Retrieved {} application records using JDBC", rawData.size());
+                    
+                    // Convertir a objetos Application básicos (sin relaciones completas)
+                    List<Application> applications = rawData.stream().map(row -> {
+                        Application app = new Application();
+                        app.setId(((Number) row.get("id")).longValue());
+                        app.setStatus(Application.ApplicationStatus.valueOf((String) row.get("status")));
+                        
+                        // Crear un objeto Student básico
+                        Student student = new Student();
+                        student.setFirstName((String) row.get("first_name"));
+                        student.setLastName((String) row.get("paternal_last_name"));
+                        student.setMaternalLastName((String) row.get("maternal_last_name"));
+                        student.setRut((String) row.get("rut"));
+                        app.setStudent(student);
+                        
+                        return app;
+                    }).collect(Collectors.toList());
+                    
+                    log.info("Successfully converted {} JDBC records to Application objects", applications.size());
+                    return applications;
+                }
+            } catch (Exception jdbcEx) {
+                log.error("JDBC query failed: {}", jdbcEx.getMessage(), jdbcEx);
+            }
+            
+            // Fallback al método JPA original
+            List<Application> applications = applicationRepository.findAll();
+            log.info("JPA Repository found {} applications", applications.size());
+            
+            return applications;
+            
+        } catch (Exception e) {
+            log.error("Error fetching applications: {}", e.getMessage(), e);
+            return new ArrayList<>();
+        }
     }
 
     public Application getApplicationById(Long id) {
