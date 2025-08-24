@@ -40,6 +40,12 @@ public class EmailEvent {
     @Column(name = "user_agent", columnDefinition = "text")
     private String userAgent;
     
+    @Column(name = "description", columnDefinition = "text")
+    private String description;
+    
+    @Column(name = "event_date")
+    private LocalDateTime eventDate;
+    
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "additional_info", columnDefinition = "jsonb")
     @Builder.Default
@@ -50,6 +56,7 @@ public class EmailEvent {
     private LocalDateTime createdAt = LocalDateTime.now();
     
     public enum EventType {
+        QUEUED("En cola"),
         SENT("Enviado"),
         OPENED("Abierto"),
         CLICKED("Enlace clicado"),

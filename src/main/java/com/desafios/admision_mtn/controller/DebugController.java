@@ -17,7 +17,7 @@ import java.util.Map;
 @RequestMapping("/api/debug")
 @RequiredArgsConstructor
 @Slf4j
-@CrossOrigin(origins = {"*"})
+// 🔒 SEGURIDAD: Sin @CrossOrigin - usa configuración global de SecurityConfig
 public class DebugController {
     
     @PersistenceContext

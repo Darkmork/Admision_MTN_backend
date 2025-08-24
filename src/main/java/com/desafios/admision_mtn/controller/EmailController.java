@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/email")
 @RequiredArgsConstructor
 @Slf4j
-@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5173", "http://localhost:5174", "http://localhost:5175", "http://localhost:5176"})
+// 🔒 SEGURIDAD: Sin @CrossOrigin - usa configuración global de SecurityConfig
 public class EmailController {
     
     private final EmailVerificationService emailVerificationService;

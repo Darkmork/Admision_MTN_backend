@@ -5,7 +5,9 @@ import com.desafios.admision_mtn.model.Ranking;
 import com.desafios.admision_mtn.model.Usuario;
 import com.desafios.admision_mtn.service.RankingService;
 import com.desafios.admision_mtn.service.UsuarioService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,15 +16,15 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/ranking")
+@RequiredArgsConstructor
+@PreAuthorize("hasRole('ADMIN')")
+// 🔒 SEGURIDAD: Sin @CrossOrigin - usa configuración global de SecurityConfig
 public class RankingController {
 
     private final RankingService rankingService;
     private final UsuarioService usuarioService;
 
-    public RankingController(RankingService rankingService, UsuarioService usuarioService) {
-        this.rankingService = rankingService;
-        this.usuarioService = usuarioService;
-    }
+    // Constructor eliminado - usando @RequiredArgsConstructor
 
     @GetMapping
     public List<RankingDto> getRanking() {

@@ -8,6 +8,15 @@ import com.desafios.admision_mtn.entity.Interview.InterviewMode;
 import com.desafios.admision_mtn.service.InterviewService;
 import com.desafios.admision_mtn.service.InterviewNotificationService;
 import com.desafios.admision_mtn.service.PersonalizedEmailService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +36,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/interviews")
-@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5173", "http://localhost:5174", "http://localhost:5175", "http://localhost:5176"})
+@Tag(name = "Interviews", description = "Sistema completo de gestión de entrevistas del proceso de admisión")
+// 🔒 SEGURIDAD: Sin @CrossOrigin - usa configuración global de SecurityConfig
 @RequiredArgsConstructor
 @Slf4j
 public class InterviewController {
@@ -37,30 +47,122 @@ public class InterviewController {
     private final PersonalizedEmailService personalizedEmailService;
 
     // CRUD básico
+    @Operation(
+        summary = "Crear nueva entrevista", 
+        description = "Crea una nueva entrevista en el sistema. Solo administradores y directores de ciclo pueden crear entrevistas.",
+        security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "201", 
+            description = "Entrevista creada exitosamente",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = InterviewResponse.class),
+                examples = @ExampleObject(value = """
+                    {
+                        "id": 123,
+                        "applicationId": 456,
+                        "interviewerId": 78,
+                        "type": "DIRECTOR_INTERVIEW",
+                        "mode": "IN_PERSON",
+                        "status": "SCHEDULED",
+                        "scheduledDate": "2024-09-15",
+                        "scheduledTime": "10:30:00",
+                        "location": "Oficina Director",
+                        "notes": "Entrevista inicial"
+                    }
+                    """)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "400", 
+            description = "Datos de entrevista inválidos o conflicto de horarios"
+        ),
+        @ApiResponse(
+            responseCode = "403", 
+            description = "Acceso denegado - requiere rol ADMIN o CYCLE_DIRECTOR"
+        )
+    })
     @PostMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('CYCLE_DIRECTOR')")
-    public ResponseEntity<InterviewResponse> createInterview(@Valid @RequestBody CreateInterviewRequest request) {
+    public ResponseEntity<InterviewResponse> createInterview(
+        @Parameter(
+            description = "Datos de la nueva entrevista",
+            required = true,
+            schema = @Schema(implementation = CreateInterviewRequest.class)
+        )
+        @Valid @RequestBody CreateInterviewRequest request) {
         log.info("POST /api/interviews - Creando nueva entrevista");
         InterviewResponse response = interviewService.createInterview(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @Operation(
+        summary = "Obtener entrevista por ID", 
+        description = "Obtiene los detalles completos de una entrevista específica. Accesible para profesores y administradores.",
+        security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200", 
+            description = "Detalles de la entrevista",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = InterviewResponse.class)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "404", 
+            description = "Entrevista no encontrada"
+        ),
+        @ApiResponse(
+            responseCode = "403", 
+            description = "Acceso denegado"
+        )
+    })
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('CYCLE_DIRECTOR') or hasRole('TEACHER_LANGUAGE') or hasRole('TEACHER_MATHEMATICS') or hasRole('TEACHER_ENGLISH') or hasRole('PSYCHOLOGIST')")
-    public ResponseEntity<InterviewResponse> getInterviewById(@PathVariable Long id) {
+    public ResponseEntity<InterviewResponse> getInterviewById(
+        @Parameter(description = "ID de la entrevista", required = true, example = "123")
+        @PathVariable Long id) {
         log.info("GET /api/interviews/{} - Obteniendo entrevista por ID", id);
         InterviewResponse response = interviewService.getInterviewById(id);
         return ResponseEntity.ok(response);
     }
 
+    @Operation(
+        summary = "Obtener todas las entrevistas", 
+        description = "Obtiene lista paginada de entrevistas con búsqueda y ordenamiento opcionales.",
+        security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200", 
+            description = "Lista paginada de entrevistas",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = InterviewResponse.class)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "403", 
+            description = "Acceso denegado"
+        )
+    })
     @GetMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('CYCLE_DIRECTOR') or hasRole('TEACHER_LANGUAGE') or hasRole('TEACHER_MATHEMATICS') or hasRole('TEACHER_ENGLISH') or hasRole('PSYCHOLOGIST')")
     public ResponseEntity<Page<InterviewResponse>> getAllInterviews(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size,
-            @RequestParam(defaultValue = "scheduledDate") String sortBy,
-            @RequestParam(defaultValue = "desc") String sortDir,
-            @RequestParam(required = false) String search) {
+        @Parameter(description = "Número de página (0-indexed)", example = "0")
+        @RequestParam(defaultValue = "0") int page,
+        @Parameter(description = "Tamaño de página", example = "20")
+        @RequestParam(defaultValue = "20") int size,
+        @Parameter(description = "Campo para ordenar", example = "scheduledDate")
+        @RequestParam(defaultValue = "scheduledDate") String sortBy,
+        @Parameter(description = "Dirección del ordenamiento", example = "desc")
+        @RequestParam(defaultValue = "desc") String sortDir,
+        @Parameter(description = "Término de búsqueda", example = "Juan")
+        @RequestParam(required = false) String search) {
         
         log.info("GET /api/interviews - Obteniendo entrevistas (página: {}, tamaño: {}, búsqueda: '{}')", page, size, search);
         
@@ -236,6 +338,40 @@ public class InterviewController {
     }
 
     // Estadísticas
+    @Operation(
+        summary = "Obtener estadísticas de entrevistas", 
+        description = "Obtiene estadísticas completas del sistema de entrevistas: totales, por estado, por tipo, etc.",
+        security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200", 
+            description = "Estadísticas del sistema de entrevistas",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = InterviewStatsResponse.class),
+                examples = @ExampleObject(value = """
+                    {
+                        "totalInterviews": 150,
+                        "scheduledInterviews": 45,
+                        "completedInterviews": 80,
+                        "cancelledInterviews": 15,
+                        "noShowInterviews": 10,
+                        "interviewsByType": {
+                            "DIRECTOR_INTERVIEW": 75,
+                            "PSYCHOLOGICAL_INTERVIEW": 75
+                        },
+                        "averageDurationMinutes": 45,
+                        "upcomingThisWeek": 12
+                    }
+                    """)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "403", 
+            description = "Acceso denegado - requiere rol ADMIN o CYCLE_DIRECTOR"
+        )
+    })
     @GetMapping("/statistics")
     @PreAuthorize("hasRole('ADMIN') or hasRole('CYCLE_DIRECTOR')")
     public ResponseEntity<InterviewStatsResponse> getInterviewStatistics() {

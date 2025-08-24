@@ -53,6 +53,10 @@ public class EmailNotification {
     @Column(name = "sent_at")
     private LocalDateTime sentAt;
     
+    @Column(name = "delivered")
+    @Builder.Default
+    private Boolean delivered = false;
+    
     // Tracking de apertura
     @Column(name = "opened")
     @Builder.Default
@@ -118,11 +122,15 @@ public class EmailNotification {
         INTERVIEW_CONFIRMED("Entrevista Confirmada"),
         INTERVIEW_RESCHEDULED("Entrevista Reprogramada"),
         INTERVIEW_CANCELLED("Entrevista Cancelada"),
+        INTERVIEW_INVITATION("Invitación a Entrevista"),
         APPLICATION_RECEIVED("Postulación Recibida"),
+        APPLICATION_STATUS_UPDATE("Actualización de Estado"),
         DOCUMENTS_REQUIRED("Documentos Requeridos"),
+        DOCUMENT_REMINDER("Recordatorio de Documentos"),
         EVALUATION_SCHEDULED("Evaluación Programada"),
         ACCEPTANCE_NOTIFICATION("Notificación de Aceptación"),
         REJECTION_NOTIFICATION("Notificación de Rechazo"),
+        ADMISSION_RESULT("Resultado de Admisión"),
         WAITLIST_NOTIFICATION("Lista de Espera"),
         GENERAL_COMMUNICATION("Comunicación General");
         
@@ -138,17 +146,23 @@ public class EmailNotification {
     }
     
     public enum Gender {
-        MALE("su hijo"),
-        FEMALE("su hija");
+        MALE("su hijo", "el"),
+        FEMALE("su hija", "la");
         
         private final String article;
+        private final String prefix;
         
-        Gender(String article) {
+        Gender(String article, String prefix) {
             this.article = article;
+            this.prefix = prefix;
         }
         
         public String getArticle() {
             return article;
+        }
+        
+        public String getPrefix() {
+            return prefix;
         }
     }
     

@@ -3,6 +3,15 @@ package com.desafios.admision_mtn.controller;
 import com.desafios.admision_mtn.entity.Evaluation;
 import com.desafios.admision_mtn.entity.User;
 import com.desafios.admision_mtn.service.EvaluationService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -18,15 +27,55 @@ import java.util.Map;
 @RequestMapping("/api/evaluations")
 @RequiredArgsConstructor
 @Slf4j
-@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5173", "http://localhost:5174", "http://localhost:5175", "http://localhost:5176"})
+@Tag(name = "Evaluations", description = "Sistema completo de evaluaciones académicas y psicológicas")
+// 🔒 SEGURIDAD: Sin @CrossOrigin - usa configuración global de SecurityConfig
 public class EvaluationController {
 
     private final EvaluationService evaluationService;
 
     // Endpoints para administradores
     
+    @Operation(
+        summary = "Asignar evaluaciones a aplicación", 
+        description = "Asigna automáticamente todas las evaluaciones necesarias (académicas y psicológicas) a una aplicación específica.",
+        security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200", 
+            description = "Evaluaciones asignadas exitosamente",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = Evaluation.class),
+                examples = @ExampleObject(value = """
+                    [
+                        {
+                            "id": 123,
+                            "evaluationType": "MATHEMATICS_EXAM",
+                            "status": "PENDING",
+                            "evaluatorId": 45,
+                            "applicationId": 789
+                        },
+                        {
+                            "id": 124,
+                            "evaluationType": "LANGUAGE_EXAM",
+                            "status": "PENDING",
+                            "evaluatorId": 46,
+                            "applicationId": 789
+                        }
+                    ]
+                    """)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "400", 
+            description = "Error en la asignación o aplicación no encontrada"
+        )
+    })
     @PostMapping("/assign/{applicationId}")
-    public ResponseEntity<List<Evaluation>> assignEvaluationsToApplication(@PathVariable Long applicationId) {
+    public ResponseEntity<List<Evaluation>> assignEvaluationsToApplication(
+        @Parameter(description = "ID de la aplicación", required = true, example = "789")
+        @PathVariable Long applicationId) {
         try {
             List<Evaluation> evaluations = evaluationService.assignEvaluationsToApplication(applicationId);
             return ResponseEntity.ok(evaluations);
@@ -51,8 +100,46 @@ public class EvaluationController {
         }
     }
 
+    @Operation(
+        summary = "Obtener evaluaciones por aplicación", 
+        description = "Obtiene todas las evaluaciones asociadas a una aplicación específica con detalles completos.",
+        security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200", 
+            description = "Lista de evaluaciones de la aplicación",
+            content = @Content(
+                mediaType = "application/json",
+                examples = @ExampleObject(value = """
+                    [
+                        {
+                            "id": 123,
+                            "evaluationType": "MATHEMATICS_EXAM",
+                            "status": "COMPLETED",
+                            "score": 85.5,
+                            "grade": "B+",
+                            "evaluator": {
+                                "id": 45,
+                                "firstName": "María",
+                                "lastName": "González",
+                                "email": "maria.gonzalez@mtn.cl"
+                            },
+                            "completionDate": "2024-08-20T14:30:00"
+                        }
+                    ]
+                    """)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "404", 
+            description = "Aplicación no encontrada"
+        )
+    })
     @GetMapping("/application/{applicationId}")
-    public ResponseEntity<List<Map<String, Object>>> getEvaluationsByApplication(@PathVariable Long applicationId) {
+    public ResponseEntity<List<Map<String, Object>>> getEvaluationsByApplication(
+        @Parameter(description = "ID de la aplicación", required = true, example = "789")
+        @PathVariable Long applicationId) {
         try {
             List<Evaluation> evaluations = evaluationService.getEvaluationsByApplication(applicationId);
             List<Map<String, Object>> response = evaluations.stream()
@@ -242,6 +329,42 @@ public class EvaluationController {
 
     // Endpoints para evaluadores
 
+    @Operation(
+        summary = "Obtener mis evaluaciones asignadas", 
+        description = "Obtiene todas las evaluaciones asignadas al profesor/evaluador autenticado.",
+        security = @SecurityRequirement(name = "professorAuth")
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200", 
+            description = "Lista de evaluaciones asignadas",
+            content = @Content(
+                mediaType = "application/json",
+                examples = @ExampleObject(value = """
+                    [
+                        {
+                            "id": 123,
+                            "evaluationType": "MATHEMATICS_EXAM",
+                            "status": "PENDING",
+                            "application": {
+                                "id": 789,
+                                "student": {
+                                    "firstName": "Juan",
+                                    "lastName": "Pérez",
+                                    "gradeApplied": "5° Básico"
+                                }
+                            },
+                            "createdAt": "2024-08-20T10:00:00"
+                        }
+                    ]
+                    """)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "401", 
+            description = "Usuario no autenticado"
+        )
+    })
     @GetMapping("/my-evaluations")
     public ResponseEntity<List<Map<String, Object>>> getMyEvaluations() {
         try {
@@ -335,6 +458,51 @@ public class EvaluationController {
         }
     }
 
+    @Operation(
+        summary = "Obtener estadísticas de evaluaciones", 
+        description = "Obtiene estadísticas completas del sistema de evaluaciones: totales, por estado, por tipo, promedios, etc.",
+        security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200", 
+            description = "Estadísticas completas del sistema de evaluaciones",
+            content = @Content(
+                mediaType = "application/json",
+                examples = @ExampleObject(value = """
+                    {
+                        "totalEvaluations": 150,
+                        "statusBreakdown": {
+                            "PENDING": 45,
+                            "IN_PROGRESS": 25,
+                            "COMPLETED": 65,
+                            "REVIEWED": 15
+                        },
+                        "typeBreakdown": {
+                            "MATHEMATICS_EXAM": 50,
+                            "LANGUAGE_EXAM": 50,
+                            "PSYCHOLOGICAL_INTERVIEW": 50
+                        },
+                        "averageScoresByType": {
+                            "MATHEMATICS_EXAM": 82.3,
+                            "LANGUAGE_EXAM": 85.7,
+                            "PSYCHOLOGICAL_INTERVIEW": 88.1
+                        },
+                        "completionRate": 80.0,
+                        "evaluatorWorkload": {
+                            "María González": 25,
+                            "Pedro Rodríguez": 30,
+                            "Ana López": 20
+                        }
+                    }
+                    """)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "403", 
+            description = "Acceso denegado"
+        )
+    })
     @GetMapping("/statistics")
     public ResponseEntity<Map<String, Object>> getEvaluationStatistics() {
         try {

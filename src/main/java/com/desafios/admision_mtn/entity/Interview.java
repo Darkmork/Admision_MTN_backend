@@ -131,6 +131,14 @@ public class Interview {
             application.getStudent().getLastName() + " " + 
             application.getStudent().getMaternalLastName() : "";
     }
+    
+    public LocalDate getInterviewDate() {
+        return scheduledDate;
+    }
+    
+    public LocalTime getInterviewTime() {
+        return scheduledTime;
+    }
 
     public String getParentNames() {
         if (application == null) return "";

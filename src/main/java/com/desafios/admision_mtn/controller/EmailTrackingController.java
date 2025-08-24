@@ -19,7 +19,7 @@ import java.util.Optional;
 @RequestMapping("/api/emails")
 @RequiredArgsConstructor
 @Slf4j
-@CrossOrigin(origins = "*") // Permitir CORS para tracking
+// 🔒 SEGURIDAD: Sin @CrossOrigin - usa configuración global de SecurityConfig
 public class EmailTrackingController {
 
     private final EmailNotificationRepository emailNotificationRepository;

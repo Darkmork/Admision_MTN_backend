@@ -66,4 +66,9 @@ public class Student {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+    
+    // Método de conveniencia para compatibilidad con el código existente
+    public String getPaternalLastName() {
+        return lastName; // lastName ya es el apellido paterno
+    }
 }

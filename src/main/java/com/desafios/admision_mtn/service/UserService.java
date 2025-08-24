@@ -5,6 +5,8 @@ import com.desafios.admision_mtn.entity.User;
 import com.desafios.admision_mtn.repository.UserRepository;
 import com.desafios.admision_mtn.util.RutUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -24,6 +26,7 @@ public class UserService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
     
     @Override
+    @Cacheable(value = "users", key = "#username")
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByEmail(username)
             .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + username));
@@ -55,10 +58,6 @@ public class UserService implements UserDetailsService {
         return userRepository.save(user);
     }
     
-    public Optional<User> findByEmail(String email) {
-        return userRepository.findByEmail(email);
-    }
-    
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
     }
@@ -68,11 +67,17 @@ public class UserService implements UserDetailsService {
     }
     
     @Transactional
+    @CacheEvict(value = "users", key = "#email")
     public void markEmailAsVerified(String email) {
         userRepository.findByEmail(email)
             .ifPresent(user -> {
                 user.setEmailVerified(true);
                 userRepository.save(user);
             });
+    }
+    
+    @Cacheable(value = "users", key = "#email")
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 }

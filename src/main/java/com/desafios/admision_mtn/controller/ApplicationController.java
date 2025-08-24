@@ -4,6 +4,15 @@ import com.desafios.admision_mtn.dto.ApplicationResponse;
 import com.desafios.admision_mtn.dto.CreateApplicationRequest;
 import com.desafios.admision_mtn.entity.Application;
 import com.desafios.admision_mtn.service.ApplicationService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +31,8 @@ import java.util.Map;
 @RequestMapping("/api/applications")
 @RequiredArgsConstructor
 @Slf4j
-@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5173", "http://localhost:5174", "http://localhost:5175", "http://localhost:5176"})
+@Tag(name = "Applications", description = "Sistema de gestión de postulaciones de admisión escolar")
+// 🔒 SEGURIDAD: Sin @CrossOrigin - usa configuración global de SecurityConfig
 public class ApplicationController {
 
     private final ApplicationService applicationService;
@@ -30,9 +40,54 @@ public class ApplicationController {
     private final com.desafios.admision_mtn.repository.UserRepository userRepository;
     private final com.desafios.admision_mtn.repository.ApplicationRepository applicationRepository;
 
+    @Operation(
+        summary = "Crear nueva postulación", 
+        description = "Crea una nueva postulación de admisión para un estudiante. Requiere autenticación de apoderado.",
+        security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200", 
+            description = "Postulación creada exitosamente",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ApplicationResponse.class),
+                examples = @ExampleObject(value = """
+                    {
+                        "success": true,
+                        "message": "Postulación creada exitosamente",
+                        "applicationId": 123,
+                        "status": "DRAFT"
+                    }
+                    """)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "400", 
+            description = "Datos de postulación inválidos",
+            content = @Content(
+                mediaType = "application/json",
+                examples = @ExampleObject(value = """
+                    {
+                        "success": false,
+                        "message": "Error en los datos de postulación"
+                    }
+                    """)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "401", 
+            description = "Usuario no autenticado"
+        )
+    })
     @PostMapping
     public ResponseEntity<ApplicationResponse> createApplication(
-            @Valid @RequestBody CreateApplicationRequest request) {
+        @Parameter(
+            description = "Datos de la nueva postulación",
+            required = true,
+            schema = @Schema(implementation = CreateApplicationRequest.class)
+        )
+        @Valid @RequestBody CreateApplicationRequest request) {
         try {
             // Obtener el email del usuario autenticado
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -55,6 +110,25 @@ public class ApplicationController {
         }
     }
 
+    @Operation(
+        summary = "Obtener mis postulaciones", 
+        description = "Obtiene todas las postulaciones del usuario autenticado (apoderado).",
+        security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200", 
+            description = "Lista de postulaciones del usuario",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = Application.class)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "401", 
+            description = "Usuario no autenticado"
+        )
+    })
     @GetMapping("/my-applications")
     public ResponseEntity<List<Application>> getMyApplications() {
         try {
@@ -70,8 +144,33 @@ public class ApplicationController {
         }
     }
 
+    @Operation(
+        summary = "Obtener postulación por ID", 
+        description = "Obtiene los detalles completos de una postulación específica.",
+        security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200", 
+            description = "Detalles de la postulación",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = Application.class)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "404", 
+            description = "Postulación no encontrada"
+        ),
+        @ApiResponse(
+            responseCode = "401", 
+            description = "Usuario no autenticado"
+        )
+    })
     @GetMapping("/{id}")
-    public ResponseEntity<Application> getApplicationById(@PathVariable Long id) {
+    public ResponseEntity<Application> getApplicationById(
+        @Parameter(description = "ID de la postulación", required = true, example = "123")
+        @PathVariable Long id) {
         try {
             Application application = applicationService.getApplicationById(id);
             return ResponseEntity.ok(application);
@@ -83,6 +182,25 @@ public class ApplicationController {
     }
 
     // Endpoints para administradores
+    @Operation(
+        summary = "[ADMIN] Obtener todas las postulaciones", 
+        description = "Obtiene todas las postulaciones del sistema. Solo para administradores.",
+        security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200", 
+            description = "Lista completa de postulaciones",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = Application.class)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "403", 
+            description = "Acceso denegado - requiere rol ADMIN"
+        )
+    })
     @GetMapping("/admin/all")
     public ResponseEntity<List<Application>> getAllApplications() {
         try {
@@ -95,10 +213,39 @@ public class ApplicationController {
         }
     }
 
+    @Operation(
+        summary = "[ADMIN] Actualizar estado de postulación", 
+        description = "Actualiza el estado de una postulación específica. Estados válidos: DRAFT, SUBMITTED, UNDER_REVIEW, INTERVIEW_SCHEDULED, EXAM_SCHEDULED, APPROVED, REJECTED, WAITLIST.",
+        security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200", 
+            description = "Estado actualizado exitosamente",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = Application.class)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "400", 
+            description = "Estado inválido"
+        ),
+        @ApiResponse(
+            responseCode = "404", 
+            description = "Postulación no encontrada"
+        ),
+        @ApiResponse(
+            responseCode = "403", 
+            description = "Acceso denegado - requiere rol ADMIN"
+        )
+    })
     @PutMapping("/admin/{id}/status")
     public ResponseEntity<Application> updateApplicationStatus(
-            @PathVariable Long id,
-            @RequestParam String status) {
+        @Parameter(description = "ID de la postulación", required = true, example = "123")
+        @PathVariable Long id,
+        @Parameter(description = "Nuevo estado de la postulación", required = true, example = "APPROVED")
+        @RequestParam String status) {
         try {
             Application.ApplicationStatus applicationStatus = 
                 Application.ApplicationStatus.valueOf(status.toUpperCase());

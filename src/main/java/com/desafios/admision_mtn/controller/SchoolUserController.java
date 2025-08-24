@@ -20,20 +20,14 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/school-users")
-@CrossOrigin(
-    origins = {"http://localhost:3000", "http://localhost:5173", "http://localhost:5174", "http://127.0.0.1:3000", "http://127.0.0.1:5173", "http://127.0.0.1:5174", "https://admision-mtn.vercel.app"},
-    methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS},
-    allowedHeaders = {"*"},
-    allowCredentials = "true",
-    maxAge = 3600
-)
+// 🔒 SEGURIDAD: Sin @CrossOrigin - usa configuración global de SecurityConfig
 public class SchoolUserController {
 
     @Autowired
     private SchoolUserService schoolUserService;
 
     @PostMapping
-    // @PreAuthorize("hasRole('ADMIN')") // Temporalmente deshabilitado para testing
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> createSchoolUser(@Valid @RequestBody CreateSchoolUserDto dto) {
         try {
             SchoolUserResponseDto user = schoolUserService.createSchoolUser(dto);
@@ -44,28 +38,28 @@ public class SchoolUserController {
     }
 
     @GetMapping
-    // @PreAuthorize("hasRole('ADMIN')") // Temporalmente deshabilitado para testing
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<SchoolUserResponseDto>> getAllSchoolUsers() {
         List<SchoolUserResponseDto> users = schoolUserService.getAllSchoolUsers();
         return ResponseEntity.ok(users);
     }
 
     @GetMapping("/active")
-    // @PreAuthorize("hasRole('ADMIN')") // Temporalmente deshabilitado para testing
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<SchoolUserResponseDto>> getActiveSchoolUsers() {
         List<SchoolUserResponseDto> users = schoolUserService.getActiveSchoolUsers();
         return ResponseEntity.ok(users);
     }
 
     @GetMapping("/by-role/{role}")
-    // @PreAuthorize("hasRole('ADMIN')") // Temporalmente deshabilitado para testing
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<SchoolUserResponseDto>> getUsersByRole(@PathVariable RolUsuario role) {
         List<SchoolUserResponseDto> users = schoolUserService.getUsersByRole(role);
         return ResponseEntity.ok(users);
     }
 
     @GetMapping("/{id}")
-    // @PreAuthorize("hasRole('ADMIN')") // Temporalmente deshabilitado para testing
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> getUserById(@PathVariable Long id) {
         Optional<SchoolUserResponseDto> user = schoolUserService.getUserById(id);
         if (user.isPresent()) {
@@ -76,7 +70,7 @@ public class SchoolUserController {
     }
 
     @PutMapping("/{id}")
-    // @PreAuthorize("hasRole('ADMIN')") // Temporalmente deshabilitado para testing
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> updateUser(@PathVariable Long id, @Valid @RequestBody CreateSchoolUserDto dto) {
         try {
             SchoolUserResponseDto user = schoolUserService.updateUser(id, dto);
@@ -87,7 +81,7 @@ public class SchoolUserController {
     }
 
     @PatchMapping("/{id}/deactivate")
-    // @PreAuthorize("hasRole('ADMIN')") // Temporalmente deshabilitado para testing
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deactivateUser(@PathVariable Long id) {
         try {
             schoolUserService.deactivateUser(id);
@@ -98,7 +92,7 @@ public class SchoolUserController {
     }
 
     @PatchMapping("/{id}/reactivate")
-    // @PreAuthorize("hasRole('ADMIN')") // Temporalmente deshabilitado para testing
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> reactivateUser(@PathVariable Long id) {
         try {
             schoolUserService.reactivateUser(id);
@@ -109,13 +103,14 @@ public class SchoolUserController {
     }
 
     @DeleteMapping("/{id}")
-    // @PreAuthorize("hasRole('ADMIN')") // Temporalmente deshabilitado para testing
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         schoolUserService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/update-subjects-mapping")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Map<String, Object>> updateSubjectsMapping() {
         try {
             schoolUserService.updateSubjectsMapping();
@@ -133,32 +128,32 @@ public class SchoolUserController {
 
     // Endpoints específicos para cada tipo de personal
     @GetMapping("/professors")
-    // @PreAuthorize("hasRole('ADMIN')") // Temporalmente deshabilitado para testing
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<SchoolUserResponseDto>> getProfessors() {
         return ResponseEntity.ok(schoolUserService.getUsersByRole(RolUsuario.PROFESSOR));
     }
 
     @GetMapping("/kinder-teachers")
-    // @PreAuthorize("hasRole('ADMIN')") // Temporalmente deshabilitado para testing
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<SchoolUserResponseDto>> getKinderTeachers() {
         return ResponseEntity.ok(schoolUserService.getUsersByRole(RolUsuario.KINDER_TEACHER));
     }
 
     @GetMapping("/psychologists")
-    // @PreAuthorize("hasRole('ADMIN')") // Temporalmente deshabilitado para testing
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<SchoolUserResponseDto>> getPsychologists() {
         return ResponseEntity.ok(schoolUserService.getUsersByRole(RolUsuario.PSYCHOLOGIST));
     }
 
     @GetMapping("/support-staff")
-    // @PreAuthorize("hasRole('ADMIN')") // Temporalmente deshabilitado para testing
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<SchoolUserResponseDto>> getSupportStaff() {
         return ResponseEntity.ok(schoolUserService.getUsersByRole(RolUsuario.SUPPORT_STAFF));
     }
 
     // Endpoint para estadísticas
     @GetMapping("/stats")
-    // @PreAuthorize("hasRole('ADMIN')") // Temporalmente deshabilitado para testing
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Map<String, Object>> getSchoolUserStats() {
         List<SchoolUserResponseDto> allUsers = schoolUserService.getAllSchoolUsers();
         List<SchoolUserResponseDto> activeUsers = schoolUserService.getActiveSchoolUsers();

@@ -80,4 +80,7 @@ public interface EmailNotificationRepository extends JpaRepository<EmailNotifica
     
     // Buscar emails que necesitan respuesta con paginación
     Page<EmailNotification> findByResponseRequiredOrderByCreatedAtDesc(Boolean responseRequired, Pageable pageable);
+    
+    // Buscar por aplicación (método requerido por EmailQueueService)
+    List<EmailNotification> findByApplication(Application application);
 }

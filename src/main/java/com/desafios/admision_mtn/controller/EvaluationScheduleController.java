@@ -16,7 +16,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/schedules")
 @RequiredArgsConstructor
-@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:3000", "http://127.0.0.1:5173"})
+// 🔒 SEGURIDAD: Sin @CrossOrigin - usa configuración global de SecurityConfig
 public class EvaluationScheduleController {
 
     private final EvaluationScheduleService scheduleService;
