@@ -2,11 +2,14 @@ package com.desafios.admision_mtn.controller;
 
 import com.desafios.admision_mtn.entity.EvaluationSchedule;
 import com.desafios.admision_mtn.entity.Evaluation;
+import com.desafios.admision_mtn.entity.User;
 import com.desafios.admision_mtn.service.EvaluationScheduleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -144,8 +147,12 @@ public class EvaluationScheduleController {
      * Verificar si el usuario actual es el evaluador
      */
     public boolean isCurrentUser(Long evaluatorId) {
-        // TODO: Implementar lógica de verificación del usuario actual
-        return true;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof User)) {
+            return false;
+        }
+        User currentUser = (User) authentication.getPrincipal();
+        return currentUser.getId().equals(evaluatorId);
     }
 
     private List<MockEvaluationSchedule> generateMockSchedules(Long applicationId) {
