@@ -3,6 +3,7 @@ package com.desafios.admision_mtn.model;
 import com.desafios.admision_mtn.model.RolUsuario;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -10,6 +11,7 @@ import java.util.Optional;
 @Entity
 @Table(name = "usuarios")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
+@Slf4j
 public class Usuario {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -51,13 +53,13 @@ public class Usuario {
             fechaRegistro = LocalDateTime.now();
         }
         updatedAt = LocalDateTime.now();
-        System.out.println("PrePersist - Usuario: " + username + ", Puntaje: " + puntaje);
+        log.debug("PrePersist - Usuario: {}, Puntaje: {}", username, puntaje);
     }
 
     @PreUpdate
     public void preUpdate() {
         updatedAt = LocalDateTime.now();
-        System.out.println("PreUpdate - Usuario: " + username + ", Puntaje: " + puntaje);
+        log.debug("PreUpdate - Usuario: {}, Puntaje: {}", username, puntaje);
     }
 
     public int getPuntaje() {
@@ -65,7 +67,7 @@ public class Usuario {
     }
 
     public void setPuntaje(int puntaje) {
-        System.out.println("setPuntaje called - Usuario: " + this.username + ", Nuevo puntaje: " + puntaje);
+        log.debug("setPuntaje called - Usuario: {}, Nuevo puntaje: {}", this.username, puntaje);
         this.puntaje = puntaje;
     }
 

@@ -2,12 +2,14 @@ package com.desafios.admision_mtn.service;
 
 import com.desafios.admision_mtn.model.Usuario;
 import com.desafios.admision_mtn.repository.UsuarioRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class UsuarioService implements IUsuarioService {
 
     private final UsuarioRepository usuarioRepository;
@@ -48,16 +50,16 @@ public class UsuarioService implements IUsuarioService {
 
     @Override
     public Usuario save(Usuario usuario) {
-        System.out.println("=== DEBUG USUARIO SERVICE SAVE ===");
-        System.out.println("Guardando usuario: " + usuario.getUsername() + " (ID: " + usuario.getId() + ")");
-        System.out.println("Puntaje antes de guardar: " + usuario.getPuntaje());
-        
+        log.debug("=== DEBUG USUARIO SERVICE SAVE ===");
+        log.debug("Guardando usuario: {} (ID: {})", usuario.getUsername(), usuario.getId());
+        log.debug("Puntaje antes de guardar: {}", usuario.getPuntaje());
+
         Usuario saved = usuarioRepository.save(usuario);
-        
-        System.out.println("Usuario guardado con ID: " + saved.getId());
-        System.out.println("Puntaje después de guardar: " + saved.getPuntaje());
-        System.out.println("================================");
-        
+
+        log.debug("Usuario guardado con ID: {}", saved.getId());
+        log.debug("Puntaje después de guardar: {}", saved.getPuntaje());
+        log.debug("================================");
+
         return saved;
     }
 

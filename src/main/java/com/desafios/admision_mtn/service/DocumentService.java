@@ -193,4 +193,8 @@ public class DocumentService {
     public Long getDocumentCountByApplication(Long applicationId) {
         return documentRepository.countByApplication_Id(applicationId);
     }
+
+    public boolean userOwnsDocument(Long documentId, String userEmail) {
+        return documentRepository.existsByIdAndApplication_ApplicantUser_Email(documentId, userEmail);
+    }
 }
