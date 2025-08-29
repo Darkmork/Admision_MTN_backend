@@ -29,56 +29,60 @@ public class Interview {
     private Application application;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "interviewer_user_id", nullable = false)
+    @JoinColumn(name = "interviewer_id", nullable = false)
     private User interviewer;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "status", nullable = false)
     private InterviewStatus status = InterviewStatus.SCHEDULED;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "interview_type", nullable = false)
     private InterviewType type;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private InterviewMode mode;
+    // Nota: mode no existe en la tabla real, usar valor por defecto
+    @Transient
+    private InterviewMode mode = InterviewMode.IN_PERSON; // Valor por defecto
 
+    // Database column is timestamp, mapped correctly
     @Column(name = "scheduled_date", nullable = false)
-    private LocalDate scheduledDate;
+    private LocalDateTime scheduledDateTime;
 
-    @Column(name = "scheduled_time", nullable = false)
-    private LocalTime scheduledTime;
-
-    @Column(nullable = false)
+    @Column(name = "duration_minutes", nullable = false)
     private Integer duration; // en minutos
 
     @Column(length = 500)
     private String location;
 
-    @Column(name = "virtual_meeting_link", length = 1000)
+    // Columnas que no existen en la tabla real - usar @Transient
+    @Transient
     private String virtualMeetingLink;
 
     @Column(columnDefinition = "TEXT")
     private String notes;
 
-    @Column(columnDefinition = "TEXT")
+    @Transient
     private String preparation;
 
-    @Enumerated(EnumType.STRING)
+    @Transient
     private InterviewResult result;
 
-    @Column(precision = 3)
+    @Transient
     private Double score; // 1.0 - 10.0
 
-    @Column(columnDefinition = "TEXT")
+    // Esta columna existe pero se llama 'recommendation' (singular)
+    @Column(name = "recommendation", columnDefinition = "TEXT")
     private String recommendations;
 
-    @Column(name = "follow_up_required", nullable = false)
+    @Transient
     private Boolean followUpRequired = false;
 
-    @Column(name = "follow_up_notes", columnDefinition = "TEXT")
+    @Transient
     private String followUpNotes;
+
+    // Esta columna existe en la tabla
+    @Column(name = "evaluation_notes", columnDefinition = "TEXT")
+    private String evaluationNotes;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -88,7 +92,8 @@ public class Interview {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @Column(name = "completed_at")
+    // completed_at no existe en la tabla real
+    @Transient
     private LocalDateTime completedAt;
 
     // Enums
@@ -124,7 +129,7 @@ public class Interview {
         REQUIRES_FOLLOW_UP
     }
 
-    // Métodos de conveniencia
+    // Métodos de conveniencia y compatibilidad
     public String getStudentName() {
         return application != null && application.getStudent() != null ?
             application.getStudent().getFirstName() + " " + 
@@ -132,12 +137,46 @@ public class Interview {
             application.getStudent().getMaternalLastName() : "";
     }
     
+    // Backward compatibility methods (computed from scheduledDateTime)
+    public LocalDate getScheduledDate() {
+        return scheduledDateTime != null ? scheduledDateTime.toLocalDate() : null;
+    }
+    
+    public LocalTime getScheduledTime() {
+        return scheduledDateTime != null ? scheduledDateTime.toLocalTime() : null;
+    }
+    
+    public void setScheduledDate(LocalDate date) {
+        if (date != null) {
+            LocalTime time = getScheduledTime();
+            if (time == null) time = LocalTime.of(9, 0); // Default to 9 AM
+            this.scheduledDateTime = LocalDateTime.of(date, time);
+        }
+    }
+    
+    public void setScheduledTime(LocalTime time) {
+        if (time != null) {
+            LocalDate date = getScheduledDate();
+            if (date == null) date = LocalDate.now(); // Default to today
+            this.scheduledDateTime = LocalDateTime.of(date, time);
+        }
+    }
+    
+    // Legacy method names for backward compatibility
     public LocalDate getInterviewDate() {
-        return scheduledDate;
+        return getScheduledDate();
     }
     
     public LocalTime getInterviewTime() {
-        return scheduledTime;
+        return getScheduledTime();
+    }
+    
+    public LocalDateTime getScheduledDateTime() {
+        return scheduledDateTime;
+    }
+    
+    public void setScheduledDateTime(LocalDateTime dateTime) {
+        this.scheduledDateTime = dateTime;
     }
 
     public String getParentNames() {
@@ -180,9 +219,9 @@ public class Interview {
     }
 
     public boolean isUpcoming() {
-        LocalDateTime interviewDateTime = LocalDateTime.of(scheduledDate, scheduledTime);
+        if (scheduledDateTime == null) return false;
         LocalDateTime now = LocalDateTime.now();
-        long hoursUntil = java.time.Duration.between(now, interviewDateTime).toHours();
+        long hoursUntil = java.time.Duration.between(now, scheduledDateTime).toHours();
         return hoursUntil >= 0 && hoursUntil <= 24;
     }
 
@@ -190,8 +229,7 @@ public class Interview {
         if (status == InterviewStatus.COMPLETED || status == InterviewStatus.CANCELLED) {
             return false;
         }
-        LocalDateTime interviewDateTime = LocalDateTime.of(scheduledDate, scheduledTime);
-        return interviewDateTime.isBefore(LocalDateTime.now());
+        return scheduledDateTime != null && scheduledDateTime.isBefore(LocalDateTime.now());
     }
 
     // Métodos de transición de estado
@@ -236,8 +274,7 @@ public class Interview {
         if (!canBeEdited()) {
             throw new IllegalStateException("La entrevista no puede ser reprogramada en su estado actual");
         }
-        this.scheduledDate = newDate;
-        this.scheduledTime = newTime;
+        this.scheduledDateTime = LocalDateTime.of(newDate, newTime);
         this.status = InterviewStatus.RESCHEDULED;
     }
 

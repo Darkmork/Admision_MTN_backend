@@ -215,7 +215,7 @@ public class ApplicationWorkflowService {
      * Verifica si la entrevista está completada
      */
     private boolean isInterviewCompleted(Long applicationId) {
-        Optional<Interview> interview = interviewRepository.findFirstByApplicationIdOrderByScheduledDateAsc(applicationId);
+        Optional<Interview> interview = interviewRepository.findFirstByApplicationIdOrderByScheduledDateTimeAsc(applicationId);
         
         if (interview.isEmpty()) {
             log.debug("📅 Aplicación {}: No hay entrevista programada", applicationId);

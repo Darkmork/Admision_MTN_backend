@@ -1,6 +1,6 @@
 package com.desafios.admision_mtn.service;
 
-import com.desafios.admision_mtn.model.Usuario;
+import com.desafios.admision_mtn.entity.User;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -48,14 +48,14 @@ public class JwtService {
     }
 
     // Generar token para usuario
-    public String generateToken(Usuario usuario) {
+    public String generateToken(User user) {
         Map<String, Object> extraClaims = new HashMap<>();
-        extraClaims.put("userId", usuario.getId());
-        extraClaims.put("role", usuario.getRol().name());
-        extraClaims.put("email", usuario.getEmail());
-        extraClaims.put("fullName", usuario.getFirstName() + " " + usuario.getLastName());
+        extraClaims.put("userId", user.getId());
+        extraClaims.put("role", user.getRole().name());
+        extraClaims.put("email", user.getEmail());
+        extraClaims.put("fullName", user.getFirstName() + " " + user.getLastName());
         
-        return generateToken(extraClaims, usuario.getUsername());
+        return generateToken(extraClaims, user.getEmail()); // username es email en nuestro sistema
     }
 
     // Generar token con claims personalizados
@@ -64,12 +64,12 @@ public class JwtService {
     }
 
     // Generar refresh token
-    public String generateRefreshToken(Usuario usuario) {
+    public String generateRefreshToken(User user) {
         Map<String, Object> extraClaims = new HashMap<>();
-        extraClaims.put("userId", usuario.getId());
+        extraClaims.put("userId", user.getId());
         extraClaims.put("tokenType", "refresh");
         
-        return buildToken(extraClaims, usuario.getUsername(), refreshExpiration);
+        return buildToken(extraClaims, user.getEmail(), refreshExpiration);
     }
 
     // Construir token

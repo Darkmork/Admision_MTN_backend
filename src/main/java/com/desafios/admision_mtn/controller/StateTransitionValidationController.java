@@ -419,7 +419,8 @@ public class StateTransitionValidationController {
     private boolean isFinalStatus(Application.ApplicationStatus status) {
         return status == Application.ApplicationStatus.APPROVED ||
                status == Application.ApplicationStatus.REJECTED ||
-               status == Application.ApplicationStatus.WAITLIST;
+               status == Application.ApplicationStatus.WAITLIST ||
+               status == Application.ApplicationStatus.ARCHIVED;
     }
 
     private String getStatusDescription(Application.ApplicationStatus status) {
@@ -432,6 +433,7 @@ public class StateTransitionValidationController {
             case APPROVED -> "Aplicación aprobada - estado final";
             case REJECTED -> "Aplicación rechazada - estado final";
             case WAITLIST -> "En lista de espera - estado final";
+            case ARCHIVED -> "Aplicación archivada - estado final";
         };
     }
 }

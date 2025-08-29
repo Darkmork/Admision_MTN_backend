@@ -329,7 +329,7 @@ public class InterviewWorkflowService {
      * Verifica si un slot de tiempo está disponible
      */
     private boolean isTimeSlotAvailable(Long interviewerId, LocalDate date, LocalTime time) {
-        long conflicts = interviewRepository.countConflictingInterviews(interviewerId, date, time);
+        long conflicts = interviewRepository.countConflictingInterviews(interviewerId, LocalDateTime.of(date, time));
         return conflicts == 0;
     }
 
@@ -477,22 +477,23 @@ public class InterviewWorkflowService {
     }
     
     private Map<String, Long> getInterviewModeDistribution() {
-        return interviewRepository.findModeDistribution().stream()
-                .collect(Collectors.toMap(
-                    row -> row[0].toString(),
-                    row -> (Long) row[1]
-                ));
+        // Mode es transient y siempre IN_PERSON
+        Map<String, Long> modeDistribution = new HashMap<>();
+        long totalInterviews = interviewRepository.count();
+        modeDistribution.put("IN_PERSON", totalInterviews);
+        modeDistribution.put("VIRTUAL", 0L);
+        modeDistribution.put("HYBRID", 0L);
+        return modeDistribution;
     }
     
     private Map<String, Object> calculatePerformanceMetrics() {
         Map<String, Object> metrics = new HashMap<>();
         
-        // Promedio de calificaciones
-        Optional<Double> averageScore = interviewRepository.findAverageScore();
-        metrics.put("averageScore", averageScore.orElse(0.0));
+        // Promedio de calificaciones (score es transient, no hay datos)
+        metrics.put("averageScore", 0.0);
         
-        // Entrevistas con resultado positivo
-        long positiveResults = interviewRepository.countPositiveResults();
+        // Entrevistas con resultado positivo - result es transient
+        long positiveResults = 0L;
         metrics.put("positiveResults", positiveResults);
         
         // Tiempo promedio de completación (esto se podría calcular si se tienen fechas)

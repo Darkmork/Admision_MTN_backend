@@ -33,6 +33,53 @@ public class EvaluationController {
 
     private final EvaluationService evaluationService;
 
+    // ===== ENDPOINTS PÚBLICOS PARA ADMIN DASHBOARD =====
+    
+    @Operation(
+        summary = "Obtener todas las evaluaciones", 
+        description = "Obtiene todas las evaluaciones del sistema para el dashboard administrativo.",
+        security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200", 
+            description = "Lista de evaluaciones obtenida exitosamente",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = Evaluation.class)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "401", 
+            description = "No autorizado - requiere autenticación"
+        ),
+        @ApiResponse(
+            responseCode = "403", 
+            description = "Prohibido - requiere rol de administrador"
+        )
+    })
+    @GetMapping
+    public ResponseEntity<List<Map<String, Object>>> getAllEvaluations() {
+        try {
+            log.info("🔍 Admin solicitando todas las evaluaciones");
+            
+            // Obtener evaluaciones con detalles completos
+            List<Evaluation> evaluations = evaluationService.getAllEvaluationsWithDetails();
+            
+            // Transformar a formato de respuesta
+            List<Map<String, Object>> response = evaluations.stream()
+                    .map(this::createEvaluationResponse)
+                    .toList();
+            
+            log.info("✅ Enviando {} evaluaciones al dashboard", response.size());
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            log.error("❌ Error obteniendo todas las evaluaciones", e);
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
     // Endpoints para administradores
     
     @Operation(

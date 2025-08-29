@@ -27,6 +27,7 @@ public class ApplicationService {
     private final UserRepository userRepository;
     private final EvaluationRepository evaluationRepository;
     private final org.springframework.jdbc.core.JdbcTemplate jdbcTemplate;
+    private final TemplatedInterviewNotificationService templatedNotificationService;
 
     public ApplicationResponse createApplication(CreateApplicationRequest request, String userEmail) {
         try {
@@ -194,8 +195,56 @@ public class ApplicationService {
     @Transactional
     public Application updateApplicationStatus(Long id, Application.ApplicationStatus status) {
         Application application = getApplicationById(id);
+        Application.ApplicationStatus previousStatus = application.getStatus();
         application.setStatus(status);
-        return applicationRepository.save(application);
+        Application savedApplication = applicationRepository.save(application);
+        
+        // Enviar notificación automática según el nuevo estado
+        sendStatusChangeNotification(savedApplication, previousStatus, status);
+        
+        return savedApplication;
+    }
+    
+    /**
+     * Envía notificación automática cuando cambia el estado de una aplicación
+     */
+    private void sendStatusChangeNotification(Application application, 
+                                            Application.ApplicationStatus previousStatus, 
+                                            Application.ApplicationStatus newStatus) {
+        try {
+            switch (newStatus) {
+                case APPROVED:
+                    // Estudiante seleccionado
+                    log.info("Enviando notificación de selección para aplicación ID: {}", application.getId());
+                    templatedNotificationService.sendStudentSelectionNotification(application);
+                    break;
+                    
+                case REJECTED:
+                    // Estudiante rechazado
+                    log.info("Enviando notificación de rechazo para aplicación ID: {}", application.getId());
+                    String rejectionReason = "No cumple con los criterios de admisión establecidos por el colegio";
+                    templatedNotificationService.sendStudentRejectionNotification(application, rejectionReason);
+                    break;
+                    
+                case WAITLIST:
+                    // Estudiante en lista de espera
+                    log.info("Enviando notificación de lista de espera para aplicación ID: {}", application.getId());
+                    templatedNotificationService.sendAdmissionResultsNotification(
+                        application, 
+                        "Lista de Espera", 
+                        "Su hijo(a) ha sido incluido(a) en nuestra lista de espera. Le contactaremos si se abre un cupo."
+                    );
+                    break;
+                    
+                default:
+                    log.debug("No se requiere notificación para el cambio de estado: {} -> {}", previousStatus, newStatus);
+                    break;
+            }
+        } catch (Exception e) {
+            log.error("Error enviando notificación de cambio de estado para aplicación {}: {}", 
+                     application.getId(), e.getMessage(), e);
+            // No relanzamos la excepción para no afectar la actualización del estado
+        }
     }
 
     private Supporter.Relationship parseRelationship(String relationship) {
@@ -330,6 +379,90 @@ public class ApplicationService {
         } catch (Exception e) {
             log.error("Error deleting all data", e);
             throw new RuntimeException("Error limpiando la base de datos: " + e.getMessage());
+        }
+    }
+
+    // ========== MÉTODOS PARA API UNIFICADA ==========
+    
+    /**
+     * Obtiene estadísticas generales de aplicaciones
+     */
+    public Map<String, Object> getApplicationStatistics() {
+        Map<String, Object> stats = new HashMap<>();
+        
+        try {
+            List<Application> allApplications = applicationRepository.findAll();
+            
+            stats.put("totalApplications", allApplications.size());
+            stats.put("pendingApplications", allApplications.stream()
+                .filter(app -> app.getStatus() == Application.ApplicationStatus.PENDING).count());
+            stats.put("underReviewApplications", allApplications.stream()
+                .filter(app -> app.getStatus() == Application.ApplicationStatus.UNDER_REVIEW).count());
+            stats.put("approvedApplications", allApplications.stream()
+                .filter(app -> app.getStatus() == Application.ApplicationStatus.APPROVED).count());
+            stats.put("rejectedApplications", allApplications.stream()
+                .filter(app -> app.getStatus() == Application.ApplicationStatus.REJECTED).count());
+                
+        } catch (Exception e) {
+            log.error("Error getting application statistics", e);
+        }
+        
+        return stats;
+    }
+    
+    /**
+     * Obtiene aplicaciones recientes (últimas 10)
+     */
+    public List<Application> getRecentApplications() {
+        try {
+            return applicationRepository.findTop10ByOrderBySubmissionDateDesc();
+        } catch (Exception e) {
+            log.error("Error getting recent applications", e);
+            return new ArrayList<>();
+        }
+    }
+    
+    /**
+     * Obtiene aplicaciones que requieren documentos
+     */
+    public List<Application> getApplicationsRequiringDocuments() {
+        try {
+            return getAllApplications().stream()
+                .filter(app -> !hasAllRequiredDocuments(app.getId()))
+                .collect(Collectors.toList());
+        } catch (Exception e) {
+            log.error("Error getting applications requiring documents", e);
+            return new ArrayList<>();
+        }
+    }
+    
+    /**
+     * Busca aplicaciones por término
+     */
+    public org.springframework.data.domain.Page<Application> searchApplications(
+            String searchTerm, org.springframework.data.domain.Pageable pageable) {
+        try {
+            return applicationRepository.searchByStudentName(searchTerm, pageable);
+        } catch (Exception e) {
+            log.error("Error searching applications", e);
+            return org.springframework.data.domain.Page.empty(pageable);
+        }
+    }
+    
+    /**
+     * Obtiene aplicaciones con filtros y paginación
+     */
+    public org.springframework.data.domain.Page<Application> getAllApplicationsWithFilters(
+            Application.ApplicationStatus status, org.springframework.data.domain.Pageable pageable) {
+        try {
+            if (status != null) {
+                return applicationRepository.findByStatus(status, pageable);
+            } else {
+                return applicationRepository.findAll(pageable);
+            }
+        } catch (Exception e) {
+            log.error("Error getting applications with filters", e);
+            return org.springframework.data.domain.Page.empty(pageable);
         }
     }
 

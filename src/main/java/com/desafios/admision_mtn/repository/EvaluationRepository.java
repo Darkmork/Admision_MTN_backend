@@ -70,4 +70,23 @@ public interface EvaluationRepository extends JpaRepository<Evaluation, Long> {
     
     @Query("SELECT COUNT(e) FROM Evaluation e WHERE e.status = :status AND e.createdAt <= :cutoffDate")
     long countOverdueEvaluations(@Param("status") Evaluation.EvaluationStatus status, @Param("cutoffDate") java.time.LocalDateTime cutoffDate);
+    
+    // ========== MÉTODOS PARA API UNIFICADA ==========
+    
+    /**
+     * Busca evaluaciones por estado
+     */
+    List<Evaluation> findByStatus(Evaluation.EvaluationStatus status);
+    
+    /**
+     * Busca evaluaciones por estado y rango de fechas de completación
+     */
+    List<Evaluation> findByStatusAndCompletionDateBetween(Evaluation.EvaluationStatus status, 
+                                                          java.time.LocalDateTime startDate, 
+                                                          java.time.LocalDateTime endDate);
+    
+    /**
+     * Busca evaluaciones por evaluador
+     */
+    List<Evaluation> findByEvaluator(User evaluator);
 }

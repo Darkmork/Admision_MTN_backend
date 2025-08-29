@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.hibernate.validator.constraints.Length;
 import lombok.Data;
 
 @Data
@@ -34,7 +35,7 @@ public class CreateUserRequest {
     
     private User.Subject subject;
     
-    @Size(min = 8, message = "La contraseña debe tener al menos 8 caracteres")
+    // Contraseña opcional - si no se proporciona, se genera automáticamente
     private String password;
     
     private Boolean sendWelcomeEmail = true;

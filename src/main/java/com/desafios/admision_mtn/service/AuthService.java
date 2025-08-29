@@ -2,8 +2,8 @@ package com.desafios.admision_mtn.service;
 
 import com.desafios.admision_mtn.dto.AuthRequest;
 import com.desafios.admision_mtn.dto.AuthResponse;
-import com.desafios.admision_mtn.model.Usuario;
-import com.desafios.admision_mtn.repository.UsuarioRepository;
+import com.desafios.admision_mtn.entity.User;
+import com.desafios.admision_mtn.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final UsuarioRepository usuarioRepository;
+    private final UserRepository userRepository;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final CustomUserDetailsService userDetailsService;
@@ -33,27 +33,27 @@ public class AuthService {
                 )
         );
 
-        // Buscar el usuario en la base de datos
-        Usuario usuario = usuarioRepository.findByUsername(request.getUsername())
+        // Buscar el usuario en la base de datos (request.getUsername() es realmente el email)
+        User user = userRepository.findByEmail(request.getUsername())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        if (!usuario.isActive()) {
+        if (!user.getActive()) {
             throw new RuntimeException("Usuario inactivo");
         }
 
         // Generar tokens
-        String accessToken = jwtService.generateToken(usuario);
-        String refreshToken = jwtService.generateRefreshToken(usuario);
+        String accessToken = jwtService.generateToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
 
         // Calcular tiempo de expiración en segundos
         long expiresIn = jwtService.getExpirationTime(accessToken) / 1000;
 
         return AuthResponse.builder()
                 .token(accessToken)
-                .email(usuario.getEmail())
-                .firstName(usuario.getFirstName())
-                .lastName(usuario.getLastName())
-                .role(usuario.getRol().name())
+                .email(user.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .role(user.getRole().name())
                 .success(true)
                 .message("Autenticación exitosa")
                 .build();
@@ -74,7 +74,7 @@ public class AuthService {
             
             // Cargar usuario
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-            Usuario usuario = userDetailsService.findUsuarioByUsername(username);
+            User user = userDetailsService.findUserByEmail(username);
 
             // Validar el refresh token
             if (!jwtService.isTokenValid(refreshToken, userDetails)) {
@@ -82,18 +82,18 @@ public class AuthService {
             }
 
             // Generar nuevos tokens
-            String newAccessToken = jwtService.generateToken(usuario);
-            String newRefreshToken = jwtService.generateRefreshToken(usuario);
+            String newAccessToken = jwtService.generateToken(user);
+            String newRefreshToken = jwtService.generateRefreshToken(user);
 
             // Calcular tiempo de expiración
             long expiresIn = jwtService.getExpirationTime(newAccessToken) / 1000;
 
             return AuthResponse.builder()
                     .token(newAccessToken)
-                    .email(usuario.getEmail())
-                    .firstName(usuario.getFirstName())
-                    .lastName(usuario.getLastName())
-                    .role(usuario.getRol().name())
+                    .email(user.getEmail())
+                    .firstName(user.getFirstName())
+                    .lastName(user.getLastName())
+                    .role(user.getRole().name())
                     .success(true)
                     .message("Token refrescado exitosamente")
                     .build();
@@ -106,27 +106,27 @@ public class AuthService {
     /**
      * Obtiene el usuario actual del contexto de seguridad
      */
-    public Usuario getCurrentUser() {
+    public User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new RuntimeException("No hay usuario autenticado");
         }
 
-        String username = authentication.getName();
-        return usuarioRepository.findByUsername(username)
+        String email = authentication.getName();
+        return userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
     }
 
     /**
      * Verifica si un usuario tiene un rol específico
      */
-    public boolean hasRole(String username, String role) {
+    public boolean hasRole(String email, String role) {
         try {
-            Usuario usuario = usuarioRepository.findByUsername(username)
+            User user = userRepository.findByEmail(email)
                     .orElse(null);
             
-            return usuario != null && usuario.getRol().name().equals(role);
+            return user != null && user.getRole().name().equals(role);
         } catch (Exception e) {
             return false;
         }

@@ -15,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,6 +28,8 @@ import java.util.stream.Collectors;
 @PreAuthorize("hasRole('ADMIN')")
 // 🔒 SEGURIDAD: Sin @CrossOrigin - usa configuración global de SecurityConfig
 public class ProgresoUsuarioController {
+
+    private static final Logger logger = LoggerFactory.getLogger(ProgresoUsuarioController.class);
 
     private final ProgresoUsuarioService progresoUsuarioService;
     private final UsuarioService usuarioService;
@@ -88,31 +92,30 @@ public class ProgresoUsuarioController {
 
     @PostMapping("/submit")
     public ResponseEntity<ProgresoUsuarioDto> submitSolution(@RequestBody SubmitSolutionDto submitDto) {
-        System.out.println("=== SUBMIT SOLUTION LLAMADO ===");
-        System.out.println("Usuario ID: " + submitDto.getUsuarioId());
-        System.out.println("Problema ID: " + submitDto.getProblemaId());
-        System.out.println("Es correcto: " + submitDto.isCorrect());
-        System.out.println("Dificultad: " + submitDto.getDificultad());
-        System.out.println("Tema ID: " + submitDto.getTemaId());
+        logger.info("[SUBMIT_SOLUTION] Iniciando procesamiento - Usuario: {}, Problema: {}, Correcto: {}, Dificultad: {}, Tema: {}", 
+                   submitDto.getUsuarioId(), submitDto.getProblemaId(), submitDto.isCorrect(), 
+                   submitDto.getDificultad(), submitDto.getTemaId());
         
         Optional<Usuario> usuarioOpt = usuarioService.findById(submitDto.getUsuarioId());
         Optional<Problema> problemaOpt = problemaService.findById(submitDto.getProblemaId());
         
         if (usuarioOpt.isEmpty()) {
-            System.err.println("ERROR: Usuario no encontrado con ID: " + submitDto.getUsuarioId());
+            logger.warn("[SUBMIT_SOLUTION] Usuario no encontrado con ID: {}", submitDto.getUsuarioId());
             return ResponseEntity.badRequest().build();
         }
         
         if (problemaOpt.isEmpty()) {
-            System.err.println("ERROR: Problema no encontrado con ID: " + submitDto.getProblemaId());
-            System.err.println("Problemas disponibles en la BD:");
-            problemaService.findAll().forEach(p -> 
-                System.err.println("  - ID: " + p.getId() + ", Título: " + p.getTitulo() + ", Dificultad: " + p.getDificultad()));
+            logger.warn("[SUBMIT_SOLUTION] Problema no encontrado con ID: {}", submitDto.getProblemaId());
+            if (logger.isDebugEnabled()) {
+                logger.debug("[SUBMIT_SOLUTION] Problemas disponibles:");
+                problemaService.findAll().forEach(p -> 
+                    logger.debug("  - ID: {}, Título: {}, Dificultad: {}", p.getId(), p.getTitulo(), p.getDificultad()));
+            }
             return ResponseEntity.badRequest().build();
         }
         
-        System.out.println("Usuario encontrado: " + usuarioOpt.get().getUsername());
-        System.out.println("Problema encontrado: " + problemaOpt.get().getTitulo());
+        logger.debug("[SUBMIT_SOLUTION] Usuario encontrado: {}, Problema: {}", 
+                    usuarioOpt.get().getUsername(), problemaOpt.get().getTitulo());
 
         // Buscar progreso existente o crear nuevo
         Optional<ProgresoUsuario> existingProgreso = progresoUsuarioService
@@ -148,29 +151,28 @@ public class ProgresoUsuarioController {
                     submitDto.getDificultad() : 
                     problemaOpt.get().getDificultad().toString();
                 
-                System.out.println("=== CALCULANDO PUNTOS ===");
-                System.out.println("Dificultad para puntos: '" + dificultadParaPuntos + "'");
-                System.out.println("Dificultad del DTO: '" + submitDto.getDificultad() + "'");
-                System.out.println("Dificultad del problema BD: '" + problemaOpt.get().getDificultad() + "'");
+                logger.info("[SUBMIT_SOLUTION] Calculando puntos - Dificultad: {}, DTO: {}, BD: {}", 
+                           dificultadParaPuntos, submitDto.getDificultad(), problemaOpt.get().getDificultad());
                 
                 int puntos = progresoUsuarioService.obtenerPuntajePorDificultad(dificultadParaPuntos);
-                System.out.println("Puntos calculados: " + puntos);
+                logger.info("[SUBMIT_SOLUTION] Puntos calculados: {}", puntos);
                 
                 // Actualizar puntaje del usuario
                 Usuario usuario = usuarioOpt.get();
                 int puntajeAnterior = usuario.getPuntaje();
                 usuario.setPuntaje(puntajeAnterior + puntos);
                 
-                System.out.println("Puntaje anterior: " + puntajeAnterior);
-                System.out.println("Puntaje nuevo: " + usuario.getPuntaje());
+                logger.info("[SUBMIT_SOLUTION] Actualizando puntaje - Anterior: {}, Nuevo: {}", 
+                           puntajeAnterior, usuario.getPuntaje());
                 
-                Usuario usuarioGuardado = usuarioService.save(usuario); // Guardar el usuario con el nuevo puntaje
-                System.out.println("Usuario guardado con puntaje: " + usuarioGuardado.getPuntaje());
-                System.out.println("=========================");
+                Usuario usuarioGuardado = usuarioService.save(usuario);
+                logger.info("[SUBMIT_SOLUTION] Usuario guardado con puntaje: {}", usuarioGuardado.getPuntaje());
                 
-                System.out.println("Puntos otorgados: " + puntos + " al usuario: " + usuario.getUsername());
+                logger.info("[SUBMIT_SOLUTION] Puntos otorgados exitosamente - Usuario: {}, Puntos: {}, Puntaje Final: {}", 
+                           usuario.getUsername(), puntos, usuarioGuardado.getPuntaje());
             } else {
-                System.out.println("Problema ya resuelto antes, no se otorgan puntos.");
+                logger.debug("[SUBMIT_SOLUTION] Problema ya resuelto anteriormente - Usuario: {}, Problema: {}", 
+                            usuarioOpt.get().getUsername(), problemaOpt.get().getTitulo());
             }
         } else {
             progreso.setEstado(EstadoProgreso.IN_PROGRESS);
@@ -183,9 +185,8 @@ public class ProgresoUsuarioController {
     // Endpoint de test para asignar puntos directamente
     @PostMapping("/test-puntos")
     public ResponseEntity<String> testAsignarPuntos(@RequestBody TestPuntosDto testDto) {
-        System.out.println("=== TEST ASIGNAR PUNTOS ===");
-        System.out.println("Usuario ID: " + testDto.getUsuarioId());
-        System.out.println("Puntos a asignar: " + testDto.getPuntos());
+        logger.info("[TEST_PUNTOS] Iniciando test - Usuario: {}, Puntos: {}", 
+                   testDto.getUsuarioId(), testDto.getPuntos());
         
         Optional<Usuario> usuarioOpt = usuarioService.findById(testDto.getUsuarioId());
         if (usuarioOpt.isEmpty()) {
@@ -193,26 +194,25 @@ public class ProgresoUsuarioController {
         }
         
         Usuario usuario = usuarioOpt.get();
-        System.out.println("Usuario encontrado: " + usuario.getUsername());
-        System.out.println("Puntaje actual: " + usuario.getPuntaje());
+        logger.info("[TEST_PUNTOS] Usuario encontrado: {}, Puntaje actual: {}", 
+                   usuario.getUsername(), usuario.getPuntaje());
         
         int puntajeAnterior = usuario.getPuntaje();
         usuario.setPuntaje(puntajeAnterior + testDto.getPuntos());
         
         try {
             Usuario saved = usuarioService.save(usuario);
-            System.out.println("Usuario guardado - Puntaje final: " + saved.getPuntaje());
+            logger.info("[TEST_PUNTOS] Usuario guardado - Puntaje final: {}", saved.getPuntaje());
             return ResponseEntity.ok("Puntos asignados exitosamente. Puntaje anterior: " + puntajeAnterior + ", Puntaje nuevo: " + saved.getPuntaje());
         } catch (Exception e) {
-            System.err.println("Error guardando usuario: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("[TEST_PUNTOS] Error guardando usuario: {}", e.getMessage(), e);
             return ResponseEntity.status(500).body("Error guardando: " + e.getMessage());
         }
     }
 
     @GetMapping("/usuario/{usuarioId}/estadisticas")
     public ResponseEntity<UserStatsDto> getUserStats(@PathVariable Long usuarioId) {
-        System.out.println("=== CALCULANDO ESTADÍSTICAS PARA USUARIO " + usuarioId + " ===");
+        logger.info("[USER_STATS] Calculando estadísticas para usuario: {}", usuarioId);
         
         Optional<Usuario> usuarioOpt = usuarioService.findById(usuarioId);
         if (usuarioOpt.isEmpty()) {
@@ -220,14 +220,15 @@ public class ProgresoUsuarioController {
         }
 
         List<ProgresoUsuario> progresos = progresoUsuarioService.findByUsuario(usuarioOpt.get());
-        System.out.println("Total registros de progreso encontrados: " + progresos.size());
+        logger.debug("[USER_STATS] Total registros de progreso encontrados: {}", progresos.size());
         
-        // Debug: mostrar todos los progresos
-        progresos.forEach(p -> {
-            System.out.println("  - Problema ID: " + p.getProblema().getId() + 
-                             ", Estado: " + p.getEstado() + 
-                             ", Intentos: " + p.getIntentos());
-        });
+        if (logger.isDebugEnabled()) {
+            logger.debug("[USER_STATS] Detalle de progresos:");
+            progresos.forEach(p -> {
+                logger.debug("  - Problema ID: {}, Estado: {}, Intentos: {}", 
+                           p.getProblema().getId(), p.getEstado(), p.getIntentos());
+            });
+        }
         
         long totalProblemas = progresos.size();
         long problemasSolved = progresos.stream()
@@ -237,11 +238,8 @@ public class ProgresoUsuarioController {
                 .filter(p -> p.getEstado() == EstadoProgreso.IN_PROGRESS)
                 .count();
                 
-        System.out.println("Estadísticas calculadas:");
-        System.out.println("  - Total problemas: " + totalProblemas);
-        System.out.println("  - Problemas resueltos: " + problemasSolved);
-        System.out.println("  - Problemas en progreso: " + problemasInProgress);
-        System.out.println("  - Puntaje usuario: " + usuarioOpt.get().getPuntaje());
+        logger.info("[USER_STATS] Resultados - Total: {}, Resueltos: {}, En progreso: {}, Puntaje: {}", 
+                   totalProblemas, problemasSolved, problemasInProgress, usuarioOpt.get().getPuntaje());
 
         UserStatsDto stats = new UserStatsDto();
         stats.setUsuarioId(usuarioId);
@@ -250,7 +248,7 @@ public class ProgresoUsuarioController {
         stats.setProblemasInProgress(problemasInProgress);
         stats.setPuntaje(usuarioOpt.get().getPuntaje());
         
-        System.out.println("==============================");
+        logger.debug("[USER_STATS] Cálculo completado para usuario: {}", usuarioId);
         return ResponseEntity.ok(stats);
     }
 

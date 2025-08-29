@@ -400,4 +400,93 @@ public class EvaluationService {
             case PSYCHOLOGICAL_INTERVIEW -> User.UserRole.PSYCHOLOGIST;
         };
     }
+
+    /**
+     * Obtiene todas las evaluaciones del sistema con paginación
+     */
+    public List<Evaluation> getAllEvaluations() {
+        log.info("📊 Obteniendo todas las evaluaciones del sistema");
+        List<Evaluation> evaluations = evaluationRepository.findAll();
+        log.info("✅ Se encontraron {} evaluaciones", evaluations.size());
+        return evaluations;
+    }
+
+    /**
+     * Obtiene evaluaciones con información completa (application, student, evaluator)
+     */
+    public List<Evaluation> getAllEvaluationsWithDetails() {
+        log.info("📊 Obteniendo evaluaciones con detalles completos");
+        // Obtener todas las evaluaciones - las relaciones se cargan automáticamente por JPA
+        List<Evaluation> evaluations = evaluationRepository.findAll();
+        
+        // Forzar la carga de las relaciones para evitar LazyInitializationException
+        evaluations.forEach(evaluation -> {
+            if (evaluation.getApplication() != null && evaluation.getApplication().getStudent() != null) {
+                evaluation.getApplication().getStudent().getFirstName(); // Trigger lazy loading
+            }
+            if (evaluation.getEvaluator() != null) {
+                evaluation.getEvaluator().getFirstName(); // Trigger lazy loading
+            }
+        });
+        
+        log.info("✅ Se encontraron {} evaluaciones con detalles", evaluations.size());
+        return evaluations;
+    }
+    
+    // ========== MÉTODOS PARA API UNIFICADA ==========
+    
+    /**
+     * Obtiene evaluaciones pendientes del sistema
+     */
+    public List<Evaluation> getPendingEvaluations() {
+        try {
+            return evaluationRepository.findByStatus(Evaluation.EvaluationStatus.PENDING);
+        } catch (Exception e) {
+            log.error("Error getting pending evaluations", e);
+            return new ArrayList<>();
+        }
+    }
+    
+    /**
+     * Obtiene evaluaciones completadas hoy
+     */
+    public List<Evaluation> getCompletedEvaluationsToday() {
+        try {
+            LocalDateTime startOfDay = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
+            LocalDateTime endOfDay = startOfDay.plusDays(1);
+            return evaluationRepository.findByStatusAndCompletionDateBetween(
+                Evaluation.EvaluationStatus.COMPLETED, startOfDay, endOfDay);
+        } catch (Exception e) {
+            log.error("Error getting completed evaluations today", e);
+            return new ArrayList<>();
+        }
+    }
+    
+    /**
+     * Obtiene evaluaciones por evaluador específico
+     */
+    public List<Evaluation> getEvaluationsByEvaluator(Long evaluatorId) {
+        try {
+            User evaluator = userRepository.findById(evaluatorId).orElse(null);
+            if (evaluator != null) {
+                return evaluationRepository.findByEvaluator(evaluator);
+            }
+            return new ArrayList<>();
+        } catch (Exception e) {
+            log.error("Error getting evaluations by evaluator", e);
+            return new ArrayList<>();
+        }
+    }
+    
+    /**
+     * Obtiene todas las evaluaciones con paginación
+     */
+    public org.springframework.data.domain.Page<Evaluation> getAllEvaluations(org.springframework.data.domain.Pageable pageable) {
+        try {
+            return evaluationRepository.findAll(pageable);
+        } catch (Exception e) {
+            log.error("Error getting evaluations with pagination", e);
+            return org.springframework.data.domain.Page.empty(pageable);
+        }
+    }
 }

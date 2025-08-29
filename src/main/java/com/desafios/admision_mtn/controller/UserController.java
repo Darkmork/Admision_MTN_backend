@@ -23,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -84,10 +85,12 @@ public class UserController {
         @RequestParam(required = false) User.UserRole role,
         @Parameter(description = "Filtrar por estado activo/inactivo", example = "true")
         @RequestParam(required = false) Boolean active,
+        @Parameter(description = "Excluir rol específico (ej: APODERADO para usuarios del colegio)", example = "APODERADO")
+        @RequestParam(required = false) User.UserRole excludeRole,
         @Parameter(description = "Parámetros de paginación (page, size, sort)")
         Pageable pageable) {
         try {
-            Page<UserResponse> users = adminUserService.getAllUsers(search, role, active, pageable);
+            Page<UserResponse> users = adminUserService.getAllUsers(search, role, active, excludeRole, pageable);
             return ResponseEntity.ok(users);
         } catch (Exception e) {
             log.error("Error retrieving users", e);
@@ -167,7 +170,7 @@ public class UserController {
         )
     })
     @PostMapping
-    public ResponseEntity<UserResponse> createUser(
+    public ResponseEntity<?> createUser(
         @Parameter(
             description = "Datos del nuevo usuario",
             required = true,
@@ -179,7 +182,10 @@ public class UserController {
             return ResponseEntity.ok(user);
         } catch (Exception e) {
             log.error("Error creating user: {}", request.getEmail(), e);
-            return ResponseEntity.badRequest().build();
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("message", e.getMessage());
+            errorResponse.put("error", "Error al crear usuario");
+            return ResponseEntity.badRequest().body(errorResponse);
         }
     }
     

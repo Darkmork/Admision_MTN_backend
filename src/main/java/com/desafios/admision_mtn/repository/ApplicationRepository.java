@@ -9,6 +9,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Repository
 public interface ApplicationRepository extends JpaRepository<Application, Long> {
@@ -68,4 +70,23 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
     
     @Query("SELECT a FROM Application a WHERE a.status = :status AND a.updatedAt <= :cutoffDate ORDER BY a.updatedAt ASC")
     List<Application> findOverdueApplications(@Param("status") Application.ApplicationStatus status, @Param("cutoffDate") java.time.LocalDateTime cutoffDate);
+    
+    // ========== MÉTODOS PARA API UNIFICADA ==========
+    
+    /**
+     * Últimas 10 aplicaciones por fecha de envío
+     */
+    List<Application> findTop10ByOrderBySubmissionDateDesc();
+    
+    /**
+     * Buscar aplicaciones por nombre del estudiante con paginación
+     */
+    @Query("SELECT a FROM Application a WHERE LOWER(a.student.firstName) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
+           "OR LOWER(a.student.lastName) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
+    Page<Application> searchByStudentName(@Param("searchTerm") String searchTerm, Pageable pageable);
+    
+    /**
+     * Buscar aplicaciones por estado con paginación
+     */
+    Page<Application> findByStatus(Application.ApplicationStatus status, Pageable pageable);
 }

@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
 import java.util.List;
@@ -22,6 +24,8 @@ import java.util.stream.Collectors;
 @PreAuthorize("hasRole('ADMIN')")
 // 🔒 SEGURIDAD: Sin @CrossOrigin - usa configuración global de SecurityConfig
 public class UsuarioController {
+
+    private static final Logger logger = LoggerFactory.getLogger(UsuarioController.class);
 
     private final UsuarioService usuarioService;
     private final PasswordEncoder passwordEncoder;
@@ -55,7 +59,7 @@ public class UsuarioController {
                 
             return ResponseEntity.ok(ranking);
         } catch (Exception e) {
-            System.err.println("Error obteniendo ranking: " + e.getMessage());
+            logger.error("[RANKING] Error obteniendo ranking: {}", e.getMessage(), e);
             return ResponseEntity.status(500).build();
         }
     }
@@ -65,9 +69,9 @@ public class UsuarioController {
         Optional<Usuario> usuarioOpt = usuarioService.findById(id);
         if (usuarioOpt.isPresent()) {
             Usuario usuario = usuarioOpt.get();
-            System.out.println("Debug - Usuario encontrado: " + usuario.getUsername() + ", Puntaje: " + usuario.getPuntaje());
+            logger.debug("[USER_DETAIL] Usuario encontrado: {}, Puntaje: {}", usuario.getUsername(), usuario.getPuntaje());
             UsuarioDto dto = toDto(usuario);
-            System.out.println("Debug - DTO creado, Puntaje en DTO: " + dto.getPuntaje());
+            logger.debug("[USER_DETAIL] DTO creado, Puntaje en DTO: {}", dto.getPuntaje());
             return ResponseEntity.ok(dto);
         }
         return ResponseEntity.notFound().build();
@@ -118,7 +122,7 @@ public class UsuarioController {
         usuario.setPuntaje(usuario.getPuntaje() + nuevosPuntos);
         Usuario updated = usuarioService.save(usuario);
         
-        System.out.println("Debug - Actualizando puntaje: " + puntajeAnterior + " + " + nuevosPuntos + " = " + updated.getPuntaje());
+        logger.info("[UPDATE_SCORE] Actualizando puntaje - Anterior: {}, Incremento: {}, Nuevo: {}", puntajeAnterior, nuevosPuntos, updated.getPuntaje());
         
         return ResponseEntity.ok(toDto(updated));
     }
@@ -136,13 +140,8 @@ public class UsuarioController {
         usuario.setPuntaje(puntaje);
         Usuario updated = usuarioService.save(usuario);
         
-        System.out.println("=== DEBUG ESTABLECER PUNTAJE ===");
-        System.out.println("Usuario ID: " + id);
-        System.out.println("Usuario: " + usuario.getUsername());
-        System.out.println("Puntaje anterior: " + puntajeAnterior);
-        System.out.println("Puntaje nuevo: " + puntaje);
-        System.out.println("Puntaje guardado: " + updated.getPuntaje());
-        System.out.println("==============================");
+        logger.info("[SET_SCORE] Estableciendo puntaje directo - Usuario ID: {}, Username: {}, Puntaje anterior: {}, Puntaje nuevo: {}, Puntaje guardado: {}", 
+                   id, usuario.getUsername(), puntajeAnterior, puntaje, updated.getPuntaje());
         
         return ResponseEntity.ok(toDto(updated));
     }
@@ -150,41 +149,40 @@ public class UsuarioController {
     // Endpoint para inicializar puntos a todos los usuarios
     @PostMapping("/inicializar-puntos")
     public ResponseEntity<String> inicializarPuntos() {
-        System.out.println("=== INICIANDO PROCESO DE INICIALIZACIÓN DE PUNTOS ===");
+        logger.info("[INIT_POINTS] Iniciando proceso de inicialización de puntos");
         
         List<Usuario> usuarios = usuarioService.findAll();
-        System.out.println("Total usuarios encontrados: " + usuarios.size());
+        logger.info("[INIT_POINTS] Total usuarios encontrados: {}", usuarios.size());
         
         int usuariosActualizados = 0;
         
         for (Usuario usuario : usuarios) {
-            System.out.println("Usuario: " + usuario.getUsername() + " (ID: " + usuario.getId() + ") - Puntaje actual: " + usuario.getPuntaje());
+            logger.debug("[INIT_POINTS] Usuario: {} (ID: {}) - Puntaje actual: {}", usuario.getUsername(), usuario.getId(), usuario.getPuntaje());
             
             if (usuario.getPuntaje() == 0) {
-                System.out.println("Asignando 100 puntos a: " + usuario.getUsername());
+                logger.info("[INIT_POINTS] Asignando 100 puntos a: {}", usuario.getUsername());
                 usuario.setPuntaje(100);
                 
                 try {
                     Usuario savedUser = usuarioService.save(usuario);
-                    System.out.println("Usuario guardado - Nuevo puntaje: " + savedUser.getPuntaje());
+                    logger.info("[INIT_POINTS] Usuario guardado - Nuevo puntaje: {}", savedUser.getPuntaje());
                     usuariosActualizados++;
                 } catch (Exception e) {
-                    System.err.println("ERROR guardando usuario " + usuario.getUsername() + ": " + e.getMessage());
-                    e.printStackTrace();
+                    logger.error("[INIT_POINTS] Error guardando usuario {}: {}", usuario.getUsername(), e.getMessage(), e);
                 }
             } else {
-                System.out.println("Usuario " + usuario.getUsername() + " ya tiene puntos: " + usuario.getPuntaje());
+                logger.debug("[INIT_POINTS] Usuario {} ya tiene puntos: {}", usuario.getUsername(), usuario.getPuntaje());
             }
         }
         
-        System.out.println("=== PROCESO COMPLETADO - " + usuariosActualizados + " usuarios actualizados ===");
+        logger.info("[INIT_POINTS] Proceso completado - {} usuarios actualizados", usuariosActualizados);
         return ResponseEntity.ok("Puntos iniciales asignados a " + usuariosActualizados + " usuarios");
     }
 
     // Endpoint para debug completo de un usuario
     @GetMapping("/{id}/debug")
     public ResponseEntity<String> debugUsuario(@PathVariable Long id) {
-        System.out.println("=== DEBUG COMPLETO USUARIO ID: " + id + " ===");
+        logger.debug("[USER_DEBUG] Iniciando debug completo para usuario ID: {}", id);
         
         Optional<Usuario> usuarioOpt = usuarioService.findById(id);
         if (usuarioOpt.isEmpty()) {
@@ -201,7 +199,7 @@ public class UsuarioController {
         debug.append("Puntaje: ").append(usuario.getPuntaje()).append("\n");
         debug.append("Fecha Registro: ").append(usuario.getFechaRegistro()).append("\n");
         
-        System.out.println(debug.toString());
+        logger.debug("[USER_DEBUG] Información del usuario: {}", debug.toString());
         
         return ResponseEntity.ok(debug.toString());
     }

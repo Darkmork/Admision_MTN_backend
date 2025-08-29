@@ -12,12 +12,25 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class EmailService {
     
+    @Value("${spring.profiles.active:dev}")
+    private String activeProfile;
+    
+    @Value("${app.email.mock-mode:true}")
+    private boolean mockMode;
+    
     private final JavaMailSender mailSender;
     
     @Value("${spring.mail.username:admisiones@mtn.cl}")
     private String fromEmail;
     
     public void sendVerificationCode(String to, String code) {
+        if (mockMode || "dev".equals(activeProfile)) {
+            log.info("📧 [MODO DESARROLLO] Email de verificación para {}", to);
+            log.info("🔐 [CÓDIGO DE VERIFICACIÓN]: {}", code);
+            log.info("📄 [CONTENIDO]: {}", buildVerificationEmailBody(code));
+            return;
+        }
+        
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(fromEmail);
@@ -26,21 +39,22 @@ public class EmailService {
             message.setText(buildVerificationEmailBody(code));
             
             mailSender.send(message);
-            log.info("Verification email sent to: {}", to);
+            log.info("✅ Email de verificación enviado exitosamente a: {}", to);
             
         } catch (Exception e) {
-            log.error("Error sending verification email to: {}", to, e);
-            // En desarrollo, logueamos el código para testing
-            log.warn("DEVELOPMENT MODE - Verification code for {}: {}", to, code);
-            // Para desarrollo, no lanzamos excepción para que la aplicación funcione
-            // throw new RuntimeException("Error al enviar el correo de verificación", e);
+            log.error("❌ Error enviando email de verificación a {}: {}", to, e.getMessage(), e);
+            throw new RuntimeException("Error al enviar el correo de verificación: " + e.getMessage(), e);
         }
-        
-        // En desarrollo, siempre mostramos el código para facilitar testing
-        log.info("🔐 DEVELOPMENT - Verification code for {}: {}", to, code);
     }
     
     public void sendSimpleMessage(String to, String subject, String body) {
+        if (mockMode || "dev".equals(activeProfile)) {
+            log.info("📧 [MODO DESARROLLO] Email simple para {}", to);
+            log.info("📝 [ASUNTO]: {}", subject);
+            log.info("📄 [CONTENIDO]: {}", body);
+            return;
+        }
+        
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(fromEmail);
@@ -49,56 +63,68 @@ public class EmailService {
             message.setText(body);
             
             mailSender.send(message);
-            log.info("Simple email sent to: {} with subject: {}", to, subject);
+            log.info("✅ Email simple enviado exitosamente a {} con asunto: {}", to, subject);
             
         } catch (Exception e) {
-            log.error("Error sending email to: {} with subject: {}", to, subject, e);
-            // En desarrollo, logueamos el contenido para testing
-            log.warn("DEVELOPMENT MODE - Email content for {}: {}", to, body);
+            log.error("❌ Error enviando email simple a {} con asunto '{}': {}", to, subject, e.getMessage(), e);
+            throw new RuntimeException("Error al enviar email: " + e.getMessage(), e);
         }
     }
     
     public void sendWelcomeEmailWithCredentials(String to, String firstName, String lastName, 
                                               String email, String temporaryPassword, String role) {
+        String emailContent = buildWelcomeEmailBody(firstName, lastName, email, temporaryPassword, role);
+        
+        if (mockMode || "dev".equals(activeProfile)) {
+            log.info("📧 [MODO DESARROLLO] Email de bienvenida para {}", to);
+            log.info("🔐 [CREDENCIALES] Email: {} | Password: {}", email, temporaryPassword);
+            log.info("👤 [USUARIO] {} {} - Rol: {}", firstName, lastName, role);
+            log.info("📄 [CONTENIDO]: {}", emailContent);
+            return;
+        }
+        
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(fromEmail);
             message.setTo(to);
             message.setSubject("Bienvenido/a al Sistema de Admisiones - Monte Tabor & Nazaret");
-            message.setText(buildWelcomeEmailBody(firstName, lastName, email, temporaryPassword, role));
+            message.setText(emailContent);
             
             mailSender.send(message);
-            log.info("Welcome email sent to new user: {}", to);
+            log.info("✅ Email de bienvenida enviado exitosamente a: {}", to);
+            log.info("🔐 [CREDENCIALES ENVIADAS] Email: {} | Usuario: {} {}", email, firstName, lastName);
             
         } catch (Exception e) {
-            log.error("Error sending welcome email to: {}", to, e);
-            // En desarrollo, logueamos las credenciales para testing
-            log.warn("DEVELOPMENT MODE - Credentials for {}: email={}, password={}", to, email, temporaryPassword);
+            log.error("❌ Error enviando email de bienvenida a {}: {}", to, e.getMessage(), e);
+            throw new RuntimeException("Error al enviar email de bienvenida: " + e.getMessage(), e);
         }
-        
-        // En desarrollo, siempre mostramos las credenciales para facilitar testing
-        log.info("🔐 DEVELOPMENT - Credentials for {}: email={}, password={}", to, email, temporaryPassword);
     }
     
     public void sendPasswordResetEmail(String to, String firstName, String lastName, String newPassword) {
+        String emailContent = buildPasswordResetEmailBody(firstName, lastName, newPassword);
+        
+        if (mockMode || "dev".equals(activeProfile)) {
+            log.info("📧 [MODO DESARROLLO] Email de reset de contraseña para {}", to);
+            log.info("🔐 [NUEVA CONTRASEÑA]: {}", newPassword);
+            log.info("👤 [USUARIO]: {} {}", firstName, lastName);
+            log.info("📄 [CONTENIDO]: {}", emailContent);
+            return;
+        }
+        
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(fromEmail);
             message.setTo(to);
             message.setSubject("Contraseña Restablecida - Monte Tabor & Nazaret");
-            message.setText(buildPasswordResetEmailBody(firstName, lastName, newPassword));
+            message.setText(emailContent);
             
             mailSender.send(message);
-            log.info("Password reset email sent to: {}", to);
+            log.info("✅ Email de reset de contraseña enviado exitosamente a: {}", to);
             
         } catch (Exception e) {
-            log.error("Error sending password reset email to: {}", to, e);
-            // En desarrollo, logueamos la nueva contraseña para testing
-            log.warn("DEVELOPMENT MODE - New password for {}: {}", to, newPassword);
+            log.error("❌ Error enviando email de reset de contraseña a {}: {}", to, e.getMessage(), e);
+            throw new RuntimeException("Error al enviar email de reset de contraseña: " + e.getMessage(), e);
         }
-        
-        // En desarrollo, siempre mostramos la nueva contraseña para facilitar testing
-        log.info("🔐 DEVELOPMENT - New password for {}: {}", to, newPassword);
     }
     
     private String buildVerificationEmailBody(String code) {

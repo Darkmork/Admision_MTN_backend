@@ -24,7 +24,7 @@ public class RateLimitingService {
     
     // Configuración de límites por tipo de operación
     private static final int LOGIN_ATTEMPTS_LIMIT = 5; // Por IP en 15 minutos
-    private static final int API_REQUESTS_LIMIT = 100; // Por usuario en 1 minuto
+    private static final int API_REQUESTS_LIMIT = 1000; // Por usuario en 1 minuto - Aumentado para desarrollo
     private static final int FILE_UPLOAD_LIMIT = 20; // Por usuario en 1 hora
     private static final int PASSWORD_RESET_LIMIT = 3; // Por email en 1 hora
     

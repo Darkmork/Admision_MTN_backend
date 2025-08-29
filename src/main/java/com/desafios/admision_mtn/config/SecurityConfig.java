@@ -64,6 +64,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/**").permitAll() // Login, registro
                 .requestMatchers("/api/rut/**").permitAll() // Validación RUT chileno
                 .requestMatchers("/api/documents/public/types").permitAll() // Solo tipos de documentos
+                .requestMatchers("/api/public/interview-response/**").permitAll() // Respuestas automáticas a entrevistas
                 
                 // 📚 DOCUMENTACIÓN API SWAGGER/OpenAPI
                 .requestMatchers("/swagger-ui/**").permitAll() // Swagger UI
@@ -88,6 +89,8 @@ public class SecurityConfig {
                 .requestMatchers("/api/applications/public/debug-jpa").permitAll() // Debug JPA
                 .requestMatchers("/api/applications/public/debug-connection").permitAll() // Debug conexión BD
                 .requestMatchers("/api/applications/test").permitAll() // Test básico
+                .requestMatchers("/api/debug/**").permitAll() // Debug JDBC y conexión directa
+                .requestMatchers("/api/interviews/public/all").permitAll() // Debug entrevistas para gestión
                 
                 // 🚨 ENDPOINTS REMOVIDOS POR SEGURIDAD:
                 // - /api/test/** (expone contraseñas y datos sensibles)

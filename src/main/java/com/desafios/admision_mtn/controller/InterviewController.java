@@ -32,7 +32,13 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 @RestController
 @RequestMapping("/api/interviews")
@@ -45,6 +51,10 @@ public class InterviewController {
     private final InterviewService interviewService;
     private final InterviewNotificationService notificationService;
     private final PersonalizedEmailService personalizedEmailService;
+    private final JdbcTemplate jdbcTemplate;
+    
+    @PersistenceContext
+    private EntityManager entityManager;
 
     // CRUD básico
     @Operation(
@@ -201,7 +211,7 @@ public class InterviewController {
         Pageable pageable = PageRequest.of(page, size, sort);
         
         Page<InterviewResponse> response = interviewService.findWithFilters(
-            status, type, mode, interviewerId, startDate, endDate, pageable);
+            status, type, interviewerId, startDate, endDate, pageable);
         
         return ResponseEntity.ok(response);
     }
@@ -475,6 +485,65 @@ public class InterviewController {
         } catch (Exception e) {
             log.error("Error enviando recordatorio: {}", e.getMessage());
             return ResponseEntity.badRequest().body("Error enviando recordatorio: " + e.getMessage());
+        }
+    }
+
+    // ENDPOINT TEMPORAL PÚBLICO PARA DEBUG - CONEXIÓN DIRECTA A BD
+    @GetMapping("/public/all")
+    public ResponseEntity<?> getAllInterviewsPublic() {
+        log.info("GET /api/interviews/public/all - Test conexión directa a BD");
+        try {
+            // Usar JdbcTemplate directamente como hace ApplicationService (que funciona)
+            String databaseName = jdbcTemplate.queryForObject("SELECT current_database()", String.class);
+            log.info("JdbcTemplate database name: {}", databaseName);
+            
+            Integer tableExists = jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM information_schema.tables WHERE table_name = 'interviews'", 
+                Integer.class);
+            log.info("JdbcTemplate - Table interviews exists: {}", tableExists);
+            
+            Integer totalCount = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM interviews", Integer.class);
+            log.info("JdbcTemplate finds {} interviews in database", totalCount);
+            
+            // También verificar applications para comparar
+            Integer appsCount = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM applications", Integer.class);
+            log.info("JdbcTemplate finds {} applications in database", appsCount);
+            
+            // Obtener los datos usando JdbcTemplate
+            List<Map<String, Object>> rawResults = jdbcTemplate.queryForList(
+                "SELECT i.id, i.application_id, i.status, i.scheduled_date " +
+                "FROM interviews i " +
+                "ORDER BY i.id LIMIT 10");
+                
+            log.info("JdbcTemplate retrieved {} interview records", rawResults.size());
+            
+            // Crear respuesta simple a partir de los datos de JdbcTemplate
+            List<Map<String, Object>> simpleResponse = new ArrayList<>();
+            for (Map<String, Object> row : rawResults) {
+                Map<String, Object> interview = new HashMap<>();
+                interview.put("id", row.get("id"));
+                interview.put("applicationId", row.get("application_id"));
+                interview.put("status", row.get("status"));
+                interview.put("scheduledDate", row.get("scheduled_date"));
+                simpleResponse.add(interview);
+            }
+            
+            // Respuesta con información de debug completa
+            Map<String, Object> debugResponse = new HashMap<>();
+            debugResponse.put("databaseName", databaseName);
+            debugResponse.put("tableExists", tableExists);
+            debugResponse.put("totalCount", totalCount);
+            debugResponse.put("applicationsCount", appsCount);  // Para comparar
+            debugResponse.put("returnedRecords", rawResults.size());
+            debugResponse.put("interviews", simpleResponse);
+            
+            return ResponseEntity.ok(debugResponse);
+        } catch (Exception e) {
+            log.error("Error en consulta directa: {}", e.getMessage(), e);
+            return ResponseEntity.ok(Map.of(
+                "error", e.getMessage(),
+                "message", "Error al consultar entrevistas directamente"
+            ));
         }
     }
 

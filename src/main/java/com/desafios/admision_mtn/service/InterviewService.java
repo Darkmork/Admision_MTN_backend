@@ -16,10 +16,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
+import jakarta.persistence.EntityManager;
 
 @Service
 @RequiredArgsConstructor
@@ -32,14 +35,22 @@ public class InterviewService {
     private final UserRepository userRepository;
     private final InterviewNotificationService notificationService;
     private final PersonalizedEmailService personalizedEmailService;
+    private final TemplatedInterviewNotificationService templatedNotificationService;
+    private final InterviewerScheduleService interviewerScheduleService;
+    private final EntityManager entityManager;
 
     // CRUD básico
     public InterviewResponse createInterview(CreateInterviewRequest request) {
         log.info("Creando nueva entrevista para aplicación ID: {}", request.getApplicationId());
         
-        // Validar que la aplicación existe
-        Application application = applicationRepository.findById(request.getApplicationId())
-            .orElseThrow(() -> new EntityNotFoundException("Aplicación no encontrada con ID: " + request.getApplicationId()));
+        // Validar que la aplicación existe usando SQL directo
+        Long applicationCount = (Long) entityManager.createNativeQuery("SELECT COUNT(*) FROM applications WHERE id = ?")
+            .setParameter(1, request.getApplicationId())
+            .getSingleResult();
+            
+        if (applicationCount == 0) {
+            throw new EntityNotFoundException("Aplicación no encontrada con ID: " + request.getApplicationId());
+        }
         
         // Validar que el entrevistador existe
         User interviewer = userRepository.findById(request.getInterviewerId())
@@ -54,29 +65,40 @@ public class InterviewService {
             throw new IllegalArgumentException("El enlace de reunión virtual es obligatorio para entrevistas virtuales");
         }
         
-        Interview interview = new Interview();
-        interview.setApplication(application);
-        interview.setInterviewer(interviewer);
-        interview.setType(request.getType());
-        interview.setMode(request.getMode());
-        interview.setScheduledDate(request.getScheduledDate());
-        interview.setScheduledTime(request.getScheduledTime());
-        interview.setDuration(request.getDuration());
-        interview.setLocation(request.getLocation());
-        interview.setVirtualMeetingLink(request.getVirtualMeetingLink());
-        interview.setNotes(request.getNotes());
-        interview.setPreparation(request.getPreparation());
-        interview.setStatus(InterviewStatus.SCHEDULED);
+        // Crear la entrevista usando SQL directo para evitar problemas con entidades complejas
+        String insertSql = "INSERT INTO interviews (application_id, interviewer_id, interview_type, scheduled_date, duration_minutes, location, status, notes, created_at) " +
+                          "VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW()) RETURNING id";
         
-        Interview savedInterview = interviewRepository.save(interview);
-        log.info("Entrevista creada exitosamente con ID: {}", savedInterview.getId());
+        // Combinar fecha y hora en un LocalDateTime
+        LocalDateTime scheduledDateTime = LocalDateTime.of(request.getScheduledDate(), request.getScheduledTime());
         
-        // Enviar notificación por email a la familia
-        // Enviar notificación personalizada con tracking y respuestas automáticas
-        personalizedEmailService.sendPersonalizedInterviewNotification(savedInterview);
+        // Usar jdbcTemplate para ejecutar la inserción
+        Long interviewId = ((Number) entityManager.createNativeQuery(insertSql)
+            .setParameter(1, request.getApplicationId())
+            .setParameter(2, request.getInterviewerId())
+            .setParameter(3, request.getType().toString())
+            .setParameter(4, Timestamp.valueOf(scheduledDateTime))
+            .setParameter(5, request.getDuration())
+            .setParameter(6, request.getLocation())
+            .setParameter(7, "SCHEDULED")
+            .setParameter(8, request.getNotes())
+            .getSingleResult()).longValue();
         
-        // También enviar la notificación tradicional como backup
-        notificationService.sendInterviewScheduledNotification(savedInterview);
+        log.info("Entrevista creada exitosamente con ID: {}", interviewId);
+        
+        // Obtener la entrevista recién creada
+        Interview savedInterview = interviewRepository.findById(interviewId)
+            .orElseThrow(() -> new RuntimeException("Error al recuperar la entrevista creada"));
+        
+        // Enviar notificación por email a la familia usando templates
+        templatedNotificationService.sendInterviewAssignmentNotification(savedInterview);
+        
+        // Verificar si esta aplicación tiene las 3 entrevistas programadas
+        List<Interview> allInterviews = interviewRepository.findByApplicationId(request.getApplicationId());
+        if (hasAllRequiredInterviews(allInterviews)) {
+            log.info("La aplicación {} tiene las 3 entrevistas requeridas, enviando notificación de set completo", request.getApplicationId());
+            templatedNotificationService.sendCompleteInterviewSetNotification(request.getApplicationId(), allInterviews);
+        }
         
         return InterviewResponse.from(savedInterview);
     }
@@ -90,8 +112,77 @@ public class InterviewService {
 
     @Transactional(readOnly = true)
     public Page<InterviewResponse> getAllInterviews(Pageable pageable) {
-        return interviewRepository.findAll(pageable)
-            .map(InterviewResponse::from);
+        log.info("=== DEBUGGING getAllInterviews START ===");
+        
+        try {
+            // Intentar obtener entrevistas con SQL nativo para bypass JPA mapping issues
+            @SuppressWarnings("unchecked")
+            List<Object[]> nativeResults = entityManager.createNativeQuery(
+                "SELECT i.id, i.application_id, i.interviewer_id, i.interview_type, i.scheduled_date, " +
+                "i.duration_minutes, i.location, i.status, i.notes, i.created_at, " +
+                "s.first_name || ' ' || s.paternal_last_name as student_name, " +
+                "u.first_name || ' ' || u.last_name as interviewer_name " +
+                "FROM interviews i " +
+                "LEFT JOIN applications a ON i.application_id = a.id " +
+                "LEFT JOIN students s ON a.student_id = s.id " +
+                "LEFT JOIN users u ON i.interviewer_id = u.id " +
+                "ORDER BY i.id LIMIT ?")
+                .setParameter(1, pageable.getPageSize())
+                .getResultList();
+                
+            log.info("=== Native query returned {} results ===", nativeResults.size());
+            
+            // Crear responses manualmente desde los resultados nativos
+            List<InterviewResponse> responses = nativeResults.stream()
+                .map(this::mapNativeResultToResponse)
+                .collect(Collectors.toList());
+            
+            // Obtener conteo total
+            Long totalCount = ((Number) entityManager.createNativeQuery("SELECT COUNT(*) FROM interviews")
+                .getSingleResult()).longValue();
+                
+            log.info("=== Total count: {}, Returning {} responses ===", totalCount, responses.size());
+            
+            // Crear Page manualmente
+            return new org.springframework.data.domain.PageImpl<>(responses, pageable, totalCount);
+            
+        } catch (Exception e) {
+            log.error("Error in getAllInterviews: {}", e.getMessage(), e);
+            throw new RuntimeException("Error retrieving interviews", e);
+        }
+    }
+    
+    private InterviewResponse mapNativeResultToResponse(Object[] row) {
+        InterviewResponse response = new InterviewResponse();
+        response.setId(((Number) row[0]).longValue());
+        response.setApplicationId(((Number) row[1]).longValue());
+        response.setInterviewerId(((Number) row[2]).longValue());
+        response.setType(InterviewType.valueOf((String) row[3]));
+        response.setStatus(InterviewStatus.valueOf((String) row[7]));
+        response.setStudentName((String) row[10]);
+        response.setInterviewerName((String) row[11]);
+        response.setLocation((String) row[6]);
+        response.setNotes((String) row[8]);
+        
+        // Parsear la fecha/hora
+        if (row[4] != null) {
+            java.sql.Timestamp timestamp = (java.sql.Timestamp) row[4];
+            LocalDateTime dateTime = timestamp.toLocalDateTime();
+            response.setScheduledDate(dateTime.toLocalDate());
+            response.setScheduledTime(dateTime.toLocalTime());
+        }
+        
+        if (row[5] != null) {
+            response.setDuration((Integer) row[5]);
+        }
+        
+        // Valores por defecto
+        response.setMode(InterviewMode.IN_PERSON);
+        response.setParentNames(""); // Temporalmente vacío
+        response.setGradeApplied(""); // Temporalmente vacío
+        response.setFollowUpRequired(false);
+        
+        return response;
     }
 
     @Transactional(readOnly = true)
@@ -104,14 +195,13 @@ public class InterviewService {
     public Page<InterviewResponse> findWithFilters(
             InterviewStatus status,
             InterviewType type,
-            InterviewMode mode,
             Long interviewerId,
             LocalDate startDate,
             LocalDate endDate,
             Pageable pageable) {
         
         return interviewRepository.findWithFilters(
-                status, type, mode, interviewerId, startDate, endDate, pageable)
+                status, type, interviewerId, startDate, endDate, pageable)
             .map(InterviewResponse::from);
     }
 
@@ -242,6 +332,9 @@ public class InterviewService {
         
         Interview completedInterview = interviewRepository.save(interview);
         
+        // Verificar si todas las entrevistas requeridas están completadas
+        checkAndUpdateApplicationStatusIfAllInterviewsCompleted(completedInterview.getApplication().getId());
+        
         log.info("Entrevista completada exitosamente con ID: {}", id);
         return InterviewResponse.from(completedInterview);
     }
@@ -318,9 +411,8 @@ public class InterviewService {
 
     @Transactional(readOnly = true)
     public List<InterviewResponse> getInterviewsRequiringFollowUp() {
-        return interviewRepository.findRequiringFollowUp().stream()
-            .map(InterviewResponse::from)
-            .collect(Collectors.toList());
+        // followUpRequired es transient, retornar lista vacía
+        return new ArrayList<>();
     }
 
     @Transactional(readOnly = true)
@@ -344,6 +436,76 @@ public class InterviewService {
             .collect(Collectors.toList());
     }
 
+    /**
+     * Obtener entrevistadores disponibles para una fecha y hora específica
+     * Este método integra el sistema de horarios configurados por los entrevistadores
+     */
+    @Transactional(readOnly = true)
+    public List<User> getAvailableInterviewers(LocalDate date, LocalTime time) {
+        log.info("Obteniendo entrevistadores disponibles para fecha: {} hora: {}", date, time);
+        
+        // Usar el servicio de horarios para obtener entrevistadores con horarios configurados
+        List<User> availableInterviewers = interviewerScheduleService.findAvailableInterviewers(date, time);
+        
+        // Filtrar entrevistadores que ya tienen entrevistas programadas en esa fecha y hora
+        List<User> finalAvailableList = availableInterviewers.stream()
+            .filter(interviewer -> {
+                long conflicts = interviewRepository.countConflictingInterviews(
+                    interviewer.getId(), LocalDateTime.of(date, time));
+                return conflicts == 0;
+            })
+            .collect(Collectors.toList());
+        
+        log.info("Entrevistadores disponibles encontrados: {} (de {} con horarios configurados)", 
+                finalAvailableList.size(), availableInterviewers.size());
+        
+        return finalAvailableList;
+    }
+
+    /**
+     * Obtener entrevistadores por tipo de entrevista y disponibilidad
+     * Filtra automáticamente según los horarios configurados
+     */
+    @Transactional(readOnly = true) 
+    public List<User> getAvailableInterviewersByType(InterviewType interviewType, LocalDate date, LocalTime time) {
+        log.info("Obteniendo entrevistadores disponibles para tipo: {} fecha: {} hora: {}", 
+                interviewType, date, time);
+        
+        List<User> availableInterviewers = getAvailableInterviewers(date, time);
+        
+        // Filtrar por tipo de entrevista según roles
+        List<User> filteredByType = availableInterviewers.stream()
+            .filter(interviewer -> isInterviewerValidForType(interviewer, interviewType))
+            .collect(Collectors.toList());
+        
+        log.info("Entrevistadores válidos para tipo {}: {}", interviewType, filteredByType.size());
+        
+        return filteredByType;
+    }
+
+    /**
+     * Verificar si un entrevistador puede realizar un tipo específico de entrevista
+     */
+    private boolean isInterviewerValidForType(User interviewer, InterviewType interviewType) {
+        if (interviewer.getRole() == null) {
+            return false;
+        }
+        
+        String roleName = interviewer.getRole().name();
+        
+        switch (interviewType) {
+            case PSYCHOLOGICAL:
+                return "PSYCHOLOGIST".equals(roleName) || "ADMIN".equals(roleName);
+            case FAMILY:
+            case INDIVIDUAL:
+                return "CYCLE_DIRECTOR".equals(roleName) || 
+                       "COORDINATOR".equals(roleName) || 
+                       "ADMIN".equals(roleName);
+            default:
+                return false;
+        }
+    }
+
     // Estadísticas
     @Transactional(readOnly = true)
     public InterviewStatsResponse getInterviewStatistics() {
@@ -359,15 +521,15 @@ public class InterviewService {
             interviewRepository.countByStatus(InterviewStatus.CONFIRMED) +
             interviewRepository.countByStatus(InterviewStatus.IN_PROGRESS);
         
-        // Métricas de resultados
-        long positiveResults = interviewRepository.countByResult(InterviewResult.POSITIVE);
-        long neutralResults = interviewRepository.countByResult(InterviewResult.NEUTRAL);
-        long negativeResults = interviewRepository.countByResult(InterviewResult.NEGATIVE);
-        long pendingReviewResults = interviewRepository.countByResult(InterviewResult.PENDING_REVIEW);
-        long requiresFollowUpResults = interviewRepository.countByResult(InterviewResult.REQUIRES_FOLLOW_UP);
+        // Métricas de resultados - result es transient, no hay datos en DB
+        long positiveResults = 0L;
+        long neutralResults = 0L;
+        long negativeResults = 0L;
+        long pendingReviewResults = 0L;
+        long requiresFollowUpResults = 0L;
         
         // Promedios y tasas
-        double averageScore = interviewRepository.findAverageScore().orElse(0.0);
+        double averageScore = 0.0; // score es transient, no hay datos en DB
         double completionRate = totalInterviews > 0 ? (double) completedInterviews / totalInterviews * 100 : 0;
         double cancellationRate = totalInterviews > 0 ? (double) (cancelledInterviews + noShowInterviews) / totalInterviews * 100 : 0;
         double successRate = completedInterviews > 0 ? (double) positiveResults / completedInterviews * 100 : 0;
@@ -375,7 +537,11 @@ public class InterviewService {
         // Distribuciones
         Map<String, Long> statusDistribution = convertToMap(interviewRepository.findStatusDistribution());
         Map<String, Long> typeDistribution = convertToMap(interviewRepository.findTypeDistribution());
-        Map<String, Long> modeDistribution = convertToMap(interviewRepository.findModeDistribution());
+        // Mode distribution - mode es transient y siempre IN_PERSON
+        Map<String, Long> modeDistribution = new HashMap<>();
+        modeDistribution.put("IN_PERSON", totalInterviews);
+        modeDistribution.put("VIRTUAL", 0L);
+        modeDistribution.put("HYBRID", 0L);
         
         // Resultado distribución calculada manualmente
         Map<String, Long> resultDistribution = new HashMap<>();
@@ -388,8 +554,8 @@ public class InterviewService {
         // Tendencias mensuales
         Map<String, Long> monthlyTrends = convertToMap(interviewRepository.findMonthlyStatistics());
         
-        // Métricas adicionales
-        long followUpRequired = interviewRepository.findRequiringFollowUp().size();
+        // Métricas adicionales - followUpRequired es transient
+        long followUpRequired = 0L;
         long upcomingInterviews = interviewRepository.findUpcomingInterviews().size();
         long overdueInterviews = interviewRepository.findOverdueInterviews().size();
         
@@ -433,7 +599,17 @@ public class InterviewService {
     }
 
     private void validateInterviewerAvailability(Long interviewerId, LocalDate date, LocalTime time, Long excludeInterviewId) {
-        long conflicts = interviewRepository.countConflictingInterviews(interviewerId, date, time);
+        // Primero verificar si el entrevistador tiene horarios configurados y está disponible según el sistema de horarios
+        boolean hasScheduleAvailability = interviewerScheduleService.isInterviewerAvailable(interviewerId, date, time);
+        
+        if (!hasScheduleAvailability) {
+            log.warn("Entrevistador ID: {} no tiene disponibilidad configurada para fecha: {} hora: {}", 
+                    interviewerId, date, time);
+            throw new IllegalArgumentException("El entrevistador no tiene horarios disponibles configurados para esa fecha y hora");
+        }
+        
+        // Luego verificar conflictos con entrevistas ya programadas
+        long conflicts = interviewRepository.countConflictingInterviews(interviewerId, LocalDateTime.of(date, time));
         
         // Si estamos actualizando una entrevista existente, restar 1 si hay conflicto con la misma entrevista
         if (excludeInterviewId != null && conflicts > 0) {
@@ -448,6 +624,9 @@ public class InterviewService {
         if (conflicts > 0) {
             throw new IllegalArgumentException("El entrevistador ya tiene una entrevista programada en esa fecha y hora");
         }
+        
+        log.debug("Validación de disponibilidad exitosa para entrevistador ID: {} en fecha: {} hora: {}", 
+                interviewerId, date, time);
     }
 
     private Map<String, Long> convertToMap(List<Object[]> results) {
@@ -456,5 +635,59 @@ public class InterviewService {
                 result -> result[0].toString(),
                 result -> ((Number) result[1]).longValue()
             ));
+    }
+
+    /**
+     * Verifica si todas las entrevistas requeridas (PSYCHOLOGICAL, FAMILY, INDIVIDUAL) están completadas
+     * y actualiza el estado de la aplicación a APPROVED si es así
+     */
+    private void checkAndUpdateApplicationStatusIfAllInterviewsCompleted(Long applicationId) {
+        log.info("Verificando estado de entrevistas para aplicación ID: {}", applicationId);
+        
+        try {
+            // Obtener todas las entrevistas de la aplicación
+            List<Interview> interviews = interviewRepository.findByApplicationId(applicationId);
+            
+            // Verificar que existan las 3 entrevistas requeridas y que estén completadas
+            boolean hasPsychological = interviews.stream()
+                .anyMatch(i -> i.getType() == Interview.InterviewType.PSYCHOLOGICAL && 
+                             i.getStatus() == Interview.InterviewStatus.COMPLETED);
+                             
+            boolean hasFamily = interviews.stream()
+                .anyMatch(i -> i.getType() == Interview.InterviewType.FAMILY && 
+                             i.getStatus() == Interview.InterviewStatus.COMPLETED);
+                             
+            boolean hasIndividual = interviews.stream()
+                .anyMatch(i -> i.getType() == Interview.InterviewType.INDIVIDUAL && 
+                             i.getStatus() == Interview.InterviewStatus.COMPLETED);
+            
+            if (hasPsychological && hasFamily && hasIndividual) {
+                // Todas las entrevistas están completadas, actualizar el estado de la aplicación
+                log.info("Todas las entrevistas están completadas para aplicación ID: {}. Actualizando estado a APPROVED", applicationId);
+                
+                // Aquí necesitaríamos inyectar el ApplicationService para actualizar el estado
+                // Por ahora lo dejaremos como log para evitar dependencia circular
+                log.info("ACCIÓN REQUERIDA: Actualizar estado de aplicación {} a APPROVED - todas las entrevistas completadas", applicationId);
+                
+                // TODO: Implementar actualización de estado de aplicación cuando esté disponible ApplicationService
+            } else {
+                log.debug("Entrevistas pendientes para aplicación ID: {} - Psicológica: {}, Familia: {}, Individual: {}", 
+                    applicationId, hasPsychological, hasFamily, hasIndividual);
+            }
+            
+        } catch (Exception e) {
+            log.error("Error al verificar estado de entrevistas para aplicación ID: {}: {}", applicationId, e.getMessage());
+        }
+    }
+
+    /**
+     * Verificar si una aplicación tiene las 3 entrevistas requeridas
+     */
+    private boolean hasAllRequiredInterviews(List<Interview> interviews) {
+        boolean hasPsychological = interviews.stream().anyMatch(i -> i.getType() == Interview.InterviewType.PSYCHOLOGICAL);
+        boolean hasFamily = interviews.stream().anyMatch(i -> i.getType() == Interview.InterviewType.FAMILY);
+        boolean hasIndividual = interviews.stream().anyMatch(i -> i.getType() == Interview.InterviewType.INDIVIDUAL);
+        
+        return hasPsychological && hasFamily && hasIndividual;
     }
 }

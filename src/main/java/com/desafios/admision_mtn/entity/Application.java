@@ -77,6 +77,7 @@ public class Application {
         EXAM_SCHEDULED,
         APPROVED,
         REJECTED,
-        WAITLIST
+        WAITLIST,
+        ARCHIVED
     }
 }

@@ -20,20 +20,47 @@ import java.util.Map;
 import java.util.HashMap;
 
 @RestController
-@RequestMapping("/api/admin/email-notifications")
 @RequiredArgsConstructor
 @Slf4j
-@PreAuthorize("hasRole('ADMIN')")
 // 🔒 SEGURIDAD: Sin @CrossOrigin - usa configuración global de SecurityConfig
 public class EmailNotificationController {
 
     private final EmailNotificationRepository emailNotificationRepository;
     private final EmailEventRepository emailEventRepository;
 
+    // ===== ENDPOINT PÚBLICO PARA DASHBOARD =====
+    
     /**
-     * Obtener todas las notificaciones de email con paginación
+     * Obtener todas las notificaciones de email (endpoint público para dashboard)
      */
-    @GetMapping
+    @GetMapping("/api/email-notifications")
+    public ResponseEntity<List<EmailNotification>> getEmailNotificationsPublic(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "25") int size) {
+        try {
+            log.info("📧 Solicitando notificaciones de email (endpoint público)");
+            
+            Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+            Page<EmailNotification> notificationsPage = emailNotificationRepository.findAllByOrderByCreatedAtDesc(pageable);
+            
+            List<EmailNotification> notifications = notificationsPage.getContent();
+            log.info("✅ Enviando {} notificaciones de email", notifications.size());
+            
+            return ResponseEntity.ok(notifications);
+            
+        } catch (Exception e) {
+            log.error("❌ Error obteniendo notificaciones de email: {}", e.getMessage(), e);
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    // ===== ENDPOINTS ADMIN CON AUTENTICACIÓN =====
+
+    /**
+     * Obtener todas las notificaciones de email con paginación (Admin)
+     */
+    @GetMapping("/api/admin/email-notifications")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Map<String, Object>> getAllEmailNotifications(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "25") int size,
@@ -65,7 +92,8 @@ public class EmailNotificationController {
     /**
      * Obtener notificaciones por aplicación
      */
-    @GetMapping("/application/{applicationId}")
+    @GetMapping("/api/admin/email-notifications/application/{applicationId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<EmailNotification>> getNotificationsByApplication(@PathVariable Long applicationId) {
         try {
             List<EmailNotification> notifications = emailNotificationRepository.findByApplication_IdOrderByCreatedAtDesc(applicationId);
@@ -79,7 +107,8 @@ public class EmailNotificationController {
     /**
      * Obtener estadísticas de emails
      */
-    @GetMapping("/stats")
+    @GetMapping("/api/admin/email-notifications/stats")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Map<String, Object>> getEmailStats() {
         try {
             // Estadísticas generales
@@ -138,7 +167,8 @@ public class EmailNotificationController {
     /**
      * Obtener emails no leídos
      */
-    @GetMapping("/unopened")
+    @GetMapping("/api/admin/email-notifications/unopened")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<EmailNotification>> getUnopenedEmails() {
         try {
             List<EmailNotification> unopenedEmails = emailNotificationRepository.findUnopened();
@@ -152,7 +182,8 @@ public class EmailNotificationController {
     /**
      * Obtener emails pendientes de respuesta
      */
-    @GetMapping("/pending-responses")
+    @GetMapping("/api/admin/email-notifications/pending-responses")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<EmailNotification>> getPendingResponses() {
         try {
             List<EmailNotification> pendingResponses = emailNotificationRepository.findPendingResponses();
@@ -166,7 +197,8 @@ public class EmailNotificationController {
     /**
      * Obtener eventos de una notificación específica
      */
-    @GetMapping("/{notificationId}/events")
+    @GetMapping("/api/admin/email-notifications/{notificationId}/events")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<EmailEvent>> getNotificationEvents(@PathVariable Long notificationId) {
         try {
             EmailNotification notification = emailNotificationRepository.findById(notificationId)
@@ -188,7 +220,8 @@ public class EmailNotificationController {
     /**
      * Obtener detalle de una notificación específica
      */
-    @GetMapping("/{notificationId}")
+    @GetMapping("/api/admin/email-notifications/{notificationId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EmailNotification> getNotificationById(@PathVariable Long notificationId) {
         try {
             EmailNotification notification = emailNotificationRepository.findById(notificationId)
@@ -209,7 +242,8 @@ public class EmailNotificationController {
     /**
      * Obtener estadísticas por escuela
      */
-    @GetMapping("/stats/by-school")
+    @GetMapping("/api/admin/email-notifications/stats/by-school")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Map<String, Object>> getStatsBySchool() {
         try {
             Map<String, Object> schoolStats = new HashMap<>();

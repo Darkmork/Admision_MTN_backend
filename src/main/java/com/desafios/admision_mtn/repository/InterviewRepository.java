@@ -25,22 +25,24 @@ public interface InterviewRepository extends JpaRepository<Interview, Long> {
     
     List<Interview> findByType(InterviewType type);
     
-    List<Interview> findByMode(InterviewMode mode);
+    // Note: mode is @Transient field, no database query method needed
     
     List<Interview> findByInterviewerId(Long interviewerId);
     
     List<Interview> findByApplicationId(Long applicationId);
     
     // Buscar la primera entrevista de una aplicación
-    Optional<Interview> findFirstByApplicationIdOrderByScheduledDateAsc(Long applicationId);
+    Optional<Interview> findFirstByApplicationIdOrderByScheduledDateTimeAsc(Long applicationId);
     
-    // Búsquedas por fecha
-    List<Interview> findByScheduledDate(LocalDate date);
+    // Búsquedas por fecha usando CAST para extraer solo la fecha
+    @Query("SELECT i FROM Interview i WHERE CAST(i.scheduledDateTime AS date) = :date")
+    List<Interview> findByScheduledDate(@Param("date") LocalDate date);
     
-    List<Interview> findByScheduledDateBetween(LocalDate startDate, LocalDate endDate);
+    @Query("SELECT i FROM Interview i WHERE CAST(i.scheduledDateTime AS date) BETWEEN :startDate AND :endDate")
+    List<Interview> findByScheduledDateBetween(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
     
     // Entrevistas del día actual
-    @Query("SELECT i FROM Interview i WHERE i.scheduledDate = CURRENT_DATE")
+    @Query("SELECT i FROM Interview i WHERE CAST(i.scheduledDateTime AS date) = CURRENT_DATE")
     List<Interview> findTodaysInterviews();
     
     // Entrevistas próximas (próximas 24 horas)
@@ -51,33 +53,29 @@ public interface InterviewRepository extends JpaRepository<Interview, Long> {
     List<Interview> findUpcomingInterviews();
     
     // Entrevistas vencidas
-    @Query("SELECT i FROM Interview i WHERE " +
-           "(i.scheduledDate < CURRENT_DATE OR " +
-           "(i.scheduledDate = CURRENT_DATE AND i.scheduledTime < CURRENT_TIME)) " +
+    @Query("SELECT i FROM Interview i WHERE i.scheduledDateTime < CURRENT_TIMESTAMP " +
            "AND i.status NOT IN ('COMPLETED', 'CANCELLED')")
     List<Interview> findOverdueInterviews();
     
     // Entrevistas por entrevistador y fecha
     @Query("SELECT i FROM Interview i WHERE i.interviewer.id = :interviewerId " +
-           "AND i.scheduledDate BETWEEN :startDate AND :endDate")
+           "AND CAST(i.scheduledDateTime AS date) BETWEEN :startDate AND :endDate")
     List<Interview> findByInterviewerAndDateRange(
         @Param("interviewerId") Long interviewerId,
         @Param("startDate") LocalDate startDate,
         @Param("endDate") LocalDate endDate
     );
     
-    // Búsqueda con filtros múltiples
+    // Búsqueda con filtros múltiples (mode excluded - it's transient)
     @Query("SELECT i FROM Interview i WHERE " +
            "(:status IS NULL OR i.status = :status) AND " +
            "(:type IS NULL OR i.type = :type) AND " +
-           "(:mode IS NULL OR i.mode = :mode) AND " +
            "(:interviewerId IS NULL OR i.interviewer.id = :interviewerId) AND " +
-           "(:startDate IS NULL OR i.scheduledDate >= :startDate) AND " +
-           "(:endDate IS NULL OR i.scheduledDate <= :endDate)")
+           "(:startDate IS NULL OR CAST(i.scheduledDateTime AS date) >= :startDate) AND " +
+           "(:endDate IS NULL OR CAST(i.scheduledDateTime AS date) <= :endDate)")
     Page<Interview> findWithFilters(
         @Param("status") InterviewStatus status,
         @Param("type") InterviewType type,
-        @Param("mode") InterviewMode mode,
         @Param("interviewerId") Long interviewerId,
         @Param("startDate") LocalDate startDate,
         @Param("endDate") LocalDate endDate,
@@ -97,18 +95,11 @@ public interface InterviewRepository extends JpaRepository<Interview, Long> {
     @Query("SELECT COUNT(i) FROM Interview i WHERE i.type = :type")
     long countByType(@Param("type") InterviewType type);
     
-    @Query("SELECT COUNT(i) FROM Interview i WHERE i.mode = :mode")
-    long countByMode(@Param("mode") InterviewMode mode);
+    // Note: mode is @Transient field, no count query needed
     
-    @Query("SELECT COUNT(i) FROM Interview i WHERE i.result = :result")
-    long countByResult(@Param("result") InterviewResult result);
+    // Note: result is @Transient field, no count queries needed
     
-    // Promedio de puntuaciones
-    @Query("SELECT AVG(i.score) FROM Interview i WHERE i.score IS NOT NULL")
-    Optional<Double> findAverageScore();
-    
-    @Query("SELECT AVG(i.score) FROM Interview i WHERE i.score IS NOT NULL AND i.type = :type")
-    Optional<Double> findAverageScoreByType(@Param("type") InterviewType type);
+    // Note: score is @Transient field, no average score queries needed
     
     // Estadísticas mensuales
     @Query(value = "SELECT TO_CHAR(scheduled_date, 'YYYY-MM') as month, COUNT(*) " +
@@ -118,27 +109,23 @@ public interface InterviewRepository extends JpaRepository<Interview, Long> {
            nativeQuery = true)
     List<Object[]> findMonthlyStatistics();
     
-    // Entrevistas que requieren seguimiento
-    @Query("SELECT i FROM Interview i WHERE i.followUpRequired = true AND i.status = 'COMPLETED'")
-    List<Interview> findRequiringFollowUp();
+    // Note: followUpRequired is @Transient field, no database query method needed
     
     // Verificar disponibilidad de horario para un entrevistador
     @Query("SELECT COUNT(i) FROM Interview i WHERE " +
            "i.interviewer.id = :interviewerId AND " +
-           "i.scheduledDate = :date AND " +
-           "i.scheduledTime = :time AND " +
+           "i.scheduledDateTime = :dateTime AND " +
            "i.status NOT IN ('CANCELLED', 'COMPLETED')")
     long countConflictingInterviews(
         @Param("interviewerId") Long interviewerId,
-        @Param("date") LocalDate date,
-        @Param("time") java.time.LocalTime time
+        @Param("dateTime") LocalDateTime dateTime
     );
     
     // Entrevistas por rango de fechas y estado
     @Query("SELECT i FROM Interview i WHERE " +
-           "i.scheduledDate BETWEEN :startDate AND :endDate AND " +
+           "CAST(i.scheduledDateTime AS date) BETWEEN :startDate AND :endDate AND " +
            "i.status IN :statuses " +
-           "ORDER BY i.scheduledDate, i.scheduledTime")
+           "ORDER BY i.scheduledDateTime")
     List<Interview> findByDateRangeAndStatuses(
         @Param("startDate") LocalDate startDate,
         @Param("endDate") LocalDate endDate,
@@ -153,29 +140,32 @@ public interface InterviewRepository extends JpaRepository<Interview, Long> {
     @Query("SELECT i.type, COUNT(i) FROM Interview i GROUP BY i.type")
     List<Object[]> findTypeDistribution();
     
-    // Distribución de entrevistas por modalidad
-    @Query("SELECT i.mode, COUNT(i) FROM Interview i GROUP BY i.mode")
-    List<Object[]> findModeDistribution();
+    // Note: mode is @Transient field, no distribution query needed
     
-    // Entrevistas completadas con resultado positivo
-    @Query("SELECT COUNT(i) FROM Interview i WHERE i.status = 'COMPLETED' AND i.result = 'POSITIVE'")
-    long countPositiveResults();
+    // Note: result is @Transient field, no count query needed
     
     // Buscar entrevistas por múltiples criterios con paginación
     @Query("SELECT i FROM Interview i WHERE " +
            "(:searchTerm IS NULL OR " +
            "LOWER(CONCAT(i.application.student.firstName, ' ', i.application.student.lastName, ' ', i.application.student.maternalLastName)) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
            "LOWER(CONCAT(i.interviewer.firstName, ' ', i.interviewer.lastName)) LIKE LOWER(CONCAT('%', :searchTerm, '%'))) " +
-           "ORDER BY i.scheduledDate DESC, i.scheduledTime DESC")
+           "ORDER BY i.scheduledDateTime DESC")
     Page<Interview> findBySearchTerm(@Param("searchTerm") String searchTerm, Pageable pageable);
     
     // Métodos adicionales para el dashboard
-    @Query("SELECT i FROM Interview i WHERE i.scheduledDate BETWEEN :startDate AND :endDate ORDER BY i.scheduledDate")
+    @Query("SELECT i FROM Interview i WHERE CAST(i.scheduledDateTime AS date) BETWEEN :startDate AND :endDate ORDER BY i.scheduledDateTime")
     List<Interview> findUpcomingInterviews(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
     
-    @Query("SELECT i FROM Interview i WHERE i.completedAt >= :fromDate AND i.status = 'COMPLETED' ORDER BY i.completedAt DESC")
-    List<Interview> findCompletedFromDate(@Param("fromDate") LocalDateTime fromDate);
+    // Note: completedAt is @Transient field, no database query method needed
     
     // Buscar entrevistas por múltiples aplicaciones (para el workflow)
     List<Interview> findByApplication_IdOrderByCreatedAtDesc(Long applicationId);
+    
+    // Método para cargar todas las entrevistas con relaciones simplificadas
+    @Query("SELECT i FROM Interview i " +
+           "LEFT JOIN FETCH i.application a " +
+           "LEFT JOIN FETCH a.student s " +
+           "LEFT JOIN FETCH i.interviewer u " +
+           "ORDER BY i.scheduledDateTime DESC")
+    Page<Interview> findAllWithRelations(Pageable pageable);
 }

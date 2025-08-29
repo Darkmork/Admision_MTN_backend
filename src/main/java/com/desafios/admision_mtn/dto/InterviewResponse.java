@@ -80,7 +80,7 @@ public class InterviewResponse {
         response.setType(interview.getType());
         response.setMode(interview.getMode());
         
-        // Programación
+        // Programación - usar los métodos de compatibilidad
         response.setScheduledDate(interview.getScheduledDate());
         response.setScheduledTime(interview.getScheduledTime());
         response.setDuration(interview.getDuration());

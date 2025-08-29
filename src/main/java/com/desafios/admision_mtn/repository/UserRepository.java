@@ -3,6 +3,8 @@ package com.desafios.admision_mtn.repository;
 import com.desafios.admision_mtn.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -37,4 +39,12 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     long countByRole(User.UserRole role);
     
     long countByRoleAndActiveTrue(User.UserRole role);
+    
+    // Método nativo para bypasear problemas de mapeo Hibernate
+    @Query(value = "SELECT * FROM users WHERE email = ?1", nativeQuery = true)
+    Optional<User> findByEmailNative(String email);
+    
+    // Debug method to check if user exists
+    @Query(value = "SELECT COUNT(*) FROM users WHERE email = ?1", nativeQuery = true)
+    Long countByEmailNative(String email);
 }

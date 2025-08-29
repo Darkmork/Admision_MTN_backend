@@ -263,6 +263,38 @@ public class ApplicationController {
         }
     }
     
+    @Operation(
+        summary = "Archivar postulación", 
+        description = "Cambia el estado de una postulación a ARCHIVED. Solo para administradores.",
+        security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Postulación archivada exitosamente",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = Application.class))
+        ),
+        @ApiResponse(responseCode = "404", description = "Postulación no encontrada"),
+        @ApiResponse(responseCode = "403", description = "Acceso denegado - requiere rol ADMIN")
+    })
+    @PutMapping("/{id}/archive")
+    public ResponseEntity<Application> archiveApplication(
+        @Parameter(description = "ID de la postulación", required = true, example = "123")
+        @PathVariable Long id) {
+        try {
+            log.info("📂 Admin: Archivando postulación {}", id);
+            
+            Application updatedApplication = applicationService.updateApplicationStatus(id, Application.ApplicationStatus.ARCHIVED);
+            
+            log.info("✅ Admin: Postulación {} archivada exitosamente", id);
+            return ResponseEntity.ok(updatedApplication);
+            
+        } catch (Exception e) {
+            log.error("❌ Error archivando postulación {}: {}", id, e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
+    }
+    
     // Endpoint de prueba para verificar que el backend esté funcionando
     @GetMapping("/test")
     public ResponseEntity<String> testEndpoint() {

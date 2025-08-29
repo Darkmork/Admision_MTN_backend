@@ -123,6 +123,10 @@ public class EmailNotification {
         INTERVIEW_RESCHEDULED("Entrevista Reprogramada"),
         INTERVIEW_CANCELLED("Entrevista Cancelada"),
         INTERVIEW_INVITATION("Invitación a Entrevista"),
+        INTERVIEW_ASSIGNMENT("Asignación de Entrevista"),
+        INTERVIEW_COMPLETE_SET("Set Completo de Entrevistas"),
+        INTERVIEW_CONFIRMATION("Confirmación de Entrevista"),
+        INTERVIEW_RESCHEDULE("Reprogramación de Entrevista"),
         APPLICATION_RECEIVED("Postulación Recibida"),
         APPLICATION_STATUS_UPDATE("Actualización de Estado"),
         DOCUMENTS_REQUIRED("Documentos Requeridos"),
@@ -131,6 +135,9 @@ public class EmailNotification {
         ACCEPTANCE_NOTIFICATION("Notificación de Aceptación"),
         REJECTION_NOTIFICATION("Notificación de Rechazo"),
         ADMISSION_RESULT("Resultado de Admisión"),
+        STUDENT_SELECTION("Selección de Estudiante"),
+        STUDENT_REJECTION("Rechazo de Estudiante"),
+        ADMISSION_RESULTS("Resultados de Admisión"),
         WAITLIST_NOTIFICATION("Lista de Espera"),
         GENERAL_COMMUNICATION("Comunicación General");
         

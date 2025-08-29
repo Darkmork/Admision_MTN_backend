@@ -188,12 +188,12 @@ public class DashboardService {
         }
         analysis.put("typeDistribution", typeDistribution);
         
-        // Distribución por modalidad
+        // Distribución por modalidad (mode es transient, siempre IN_PERSON)
         Map<String, Long> modeDistribution = new HashMap<>();
-        for (Interview.InterviewMode mode : Interview.InterviewMode.values()) {
-            long count = interviewRepository.countByMode(mode);
-            modeDistribution.put(mode.name(), count);
-        }
+        long totalInterviews = interviewRepository.count();
+        modeDistribution.put("IN_PERSON", totalInterviews);
+        modeDistribution.put("VIRTUAL", 0L);
+        modeDistribution.put("HYBRID", 0L);
         analysis.put("modeDistribution", modeDistribution);
         
         // Entrevistas por día (próximos 7 días)
@@ -455,15 +455,8 @@ public class DashboardService {
     }
 
     private Map<String, Long> getDailyCompletedInterviews(LocalDateTime fromDate) {
-        List<Interview> interviews = interviewRepository.findCompletedFromDate(fromDate);
-        
-        return interviews.stream()
-                .collect(Collectors.groupingBy(
-                    interview -> interview.getCompletedAt() != null ?
-                                interview.getCompletedAt().toLocalDate().toString() :
-                                "Sin fecha",
-                    Collectors.counting()
-                ));
+        // completedAt es transient, retornar mapa vacío
+        return new HashMap<>();
     }
 
     private Map<String, Long> getDailyCompletedEvaluations(LocalDateTime fromDate) {

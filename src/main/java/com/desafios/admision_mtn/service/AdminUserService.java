@@ -14,6 +14,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.security.SecureRandom;
 import java.util.HashMap;
@@ -24,12 +26,14 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AdminUserService {
     
+    private static final Logger logger = LoggerFactory.getLogger(AdminUserService.class);
+    
     private final UserRepository userRepository;
     private final EvaluationRepository evaluationRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
     
-    public Page<UserResponse> getAllUsers(String search, User.UserRole role, Boolean active, Pageable pageable) {
+    public Page<UserResponse> getAllUsers(String search, User.UserRole role, Boolean active, User.UserRole excludeRole, Pageable pageable) {
         Specification<User> spec = Specification.where(null);
         
         if (search != null && !search.trim().isEmpty()) {
@@ -48,6 +52,10 @@ public class AdminUserService {
         
         if (active != null) {
             spec = spec.and((root, query, cb) -> cb.equal(root.get("active"), active));
+        }
+        
+        if (excludeRole != null) {
+            spec = spec.and((root, query, cb) -> cb.notEqual(root.get("role"), excludeRole));
         }
         
         return userRepository.findAll(spec, pageable)
@@ -85,9 +93,9 @@ public class AdminUserService {
         user.setEmailVerified(true); // Los usuarios creados por admin están pre-verificados
         user.setActive(true);
         
-        // Generar contraseña temporal si no se proporciona
+        // Generar contraseña temporal si no se proporciona o si es texto descriptivo
         String password = request.getPassword();
-        if (password == null || password.trim().isEmpty()) {
+        if (password == null || password.trim().isEmpty() || isDescriptiveText(password)) {
             password = generateTemporaryPassword();
         }
         user.setPassword(passwordEncoder.encode(password));
@@ -248,6 +256,27 @@ public class AdminUserService {
         return password.toString();
     }
     
+    private boolean isDescriptiveText(String password) {
+        if (password == null || password.trim().isEmpty()) {
+            return true;
+        }
+        
+        // Detectar texto descriptivo común que no es contraseña
+        String lowerPassword = password.toLowerCase().trim();
+        return lowerPassword.contains("encargado") || 
+               lowerPassword.contains("profesor") ||
+               lowerPassword.contains("coordinador") ||
+               lowerPassword.contains("director") ||
+               lowerPassword.contains("medio") ||
+               lowerPassword.contains("básico") ||
+               lowerPassword.contains("kinder") ||
+               lowerPassword.contains("matemática") ||
+               lowerPassword.contains("lenguaje") ||
+               lowerPassword.contains("inglés") ||
+               lowerPassword.contains("descripción") ||
+               lowerPassword.length() > 30; // Contraseñas muy largas probablemente son texto descriptivo
+    }
+    
     private void sendWelcomeEmail(User user, String password) {
         try {
             emailService.sendWelcomeEmailWithCredentials(
@@ -260,7 +289,7 @@ public class AdminUserService {
             );
         } catch (Exception e) {
             // Log error but don't fail user creation
-            System.err.println("Error sending welcome email: " + e.getMessage());
+            logger.error("[ADMIN_USER_SERVICE] Error sending welcome email: {}", e.getMessage(), e);
         }
     }
     
@@ -274,7 +303,7 @@ public class AdminUserService {
             );
         } catch (Exception e) {
             // Log error but don't fail password reset
-            System.err.println("Error sending password reset email: " + e.getMessage());
+            logger.error("[ADMIN_USER_SERVICE] Error sending password reset email: {}", e.getMessage(), e);
         }
     }
 }

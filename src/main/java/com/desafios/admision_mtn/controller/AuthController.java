@@ -7,7 +7,7 @@ import com.desafios.admision_mtn.entity.User;
 import com.desafios.admision_mtn.service.UserService;
 import com.desafios.admision_mtn.security.RateLimitingService;
 import com.desafios.admision_mtn.security.SecurityValidationService;
-import com.desafios.admision_mtn.util.JwtUtil;
+import com.desafios.admision_mtn.service.JwtService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -37,7 +37,7 @@ public class AuthController {
     
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
-    private final JwtUtil jwtUtil;
+    private final JwtService jwtService;
     private final RateLimitingService rateLimitingService;
     private final SecurityValidationService securityValidationService;
     
@@ -109,13 +109,15 @@ public class AuthController {
         }
         
         try {
+            // Usar nuestro servicio de autenticación
             Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
             );
             
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            User user = (User) userDetails;
-            String token = jwtUtil.generateToken(userDetails);
+            // Buscar el usuario después de la autenticación exitosa
+            User user = userService.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+            String token = jwtService.generateToken(user);
             
             log.info("✅ Login exitoso para usuario: {} desde IP: {}", user.getEmail(), clientIp);
             
@@ -175,8 +177,7 @@ public class AuthController {
         
         try {
             User user = userService.registerUser(request);
-            UserDetails userDetails = userService.loadUserByUsername(user.getEmail());
-            String token = jwtUtil.generateToken(userDetails);
+            String token = jwtService.generateToken(user);
             
             log.info("✅ Registro exitoso para usuario: {} desde IP: {}", user.getEmail(), clientIp);
             
@@ -206,6 +207,30 @@ public class AuthController {
         
         boolean exists = userService.existsByEmail(email);
         return ResponseEntity.ok(exists);
+    }
+    
+    // Endpoint temporal de debug para diagnosticar problema de BD
+    @GetMapping("/debug/user")
+    public ResponseEntity<String> debugUser(@RequestParam String email) {
+        try {
+            log.info("🔍 DEBUG: Buscando usuario: {}", email);
+            java.util.Optional<com.desafios.admision_mtn.entity.User> user = userService.findByEmail(email);
+            if (user.isPresent()) {
+                com.desafios.admision_mtn.entity.User u = user.get();
+                String result = String.format("✅ Usuario encontrado: ID=%d, Email=%s, Active=%s, EmailVerified=%s", 
+                    u.getId(), u.getEmail(), u.getActive(), u.getEmailVerified());
+                log.info(result);
+                return ResponseEntity.ok(result);
+            } else {
+                String result = "❌ Usuario NO encontrado: " + email;
+                log.error(result);
+                return ResponseEntity.ok(result);
+            }
+        } catch (Exception e) {
+            String error = "💥 Error en debug: " + e.getMessage();
+            log.error(error, e);
+            return ResponseEntity.ok(error);
+        }
     }
     
     /**
