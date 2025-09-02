@@ -91,6 +91,11 @@ public class SecurityConfig {
                 .requestMatchers("/api/applications/test").permitAll() // Test básico
                 .requestMatchers("/api/debug/**").permitAll() // Debug JDBC y conexión directa
                 .requestMatchers("/api/interviews/public/all").permitAll() // Debug entrevistas para gestión
+                .requestMatchers("/api/interviews/public/complete").permitAll() // Entrevistas completas para frontend
+                .requestMatchers("/api/interviews/public/interviewers").permitAll() // Lista de entrevistadores para testing
+                
+                // 🏗️ ENDPOINTS DE PRUEBA DE MICROSERVICIOS (temporal para testing)
+                .requestMatchers("/api/microservices-test/**").permitAll() // Simulación de microservicios para desarrollo
                 
                 // 🚨 ENDPOINTS REMOVIDOS POR SEGURIDAD:
                 // - /api/test/** (expone contraseñas y datos sensibles)

@@ -5,6 +5,7 @@ import com.desafios.admision_mtn.dto.UpdateUserRequest;
 import com.desafios.admision_mtn.dto.UserResponse;
 import com.desafios.admision_mtn.entity.User;
 import com.desafios.admision_mtn.service.AdminUserService;
+import com.desafios.admision_mtn.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -37,6 +38,7 @@ import java.util.Map;
 public class UserController {
     
     private final AdminUserService adminUserService;
+    private final UserService userService;
     
     @Operation(
         summary = "[ADMIN] Obtener todos los usuarios", 
@@ -316,6 +318,62 @@ public class UserController {
     }
     
     @Operation(
+        summary = "Obtener perfil del usuario actual", 
+        description = "Obtiene la información del perfil del usuario autenticado basado en el JWT token.",
+        security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200", 
+            description = "Perfil del usuario actual",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = UserResponse.class)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "401", 
+            description = "Token no válido o usuario no encontrado"
+        )
+    })
+    @PreAuthorize("isAuthenticated()") // Allow any authenticated user, not just ADMIN
+    @GetMapping("/me")
+    public ResponseEntity<UserResponse> getCurrentUser(java.security.Principal principal) {
+        try {
+            if (principal == null) {
+                log.error("Principal is null - user not authenticated");
+                return ResponseEntity.status(401).build();
+            }
+            
+            String email = principal.getName();
+            log.info("📋 Getting profile for authenticated user: {}", email);
+            
+            // Find user by email and convert to UserResponse
+            User user = userService.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+            
+            UserResponse userResponse = UserResponse.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .role(user.getRole())
+                .educationalLevel(user.getEducationalLevel())
+                .subject(user.getSubject())
+                .phone(user.getPhone())
+                .rut(user.getRut())
+                .active(user.getActive())
+                .emailVerified(user.getEmailVerified())
+                .build();
+            
+            return ResponseEntity.ok(userResponse);
+        } catch (Exception e) {
+            log.error("Error getting current user profile", e);
+            return ResponseEntity.status(401).build();
+        }
+    }
+
+    @Operation(
         summary = "[ADMIN] Obtener estadísticas de usuarios", 
         description = "Obtiene estadísticas completas del sistema de usuarios: total por rol, activos/inactivos, etc.",
         security = @SecurityRequirement(name = "bearerAuth")
@@ -323,26 +381,7 @@ public class UserController {
     @ApiResponses(value = {
         @ApiResponse(
             responseCode = "200", 
-            description = "Estadísticas del sistema de usuarios",
-            content = @Content(
-                mediaType = "application/json",
-                examples = @ExampleObject(value = """
-                    {
-                        "totalUsers": 25,
-                        "activeUsers": 22,
-                        "inactiveUsers": 3,
-                        "usersByRole": {
-                            "ADMIN": 2,
-                            "TEACHER_MATHEMATICS": 8,
-                            "TEACHER_LANGUAGE": 6,
-                            "TEACHER_ENGLISH": 4,
-                            "PSYCHOLOGIST": 3,
-                            "CYCLE_DIRECTOR": 2
-                        },
-                        "recentlyCreated": 3
-                    }
-                    """)
-            )
+            description = "Estadísticas del sistema de usuarios"
         ),
         @ApiResponse(
             responseCode = "403", 
